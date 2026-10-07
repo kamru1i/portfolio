@@ -1,118 +1,112 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA, ServiceItem } from "@/lib/portfolio-data";
 
 export function ServicesSection() {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const sectionRef = useRef<HTMLDivElement>(null);
+
   const services = PORTFOLIO_DATA.services;
 
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   return (
-    <section id="expertise" className="w-full pt-20 md:pt-28 pb-16">
+    <section
+      id="expertise"
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full pt-20 md:pt-28 pb-20 select-none"
+    >
       <HairlineRule className="mb-14 md:mb-20" />
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-start">
-        {/* Section Heading (Left) */}
-        <motion.div
-          initial={{ opacity: 0, x: 80 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-10% 0px" }}
-          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-          className="md:col-span-5"
-        >
-          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl text-white uppercase leading-[1.1] tracking-tight">
+      {/* Split Section: Title (Left) + 5 Rows (Right) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
+        {/* Section Heading (Left, Gambarino 60px) */}
+        <div className="md:col-span-5">
+          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-[60px] text-white uppercase leading-[1.05] tracking-tight">
             EXPERTISE &amp;
             <br />
             SERVICES
           </h2>
-        </motion.div>
+        </div>
 
-        {/* Interactive Services Rows (Right) */}
-        <div className="md:col-span-7 flex flex-col w-full">
-          {services.map((service, index) => (
-            <ServiceRow
-              key={service.id}
-              service={service}
-              index={index}
-              isHovered={hoveredId === service.id}
-              onHover={() => setHoveredId(service.id)}
-              onLeave={() => setHoveredId(null)}
-            />
-          ))}
+        {/* 5 Sleek Service Rows (Right) */}
+        <div className="md:col-span-7 flex flex-col w-full divide-y divide-white/15 border-t border-white/15">
+          {services.map((service, index) => {
+            const isHovered = hoveredIndex === index;
+
+            return (
+              <div
+                key={service.id}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                className="group relative w-full h-[52px] sm:h-[58px] flex items-center justify-between font-mono-custom text-[15px] sm:text-[16px] cursor-pointer transition-colors"
+              >
+                {/* Title */}
+                <span
+                  className={`tracking-wider uppercase transition-colors duration-200 ${
+                    isHovered ? "text-white" : "text-[#a1a1a1] group-hover:text-white"
+                  }`}
+                >
+                  {service.title}
+                </span>
+
+                {/* Index Number */}
+                <span
+                  className={`font-medium transition-colors duration-200 pl-4 ${
+                    isHovered ? "text-white" : "text-[#a1a1a1] group-hover:text-white"
+                  }`}
+                >
+                  {service.index}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
+
+      {/* Floating Image Cursor Follower on Hover */}
+      <AnimatePresence>
+        {hoveredIndex !== null && services[hoveredIndex] && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              x: mousePos.x - 140,
+              y: mousePos.y - 95,
+            }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{
+              type: "spring",
+              damping: 24,
+              stiffness: 280,
+              mass: 0.3,
+            }}
+            className="pointer-events-none absolute z-30 hidden md:block w-[280px] h-[190px] rounded-[10px] overflow-hidden border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.8)] bg-[#111111]"
+          >
+            <Image
+              src={services[hoveredIndex].image}
+              alt={services[hoveredIndex].title}
+              fill
+              className="object-cover"
+              sizes="280px"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
-  );
-}
-
-function ServiceRow({
-  service,
-  index,
-  isHovered,
-  onHover,
-  onLeave,
-}: {
-  service: ServiceItem;
-  index: number;
-  isHovered: boolean;
-  onHover: () => void;
-  onLeave: () => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 100 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-5% 0px" }}
-      transition={{
-        duration: 0.7,
-        delay: index * 0.08,
-        ease: [0.25, 0.1, 0.25, 1],
-      }}
-      className="relative w-full border-b border-white/15 py-5 sm:py-6 cursor-pointer group"
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-    >
-      <div className="flex items-center justify-between font-mono-custom text-[15px] sm:text-[16px]">
-        {/* Title */}
-        <span
-          className={`tracking-wider uppercase transition-colors duration-300 ${
-            isHovered ? "text-white" : "text-[#a1a1a1] group-hover:text-white"
-          }`}
-        >
-          {service.title}
-        </span>
-
-        {/* Floating Center Preview Image on Hover */}
-        <AnimatePresence>
-          {isHovered && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85, y: -4 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: -2 }}
-              transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
-              className="hidden lg:block absolute left-1/2 -translate-x-1/2 -top-12 z-20 pointer-events-none w-52 h-32 rounded-lg overflow-hidden border border-white/20 shadow-2xl bg-[#141414]"
-            >
-              <Image
-                src={service.image}
-                alt={service.title}
-                fill
-                className="object-cover"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Index Number */}
-        <span className="text-white font-medium pl-4">{service.index}</span>
-      </div>
-
-      {/* Description preview that gently expands on mobile or hover */}
-      <div className="mt-2 text-[#888888] font-mono-custom text-[13px] leading-relaxed max-w-xl">
-        {service.description}
-      </div>
-    </motion.div>
   );
 }

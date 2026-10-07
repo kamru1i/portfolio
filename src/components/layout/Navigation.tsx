@@ -11,6 +11,9 @@ interface NavigationProps {
 
 export function Navigation({ initialDelay = 2.3 }: NavigationProps) {
   const [timeStr, setTimeStr] = useState<string>("00:00 PM");
+  const [isScrolledDown, setIsScrolledDown] = useState<boolean>(false);
+
+  const [hasInitialAnimated, setHasInitialAnimated] = useState<boolean>(false);
 
   useEffect(() => {
     function updateClock() {
@@ -33,15 +36,35 @@ export function Navigation({ initialDelay = 2.3 }: NavigationProps) {
     return () => clearInterval(interval);
   }, []);
 
+  // Set initial animation complete after initialDelay
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setHasInitialAnimated(true);
+    }, (initialDelay + 0.5) * 1000);
+    return () => clearTimeout(t);
+  }, [initialDelay]);
+
+  // Reference scroll behavior: hides on scroll down, reveals when scrolled back to top
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolledDown(window.scrollY > 40);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -86 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{
+        opacity: 1,
+        y: isScrolledDown ? -86 : 0,
+      }}
       transition={{
-        type: "spring",
-        damping: 28,
-        stiffness: 180,
-        delay: initialDelay,
+        duration: 0.45,
+        ease: [0.25, 1, 0.5, 1],
+        delay: hasInitialAnimated ? 0 : initialDelay,
       }}
       className="fixed top-0 left-0 right-0 z-40 w-full px-4 sm:px-6 md:px-8 py-5 mix-blend-difference pointer-events-auto"
     >

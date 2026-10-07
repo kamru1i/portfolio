@@ -1,72 +1,99 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
 export function Rotating3DCylinder() {
   const [rotation, setRotation] = useState<number>(0);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [startX, setStartX] = useState<number>(0);
-  const [startRotation, setStartRotation] = useState<number>(0);
-  const animationFrameRef = useRef<number | null>(null);
+  const isDraggingRef = useRef<boolean>(false);
   const isHoveredRef = useRef<boolean>(false);
+  const startXRef = useRef<number>(0);
+  const startRotationRef = useRef<number>(0);
+  const velocityRef = useRef<number>(0);
+  const lastXRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(Date.now());
+  const animFrameRef = useRef<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const cards = PORTFOLIO_DATA.hero.cards;
+  const cards = [
+    { id: 1, image: "/images/hero-card-1.png", title: "AI Visual Storytelling" },
+    { id: 2, image: "/images/hero-card-2.png", title: "Automotive Cinema" },
+    { id: 3, image: "/images/hero-card-3.png", title: "Full-Stack Web Systems" },
+    { id: 4, image: "/images/hero-card-4.png", title: "Digital Infrastructure" },
+    { id: 5, image: "/images/hero-card-5.png", title: "Social Campaign Edits" },
+  ];
+
   const count = cards.length;
   const angleStep = 360 / count; // 72 deg
+  const radius = 286.287; // exact radius from reference
 
-  // Continuous auto-rotation loop
+  // Continuous physics animation loop with momentum and gentle auto-rotation
   useEffect(() => {
-    function animate() {
-      const now = Date.now();
-      const dt = (now - lastTimeRef.current) / 1000;
+    lastTimeRef.current = performance.now();
+
+    const loop = (now: number) => {
+      const dt = Math.min((now - lastTimeRef.current) / 1000, 0.1);
       lastTimeRef.current = now;
 
-      if (!isDragging && !isHoveredRef.current) {
-        // ~18 degrees per second auto-rotation for smooth visible cinematic motion
-        setRotation((prev) => (prev + 16 * dt) % 360);
+      if (!isDraggingRef.current) {
+        if (Math.abs(velocityRef.current) > 0.05) {
+          // Apply friction damping to throw velocity
+          setRotation((prev) => (prev + velocityRef.current * dt * 60) % 360);
+          velocityRef.current *= Math.pow(0.92, dt * 60);
+        } else if (!isHoveredRef.current) {
+          // Gentle cinematic auto-rotation (~2.4 deg per second)
+          setRotation((prev) => (prev + 2.4 * dt) % 360);
+        }
       }
 
-      animationFrameRef.current = requestAnimationFrame(animate);
-    }
-
-    lastTimeRef.current = Date.now();
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      animFrameRef.current = requestAnimationFrame(loop);
     };
-  }, [isDragging]);
 
-  // Pointer drag interactions
+    animFrameRef.current = requestAnimationFrame(loop);
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, []);
+
   const handlePointerDown = (e: React.PointerEvent) => {
-    setIsDragging(true);
-    setStartX(e.clientX);
-    setStartRotation(rotation);
+    isDraggingRef.current = true;
+    startXRef.current = e.clientX;
+    lastXRef.current = e.clientX;
+    startRotationRef.current = rotation;
+    velocityRef.current = 0;
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - startX;
-    // Map pixels to degrees
-    setRotation(startRotation - deltaX * 0.4);
+    if (!isDraggingRef.current) return;
+    const deltaX = e.clientX - startXRef.current;
+    const instantDelta = e.clientX - lastXRef.current;
+    lastXRef.current = e.clientX;
+
+    // Track instant velocity for flick
+    velocityRef.current = -instantDelta * 0.25;
+
+    // Update rotation
+    setRotation(startRotationRef.current - deltaX * 0.35);
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    setIsDragging(false);
+    isDraggingRef.current = false;
     (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
   };
 
   return (
     <div
-      className="relative w-full py-8 flex items-center justify-center overflow-visible select-none cursor-grab active:cursor-grabbing"
-      style={{ perspective: 1100 }}
+      ref={containerRef}
+      className="relative w-full py-4 flex items-center justify-center overflow-visible select-none cursor-grab active:cursor-grabbing"
+      style={{
+        perspective: "3000px",
+        touchAction: "none",
+      }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
       onMouseEnter={() => {
         isHoveredRef.current = true;
       }}
@@ -74,77 +101,77 @@ export function Rotating3DCylinder() {
         isHoveredRef.current = false;
       }}
     >
-      {/* 3D Carousel Cylinder Stage */}
+      {/* 3D Tilt Wrapper (-7deg X tilt) with responsive mobile scaling */}
       <div
-        className="relative flex items-center justify-center transition-transform duration-75"
+        className="transform scale-[0.84] sm:scale-95 md:scale-100 origin-center"
         style={{
-          width: "320px",
-          height: "390px",
           transformStyle: "preserve-3d",
-          transform: `rotateX(-7deg) rotateY(${rotation}deg)`,
+          transform: "rotateX(-7deg)",
         }}
       >
-        {cards.map((card, i) => {
-          const cardAngle = i * angleStep;
+        {/* Stage Container */}
+        <div
+          style={{
+            position: "relative",
+            width: "320px",
+            height: "390px",
+            transformStyle: "preserve-3d",
+            transform: `translateZ(-${radius}px) rotateY(${rotation}deg)`,
+            willChange: "transform",
+          }}
+        >
+          {cards.map((card, i) => {
+            const angle = i * angleStep;
 
-          return (
-            <div
-              key={card.id}
-              className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex flex-col justify-between p-6 transition-opacity"
-              style={{
-                width: "300px",
-                height: "380px",
-                transformStyle: "preserve-3d",
-                transform: `rotateY(${cardAngle}deg) translateZ(286px)`,
-                backgroundColor: card.color,
-                backfaceVisibility: "hidden",
-                WebkitBackfaceVisibility: "hidden",
-              }}
-            >
-              {/* Subtle Ambient Radial Light */}
+            return (
               <div
-                className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen"
+                key={card.id}
                 style={{
-                  background: `radial-gradient(circle at 70% 30%, ${card.accent} 0%, transparent 70%)`,
+                  position: "absolute",
+                  inset: 0,
+                  transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
+                  transformStyle: "preserve-3d",
                 }}
-              />
-
-              {/* Card Top Pill */}
-              <div className="relative z-10 flex items-center justify-between">
-                <span className="font-mono-custom text-[11px] tracking-widest uppercase px-2.5 py-1 rounded-full bg-white/10 text-white/90 border border-white/10">
-                  {card.tag}
-                </span>
-                <span className="font-mono-custom text-[12px] text-white/50">
-                  0{i + 1}
-                </span>
-              </div>
-
-              {/* Center Graphic Silhouette */}
-              <div className="relative z-10 my-auto flex flex-col items-center justify-center">
+              >
+                {/* Front Side: Rich full bleed image with rounded corners and shadow */}
                 <div
-                  className="w-20 h-20 rounded-full border border-white/20 flex items-center justify-center mb-2"
-                  style={{ borderColor: card.accent }}
-                >
-                  <div
-                    className="w-10 h-10 rounded-full opacity-70"
-                    style={{ backgroundColor: card.accent }}
-                  />
-                </div>
-                <div className="h-0.5 w-16 bg-white/20 mt-2" />
-              </div>
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundColor: "transparent",
+                    backgroundImage: `url(${card.image})`,
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45)",
+                  }}
+                />
 
-              {/* Card Bottom Content */}
-              <div className="relative z-10">
-                <h3 className="font-gambarino text-2xl text-white tracking-wide leading-tight">
-                  {card.title}
-                </h3>
-                <p className="font-mono-custom text-[13px] text-white/60 mt-1">
-                  {card.subtitle}
-                </p>
+                {/* Back Side: Mirrored dark interior facing cylinder center */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    transform: "rotateY(180deg)",
+                    backgroundColor: "transparent",
+                    backgroundImage: `url(${card.image})`,
+                    filter: "brightness(0.4) contrast(1.1)",
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45)",
+                  }}
+                />
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

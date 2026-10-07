@@ -8,57 +8,57 @@ export function WorksGrid() {
   const projects = PORTFOLIO_DATA.projects;
 
   return (
-    <div className="w-full flex flex-col gap-16 md:gap-24">
-      {/* Asymmetric Editorial Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-start">
-        {/* Project 1: Biqolpo (AI Video) - Left, col-span-4 */}
+    <div className="w-full flex flex-col gap-24 sm:gap-32 md:gap-40 pb-20">
+      {/* Row 1: Card 1 (Left 352px) + Card 2 (Right 704px) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+        {/* Project 1: Biqolpo (Left, 3-cols / 352px) */}
         {projects[0] && (
-          <div className="col-span-12 md:col-span-4">
-            <WorkCard project={projects[0]} />
+          <div className="col-span-12 md:col-span-3">
+            <WorkCard project={projects[0]} isLarge={false} />
           </div>
         )}
 
-        {/* Project 2: Syston Autos (Automotive Showcase) - Right, col-span-8 */}
+        {/* Project 2: Syston Autos (Right, 6-cols / 704px) */}
         {projects[1] && (
-          <div className="col-span-12 md:col-span-8">
-            <WorkCard project={projects[1]} />
+          <div className="col-span-12 md:col-span-6 md:col-start-7">
+            <WorkCard project={projects[1]} isLarge={true} />
           </div>
         )}
+      </div>
 
-        {/* Project 3: Velocity Digital (Web Platform) - Center, col-span-8 offset-2 */}
+      {/* Row 2: Card 3 (Centered 704px) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+        {/* Project 3: Velocity Digital (Center, 6-cols / 704px) */}
         {projects[2] && (
-          <div className="col-span-12 md:col-span-8 md:col-start-3 md:my-6">
-            <WorkCard project={projects[2]} />
+          <div className="col-span-12 md:col-span-6 md:col-start-4">
+            <WorkCard project={projects[2]} isLarge={true} />
           </div>
         )}
+      </div>
 
-        {/* Project 4: B&F Corporate (IT Infrastructure) - Left, col-span-8 */}
+      {/* Row 3: Card 4 (Left 704px) + Card 5 (Right 352px + Explore More) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+        {/* Project 4: B&F Corporate IT (Left, 6-cols / 704px) */}
         {projects[3] && (
-          <div className="col-span-12 md:col-span-8">
-            <WorkCard project={projects[3]} />
+          <div className="col-span-12 md:col-span-6">
+            <WorkCard project={projects[3]} isLarge={true} />
           </div>
         )}
 
-        {/* Project 5: B&F Cars (Automotive Social) - Right, col-span-4 */}
+        {/* Project 5: B&F Cars (Right, 3-cols / 352px) */}
         {projects[4] && (
-          <div className="col-span-12 md:col-span-4 flex flex-col justify-between h-full">
-            <WorkCard project={projects[4]} />
+          <div className="col-span-12 md:col-span-3 md:col-start-10 flex flex-col justify-between">
+            <WorkCard project={projects[4]} isLarge={false} />
 
             {/* Explore More CTA matching reference */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="mt-8 pt-4"
-            >
+            <div className="mt-16 sm:mt-24 pt-4">
               <a
                 href="#works"
                 className="font-mono-custom text-[15px] sm:text-[16px] text-white hover-underline-link tracking-wide"
               >
-                Explore More Works
+                Explore More
               </a>
-            </motion.div>
+            </div>
           </div>
         )}
       </div>

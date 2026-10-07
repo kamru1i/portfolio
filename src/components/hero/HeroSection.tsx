@@ -23,7 +23,7 @@ export function HeroSection({ initialDelay = 2.4 }: HeroSectionProps) {
         }}
         className="w-full text-center select-none"
       >
-        <h1 className="font-gambarino text-[12vw] sm:text-[11vw] md:text-[120px] lg:text-[160px] xl:text-[180px] leading-[0.95] tracking-[-0.01em] text-white uppercase mx-auto">
+        <h1 className="font-gambarino text-[46px] lg:text-[80px] xl:text-[100px] leading-[0.9] tracking-[-0.01em] text-white uppercase mx-auto">
           {PORTFOLIO_DATA.hero.wordmark}
         </h1>
       </motion.div>

@@ -113,7 +113,7 @@ export const PORTFOLIO_DATA = {
   projects: [
     {
       id: "biqolpo",
-      title: "Biqolpo — AI Visual Storytelling",
+      title: "Biqolpo — Latent Stories",
       category: "AI-Assisted Video & Content Creation",
       client: "Biqolpo",
       year: "2024–2026",
@@ -122,7 +122,7 @@ export const PORTFOLIO_DATA = {
         "End-to-end AI video production, prompt engineering, scene composition, and post-production refinement using Veo, Sora, Kling, and DaVinci Resolve.",
       aspect: "small",
       colSpan: "col-span-12 md:col-span-4",
-      image: "/images/project-biqolpo.svg",
+      image: "/images/work-1-biqolpo.png",
       tags: ["Google Veo", "Kling 3.0", "DaVinci Resolve", "AI Compositing"],
       links: [
         { label: "Video 01", url: "#" },
@@ -132,7 +132,7 @@ export const PORTFOLIO_DATA = {
     },
     {
       id: "syston-autos",
-      title: "Syston Autos — High-Octane Showcase",
+      title: "Syston Autos Cinema",
       category: "Social Media & Short-Form Video Production",
       client: "Syston Autos Ltd",
       year: "2024–2025",
@@ -141,7 +141,7 @@ export const PORTFOLIO_DATA = {
         "Short-form automotive promotional series with precision rhythm, speed ramping, engine audio enhancement, and cinematic color grading across 6 episodes.",
       aspect: "large",
       colSpan: "col-span-12 md:col-span-8",
-      image: "/images/project-syston.svg",
+      image: "/images/work-2-syston.png",
       tags: ["Premiere Pro", "After Effects", "Sound Design", "Color Grading"],
       links: [
         { label: "Video 01", url: "#" },
@@ -154,7 +154,7 @@ export const PORTFOLIO_DATA = {
     },
     {
       id: "velocity-digital",
-      title: "Velocity Digital — Modern Interface Systems",
+      title: "Velocity Interface System",
       category: "Front-End Development & UI Engineering",
       client: "Velocity Digital Inc.",
       year: "2023–2024",
@@ -163,13 +163,13 @@ export const PORTFOLIO_DATA = {
         "Modular, component-driven web interfaces built in React.js, Tailwind CSS, and TypeScript with fluid animations, REST API integrations, and responsive UX.",
       aspect: "large",
       colSpan: "col-span-12 md:col-span-8 md:col-start-3",
-      image: "/images/project-web.svg",
+      image: "/images/work-3-web.png",
       tags: ["React.js", "TypeScript", "Tailwind CSS", "REST APIs"],
       links: [{ label: "View Architecture", url: "#" }],
     },
     {
       id: "bf-corporate-infra",
-      title: "B&F Corporate — Digital Infrastructure",
+      title: "B&F Corporate Infrastructure",
       category: "IT Operations & Cloud Management",
       client: "B&F Corporate",
       year: "2024–2026",
@@ -178,13 +178,13 @@ export const PORTFOLIO_DATA = {
         "Multi-domain web hosting architecture, DNS/SSL lifecycle management, enterprise email servers, VPN routing, malware shielding, and office network uptime.",
       aspect: "large",
       colSpan: "col-span-12 md:col-span-8",
-      image: "/images/project-it.svg",
+      image: "/images/work-4-it.png",
       tags: ["cPanel Hosting", "DNS / SSL", "Network VPN", "Security Maintenance"],
       links: [{ label: "Operations Overview", url: "#" }],
     },
     {
       id: "bf-cars",
-      title: "B&F Cars — Social Campaign Edit",
+      title: "B&F Cars Automotive",
       category: "Automotive Social Media Video Editing",
       client: "B&F Cars",
       year: "2024–2025",
@@ -193,7 +193,7 @@ export const PORTFOLIO_DATA = {
         "Fast-paced promotional video series focused on vehicular presentation, crisp transitions, motion graphics badges, and multi-platform optimization.",
       aspect: "small",
       colSpan: "col-span-12 md:col-span-4",
-      image: "/images/project-bfcars.svg",
+      image: "/images/work-5-bfcars.png",
       tags: ["CapCut Pro", "Premiere Pro", "Motion Graphics", "Social Format"],
       links: [
         { label: "Video 01", url: "#" },
@@ -226,7 +226,7 @@ export const PORTFOLIO_DATA = {
       description:
         "Storytelling, narrative flow, rhythm, noise reduction, audio mixing, color correction & grading, motion graphics, and platform delivery.",
       tools: ["Premiere Pro", "DaVinci Resolve", "After Effects", "CapCut", "Audacity"],
-      image: "/images/service-video.svg",
+      image: "/images/service-1.png",
     },
     {
       id: "ai",
@@ -235,7 +235,7 @@ export const PORTFOLIO_DATA = {
       description:
         "Concept design, script writing, scene planning, AI video & image generation, voiceover synthesis, asset blending, and post-refinement.",
       tools: ["Gemini Omni Flash", "Google Veo", "ChatGPT Sora", "Kling 3.0", "Higgsfield Soul"],
-      image: "/images/service-ai.svg",
+      image: "/images/service-2.png",
     },
     {
       id: "web",
@@ -244,7 +244,7 @@ export const PORTFOLIO_DATA = {
       description:
         "Responsive UI engineering, React.js, Next.js, TypeScript, Tailwind CSS, Node.js, Express, MongoDB, Supabase, and WordPress/Elementor.",
       tools: ["Next.js", "React.js", "TypeScript", "Tailwind CSS", "Node.js", "WordPress"],
-      image: "/images/service-web.svg",
+      image: "/images/service-3.png",
     },
     {
       id: "it",
@@ -253,7 +253,16 @@ export const PORTFOLIO_DATA = {
       description:
         "cPanel hosting administration, domain & DNS configuration, SSL lifecycle, enterprise email, VPN management, LAN troubleshooting, and CCTV.",
       tools: ["cPanel", "GoDaddy", "DNS / SSL", "Outlook", "Office 365", "VPN / LAN"],
-      image: "/images/service-it.svg",
+      image: "/images/service-4.png",
+    },
+    {
+      id: "motion",
+      index: "05",
+      title: "MOTION GRAPHICS & SOUND DESIGN",
+      description:
+        "Kinetic typography, multi-layered visual effects, speed ramping, sound design synthesis, audio restoration, and broadcast finishing.",
+      tools: ["After Effects", "DaVinci Fairlight", "Audition", "Cinema 4D"],
+      image: "/images/service-5.png",
     },
   ] as ServiceItem[],
 

@@ -6,12 +6,12 @@ import { StatItem } from "@/lib/portfolio-data";
 
 export function OdometerCounters({ stats }: { stats: StatItem[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: "-10% 0px" });
+  const isInView = useInView(containerRef, { once: true, margin: "0px 0px -50px 0px" });
 
   return (
     <div
       ref={containerRef}
-      className="w-full pt-20 md:pt-28 pb-12 grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-start"
+      className="w-full grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-start select-none"
     >
       {stats.map((stat, i) => (
         <CounterColumn key={i} stat={stat} index={i} triggered={isInView} />
@@ -33,7 +33,7 @@ function CounterColumn({
 
   return (
     <div className="flex flex-col">
-      {/* Rolling Digits Display */}
+      {/* Rolling Digits Display in Gambarino 120px */}
       <div className="font-gambarino text-7xl sm:text-8xl md:text-[100px] lg:text-[120px] text-white leading-none tracking-[-0.02em] flex items-center select-none overflow-hidden h-[1em]">
         <div className="inline-flex items-center">
           {digits.map((digit, dIdx) => (
@@ -50,7 +50,7 @@ function CounterColumn({
         </div>
       </div>
 
-      {/* Label */}
+      {/* Label in Roboto Mono 16px */}
       <span className="font-mono-custom text-[15px] sm:text-[16px] text-[#a1a1a1] mt-4 tracking-wide">
         {stat.label}
       </span>
@@ -74,11 +74,11 @@ function DigitReel({
       <motion.div
         className="flex flex-col will-change-transform"
         initial={{ y: "0em" }}
-        animate={triggered ? { y: `-${targetDigit}em` } : { y: "0em" }}
+        animate={{ y: triggered ? `-${targetDigit}em` : "0em" }}
         transition={{
           duration: 1.8,
           delay,
-          ease: [0.16, 1, 0.3, 1], // Expo-out rolling brake curve
+          ease: [0.16, 1, 0.3, 1], // Expo-out rolling curve
         }}
       >
         {numbers.map((n) => (
