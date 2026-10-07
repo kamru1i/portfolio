@@ -1,128 +1,214 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
-export function Rotating3DCylinder() {
-  const [rotation, setRotation] = useState<number>(0);
-  const isDraggingRef = useRef<boolean>(false);
-  const isHoveredRef = useRef<boolean>(false);
-  const startXRef = useRef<number>(0);
-  const startRotationRef = useRef<number>(0);
-  const velocityRef = useRef<number>(0);
-  const lastXRef = useRef<number>(0);
-  const lastTimeRef = useRef<number>(Date.now());
-  const animFrameRef = useRef<number | null>(null);
+interface Rotating3DCylinderProps {
+  imageWidth?: number;
+  imageHeight?: number;
+  tilt?: number;
+  perspective?: number;
+  cornerRadius?: number;
+  speed?: number;
+  sensitivity?: number;
+  innerDim?: number;
+}
+
+export function Rotating3DCylinder({
+  imageWidth = 320,
+  imageHeight = 390,
+  tilt = -7,
+  perspective = 3000,
+  cornerRadius = 16,
+  speed = 2,
+  sensitivity = 5,
+  innerDim = 5.5,
+}: Rotating3DCylinderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cylinderRef = useRef<HTMLDivElement>(null);
+  const animFrameRef = useRef<number | null>(null);
+
+  // High-performance physics refs (avoiding React re-renders during RAF and drag)
+  // Initial angle 178deg matches exact reference screenshot with blue collage card and floral silhouette in front view
+  const rotRef = useRef<number>(178);
+  const velocityRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(0);
+  const dragStateRef = useRef<{ active: boolean; x: number }>({ active: false, x: 0 });
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  // Responsive spacing: 2 on desktop/tablet, 1 on mobile
+  const [spacing, setSpacing] = useState<number>(2);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSpacing(window.innerWidth < 768 ? 1 : 2);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const cards = [
-    { id: 1, image: "/images/hero-card-1.png", title: "AI Visual Storytelling" },
-    { id: 2, image: "/images/hero-card-2.png", title: "Automotive Cinema" },
-    { id: 3, image: "/images/hero-card-3.png", title: "Full-Stack Web Systems" },
-    { id: 4, image: "/images/hero-card-4.png", title: "Digital Infrastructure" },
-    { id: 5, image: "/images/hero-card-5.png", title: "Social Campaign Edits" },
+    {
+      id: 1,
+      src: "/images/hero-card-1.png",
+      alt: "Architectural Editorial Portrait",
+    },
+    {
+      id: 2,
+      src: "/images/hero-card-2.png", // Vibrant Cobalt Blue with collage cutout
+      alt: "Vibrant Cobalt Blue Collage Cutout",
+    },
+    {
+      id: 3,
+      src: "/images/hero-card-3.png",
+      alt: "Cinematic Film Narrative",
+    },
+    {
+      id: 4,
+      src: "/images/hero-card-4.png", // Warm orange figure
+      alt: "Atmospheric Amber Motion",
+    },
+    {
+      id: 5,
+      src: "/images/hero-card-5.png", // Grain monochrome floral portrait
+      alt: "Grain Monochrome Floral Portrait",
+    },
   ];
 
   const count = cards.length;
   const angleStep = 360 / count; // 72 deg
-  const radius = 286.287; // exact radius from reference
+  // Exact radius formula from reference:
+  // k = imageWidth * (1 + spacing * 0.15) / (2 * Math.tan(Math.PI / count))
+  const radius = (imageWidth * (1 + spacing * 0.15)) / (2 * Math.tan(Math.PI / count));
+  const autoRotateSpeed = speed * 6; // 12 deg/sec clockwise
 
-  // Continuous physics animation loop with momentum and gentle auto-rotation
+  // Main RAF Physics & Render Loop matching exact reference implementation
   useEffect(() => {
-    lastTimeRef.current = performance.now();
+    const cylinder = cylinderRef.current;
+    if (!cylinder) return;
 
-    const loop = (now: number) => {
-      const dt = Math.min((now - lastTimeRef.current) / 1000, 0.1);
-      lastTimeRef.current = now;
+    const updateTransform = () => {
+      if (!cylinder) return;
+      cylinder.style.transform = `translateZ(${-radius}px) rotateY(${rotRef.current}deg)`;
+    };
 
-      if (!isDraggingRef.current) {
-        if (Math.abs(velocityRef.current) > 0.05) {
-          // Apply friction damping to throw velocity
-          setRotation((prev) => (prev + velocityRef.current * dt * 60) % 360);
-          velocityRef.current *= Math.pow(0.92, dt * 60);
-        } else if (!isHoveredRef.current) {
-          // Gentle cinematic auto-rotation (~2.4 deg per second)
-          setRotation((prev) => (prev + 2.4 * dt) % 360);
+    updateTransform();
+
+    const loop = (time: number) => {
+      const dt = lastTimeRef.current ? Math.min((time - lastTimeRef.current) / 1000, 0.1) : 0;
+      lastTimeRef.current = time;
+
+      if (!dragStateRef.current.active) {
+        if (Math.abs(velocityRef.current) > 0.01) {
+          // Physics momentum damping (exact 0.94 decay factor per frame)
+          rotRef.current += velocityRef.current * dt;
+          velocityRef.current *= 0.94;
+        } else {
+          // Continuous smooth auto-rotation
+          rotRef.current += autoRotateSpeed * dt;
         }
       }
 
+      updateTransform();
       animFrameRef.current = requestAnimationFrame(loop);
     };
 
     animFrameRef.current = requestAnimationFrame(loop);
+
     return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+      }
     };
+  }, [radius, autoRotateSpeed]);
+
+  // Pointer Event Handlers matching exact reference implementation
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    try {
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    } catch {}
+    dragStateRef.current = { active: true, x: e.clientX };
+    velocityRef.current = 0;
+    setIsDragging(true);
   }, []);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    isDraggingRef.current = true;
-    startXRef.current = e.clientX;
-    lastXRef.current = e.clientX;
-    startRotationRef.current = rotation;
-    velocityRef.current = 0;
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-  };
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!dragStateRef.current.active) return;
+      e.preventDefault();
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current) return;
-    const deltaX = e.clientX - startXRef.current;
-    const instantDelta = e.clientX - lastXRef.current;
-    lastXRef.current = e.clientX;
+      const deltaX = e.clientX - dragStateRef.current.x;
+      dragStateRef.current.x = e.clientX;
+      const rate = 0.3 * sensitivity; // 1.5 deg/pixel
 
-    // Track instant velocity for flick
-    velocityRef.current = -instantDelta * 0.25;
+      rotRef.current += deltaX * rate;
+      velocityRef.current = deltaX * rate * 60; // Instant throw velocity scaled to 60fps
+    },
+    [sensitivity]
+  );
 
-    // Update rotation
-    setRotation(startRotationRef.current - deltaX * 0.35);
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    isDraggingRef.current = false;
-    (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
-  };
+  const handlePointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture?.(e.pointerId);
+    } catch {}
+    dragStateRef.current.active = false;
+    setIsDragging(false);
+  }, []);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full py-4 flex items-center justify-center overflow-visible select-none cursor-grab active:cursor-grabbing"
+      id="hero-3d-cylinder"
+      data-testid="hero-3d-cylinder"
+      data-lenis-prevent
+      className={`relative w-full h-[390px] flex items-center justify-center overflow-hidden select-none ${
+        isDragging ? "cursor-grabbing" : "cursor-grab"
+      }`}
       style={{
-        perspective: "3000px",
+        perspective: `${perspective}px`,
         touchAction: "none",
+        background: "rgba(0, 0, 0, 0)",
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      onMouseEnter={() => {
-        isHoveredRef.current = true;
-      }}
-      onMouseLeave={() => {
-        isHoveredRef.current = false;
-      }}
     >
-      {/* 3D Tilt Wrapper (-7deg X tilt) with responsive mobile scaling */}
+      {/* Ambient Lighting Glow for atmospheric depth */}
       <div
-        className="transform scale-[0.84] sm:scale-95 md:scale-100 origin-center"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
+        aria-hidden="true"
+      >
+        <div
+          className="w-[440px] h-[440px] rounded-full blur-[100px] opacity-20"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(30, 80, 200, 0.4) 0%, rgba(200, 90, 20, 0.15) 50%, transparent 75%)",
+          }}
+        />
+      </div>
+
+      {/* 3D Tilt Wrapper (-7deg tilt along X-axis matching reference) */}
+      <div
         style={{
           transformStyle: "preserve-3d",
-          transform: "rotateX(-7deg)",
+          transform: `rotateX(${tilt}deg)`,
         }}
       >
-        {/* Stage Container */}
+        {/* Stage Center Cylinder */}
         <div
+          ref={cylinderRef}
           style={{
             position: "relative",
-            width: "320px",
-            height: "390px",
+            width: `${imageWidth}px`,
+            height: `${imageHeight}px`,
             transformStyle: "preserve-3d",
-            transform: `translateZ(-${radius}px) rotateY(${rotation}deg)`,
             willChange: "transform",
           }}
         >
-          {cards.map((card, i) => {
-            const angle = i * angleStep;
-
+          {cards.map((card, idx) => {
+            const angle = idx * angleStep;
             return (
               <div
                 key={card.id}
@@ -133,29 +219,29 @@ export function Rotating3DCylinder() {
                   transformStyle: "preserve-3d",
                 }}
               >
-                {/* Front Side: Rich full bleed image with rounded corners and shadow */}
+                {/* Front Face: High-fidelity image, 16px corner radius, soft depth shadow */}
                 <div
                   style={{
                     position: "absolute",
                     inset: 0,
-                    borderRadius: "16px",
+                    borderRadius: `${cornerRadius}px`,
                     overflow: "hidden",
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundColor: "transparent",
-                    backgroundImage: `url(${card.image})`,
-                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45)",
+                    backgroundImage: `url(${card.src})`,
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
                   }}
                 />
 
-                {/* Back Side: Mirrored dark interior facing cylinder center */}
+                {/* Back Face: Mirrored interior facing cylinder center, dimmed brightness */}
                 <div
                   style={{
                     position: "absolute",
                     inset: 0,
-                    borderRadius: "16px",
+                    borderRadius: `${cornerRadius}px`,
                     overflow: "hidden",
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
@@ -163,9 +249,8 @@ export function Rotating3DCylinder() {
                     backgroundPosition: "center",
                     transform: "rotateY(180deg)",
                     backgroundColor: "transparent",
-                    backgroundImage: `url(${card.image})`,
-                    filter: "brightness(0.4) contrast(1.1)",
-                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45)",
+                    backgroundImage: `url(${card.src})`,
+                    filter: `brightness(${innerDim / 10})`,
                   }}
                 />
               </div>

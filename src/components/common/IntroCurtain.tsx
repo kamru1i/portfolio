@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface IntroCurtainProps {
   brandName?: string;
@@ -13,6 +13,8 @@ export function IntroCurtain({
   onFinish,
 }: IntroCurtainProps) {
   const [stage, setStage] = useState<"enter" | "exit" | "done">("enter");
+  const onFinishRef = useRef(onFinish);
+  onFinishRef.current = onFinish;
 
   useEffect(() => {
     // Stage 1: letter reveal finishes around 1400ms
@@ -23,14 +25,14 @@ export function IntroCurtain({
     // Stage 2: curtain finishes sliding down at ~2600ms
     const timerDone = setTimeout(() => {
       setStage("done");
-      if (onFinish) onFinish();
+      if (onFinishRef.current) onFinishRef.current();
     }, 2650);
 
     return () => {
       clearTimeout(timerExit);
       clearTimeout(timerDone);
     };
-  }, [onFinish]);
+  }, []);
 
   if (stage === "done") return null;
 
@@ -40,7 +42,9 @@ export function IntroCurtain({
     <AnimatePresence>
       <motion.div
         key="curtain"
-        className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black overflow-hidden select-none pointer-events-auto"
+        className={`fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black overflow-hidden select-none ${
+          stage === "exit" ? "pointer-events-none" : "pointer-events-auto"
+        }`}
         initial={{ y: 0 }}
         animate={
           stage === "exit"
