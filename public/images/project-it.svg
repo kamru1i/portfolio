@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <linearGradient id="bgIt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bgIt)"/>
+  <!-- Server Topology Grid -->
+  <g stroke="#38bdf8" stroke-opacity="0.25" stroke-width="1" fill="none">
+    <circle cx="600" cy="450" r="180"/>
+    <circle cx="600" cy="450" r="280" stroke-dasharray="6 6"/>
+    <circle cx="600" cy="450" r="380"/>
+    <line x1="100" y1="450" x2="1100" y2="450"/>
+    <line x1="600" y1="100" x2="600" y2="800"/>
+    <line x1="250" y1="200" x2="950" y2="700"/>
+    <line x1="250" y1="700" x2="950" y2="200"/>
+  </g>
+  <!-- Node Circles & Indicators -->
+  <g fill="#38bdf8">
+    <circle cx="600" cy="450" r="12"/>
+    <circle cx="420" cy="450" r="8"/>
+    <circle cx="780" cy="450" r="8"/>
+    <circle cx="600" cy="270" r="8"/>
+    <circle cx="600" cy="630" r="8"/>
+    <circle cx="350" cy="270" r="6" fill="#34d399"/>
+    <circle cx="850" cy="270" r="6" fill="#34d399"/>
+    <circle cx="350" cy="630" r="6" fill="#34d399"/>
+    <circle cx="850" cy="630" r="6" fill="#34d399"/>
+  </g>
+  <!-- Architecture Labels -->
+  <g font-family="monospace" font-size="13" fill="#bae6fd" letter-spacing="2">
+    <text x="620" y="445">CORE: cPanel HOSTING &amp; DNS CLUSTER</text>
+    <text x="440" y="440">SSL CERT AUTO-RENEW</text>
+    <text x="790" y="440">OFFICE LAN / VPN</text>
+    <text x="60" y="80">B&amp;F CORPORATE INFRASTRUCTURE</text>
+    <text x="60" y="105" fill="#34d399">STATUS: 99.98% UPTIME</text>
+    <text x="1140" y="80" text-anchor="end">SYSADMIN 2024–2026</text>
+  </g>
+</svg>

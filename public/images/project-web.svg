@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <rect width="1200" height="900" fill="#d4d4d8"/>
+  <!-- Giant Bold Typography Blocks -->
+  <text x="600" y="300" font-family="sans-serif" font-weight="900" font-size="280" fill="#18181b" text-anchor="middle" letter-spacing="-10">DEV!</text>
+  <line x1="80" y1="360" x2="1120" y2="360" stroke="#18181b" stroke-width="3"/>
+  <g font-family="monospace" font-size="14" fill="#27272a">
+    <text x="100" y="410">FRAMEWORK: NEXT.JS 15</text>
+    <text x="500" y="410">STACK: REACT / TYPESCRIPT</text>
+    <text x="900" y="410">STYLE: TAILWIND CSS</text>
+  </g>
+  <line x1="80" y1="440" x2="1120" y2="440" stroke="#18181b" stroke-width="3"/>
+  <text x="600" y="690" font-family="sans-serif" font-weight="900" font-size="280" fill="#18181b" text-anchor="middle" letter-spacing="-10">CODE</text>
+  <line x1="80" y1="740" x2="1120" y2="740" stroke="#18181b" stroke-width="3"/>
+  <g font-family="monospace" font-size="14" fill="#27272a">
+    <text x="100" y="785">API: REST + GRAPHQL</text>
+    <text x="500" y="785">STATE: MODULAR REACT</text>
+    <text x="900" y="785">VELOCITY DIGITAL INC.</text>
+  </g>
+</svg>

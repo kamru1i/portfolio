@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <rect width="800" height="1000" fill="#090514"/>
+  <!-- Angular Geometric Purple Slices -->
+  <polygon points="120,80 680,180 580,820 80,720" fill="#6b21a8" opacity="0.6"/>
+  <polygon points="200,160 740,240 640,880 140,800" fill="#a855f7" opacity="0.3"/>
+  <!-- Dynamic Typographic Cut -->
+  <text x="400" y="520" font-family="sans-serif" font-weight="900" font-size="120" fill="#ffffff" text-anchor="middle" letter-spacing="4">B&amp;F CARS</text>
+  <text x="400" y="580" font-family="monospace" font-size="18" fill="#e9d5ff" text-anchor="middle" letter-spacing="6">AUTOMOTIVE EDITORIAL</text>
+  <g font-family="monospace" font-size="13" fill="#ffffff" opacity="0.8">
+    <text x="60" y="90">CAMPAIGN // SOCIAL</text>
+    <text x="60" y="940">PACING · AUDIO FX · COLOR GRADE</text>
+    <text x="740" y="940" text-anchor="end">05 REELS</text>
+  </g>
+</svg>

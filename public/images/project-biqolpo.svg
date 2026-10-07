@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs>
+    <radialGradient id="g1" cx="60%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#ff5500" stop-opacity="0.9"/>
+      <stop offset="45%" stop-color="#661100" stop-opacity="0.6"/>
+      <stop offset="85%" stop-color="#0a0a0a" stop-opacity="1"/>
+    </radialGradient>
+    <filter id="noise" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.18 0"/>
+      <feComposite in2="SourceGraphic" in="glitch" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+    </filter>
+  </defs>
+  <rect width="800" height="1000" fill="#09090b"/>
+  <circle cx="480" cy="460" r="320" fill="url(#g1)"/>
+  <!-- Silhouette Figure -->
+  <g fill="#000" opacity="0.9">
+    <ellipse cx="440" cy="380" rx="42" ry="54"/>
+    <path d="M 390 440 Q 440 430 490 440 L 520 720 L 360 720 Z"/>
+    <path d="M 440 440 Q 580 470 680 500 L 640 540 Q 540 500 440 470 Z" opacity="0.6"/>
+  </g>
+  <!-- Technical Monospace Overlay -->
+  <g font-family="monospace" font-size="14" fill="#ffffff" opacity="0.75" letter-spacing="2">
+    <text x="50" y="80">BIQOLPO // AI LAB</text>
+    <text x="50" y="105" opacity="0.5">MODEL: VEO + KLING 3.0</text>
+    <text x="50" y="900">SCENE 03 : LATENT CHRONICLES</text>
+    <text x="50" y="925" opacity="0.5">FRAME RATE: 24.0 FPS CINEMATIC</text>
+    <text x="650" y="80" text-anchor="end">4K RAW</text>
+  </g>
+  <!-- Framing Hairlines -->
+  <line x1="50" y1="130" x2="750" y2="130" stroke="#ffffff" stroke-opacity="0.15"/>
+  <line x1="50" y1="860" x2="750" y2="860" stroke="#ffffff" stroke-opacity="0.15"/>
+</svg>
