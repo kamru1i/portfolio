@@ -95,6 +95,8 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
 
   if (!project) return null;
 
+  const isPortrait = project.format === "9:16";
+
   return (
     <AnimatePresence>
       <motion.div
@@ -112,7 +114,9 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative w-full max-w-5xl rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col"
+          className={`relative w-full ${
+            isPortrait ? "max-w-md" : "max-w-5xl"
+          } rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col`}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -122,7 +126,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#181818]/80">
             <div className="flex items-center gap-3">
               <span className="font-mono-custom text-xs uppercase px-2.5 py-1 rounded-full bg-white/10 text-white/80 border border-white/10">
-                {project.client || "Video Production"}
+                {isPortrait ? "9:16 Reel" : project.client || "Video Production"}
               </span>
               <h3 className="font-sans font-medium text-base sm:text-lg text-white truncate max-w-md">
                 {project.title}
@@ -140,7 +144,11 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           </div>
 
           {/* Video Player Container */}
-          <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden group">
+          <div
+            className={`relative w-full ${
+              isPortrait ? "aspect-[9/16] max-h-[70vh]" : "aspect-video"
+            } bg-black flex items-center justify-center overflow-hidden group mx-auto`}
+          >
             {project.videoUrl ? (
               <video
                 ref={videoRef}

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { EditorialListCard } from "@/components/common/EditorialListCard";
+import { SectionBadge } from "@/components/common/SectionBadge";
 import { OdometerCounters } from "./OdometerCounters";
 
 export function AwardsSection() {
@@ -26,6 +27,7 @@ export function AwardsSection() {
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           className="flex flex-col"
         >
+          <SectionBadge label="MILESTONES" />
           <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
             Milestones &amp; Recognitions
           </h2>

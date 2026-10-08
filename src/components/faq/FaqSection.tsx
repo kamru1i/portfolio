@@ -6,6 +6,7 @@ import Image from "next/image";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
+import { SectionBadge } from "@/components/common/SectionBadge";
 
 export function FaqSection() {
   const faqData = PORTFOLIO_DATA.faq;
@@ -34,10 +35,7 @@ export function FaqSection() {
           {/* Top Metadata & Heading */}
           <div>
             {/* FAQ Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-white/85 font-mono-custom text-xs uppercase tracking-widest mb-6 w-fit backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              {faqData.badge}
-            </div>
+            <SectionBadge label={faqData.badge || "FAQ"} />
 
             {/* Patrick Jane Editorial Serif Headline */}
             <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase text-balance">

@@ -26,6 +26,8 @@ export interface PortfolioProject {
   thumbnail: string;
   videoUrl?: string;
   videoType?: "local" | "youtube" | "vimeo";
+  format?: "16:9" | "9:16";
+  aspect?: "small" | "large" | "medium";
   githubUrl?: string;
   liveUrl?: string;
   canEmbed?: boolean;
@@ -270,6 +272,8 @@ export const PORTFOLIO_DATA = {
     {
       id: "syston-autos-video",
       type: "video",
+      format: "16:9",
+      aspect: "large",
       title: "Syston Autos Cinema",
       client: "Syston Autos Ltd",
       year: "2024–2025",
@@ -285,6 +289,8 @@ export const PORTFOLIO_DATA = {
     {
       id: "biqolpo-ai-video",
       type: "video",
+      format: "16:9",
+      aspect: "small",
       title: "Biqolpo — Latent Stories",
       client: "Biqolpo",
       year: "2024–2026",
@@ -300,6 +306,8 @@ export const PORTFOLIO_DATA = {
     {
       id: "bf-cars-video",
       type: "video",
+      format: "9:16",
+      aspect: "large",
       title: "B&F Cars Automotive",
       client: "B&F Cars",
       year: "2024–2025",
@@ -308,13 +316,14 @@ export const PORTFOLIO_DATA = {
       thumbnail: "/images/work-5-bfcars.png",
       videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
       videoType: "local",
-      tags: ["CapCut Pro", "Premiere Pro", "Motion Graphics", "9:16 Vertical"],
+      tags: ["CapCut Pro", "Premiere Pro", "Motion Graphics", "9:16 Vertical Reel"],
       published: true,
       order: 3,
     },
     {
       id: "velocity-interface-web",
       type: "web",
+      aspect: "large",
       title: "Velocity Interface System",
       client: "Velocity Digital Inc.",
       year: "2023–2024",
@@ -331,6 +340,7 @@ export const PORTFOLIO_DATA = {
     {
       id: "portfolio-architectural-web",
       type: "web",
+      aspect: "small",
       title: "Kamrul Islam — Architectural Portfolio",
       client: "Independent",
       year: "2026",
@@ -347,6 +357,7 @@ export const PORTFOLIO_DATA = {
     {
       id: "jobmatching-portal-web",
       type: "web",
+      aspect: "large",
       title: "JobMatchingBD Career Portal",
       client: "JobMatchingBD.com",
       year: "2022–2023",

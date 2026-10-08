@@ -7,6 +7,7 @@ import Image from "next/image";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA, ServiceItem } from "@/lib/portfolio-data";
 import { EditorialListCard } from "@/components/common/EditorialListCard";
+import { SectionBadge } from "@/components/common/SectionBadge";
 
 export function ServicesSection() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -41,6 +42,7 @@ export function ServicesSection() {
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           className="flex flex-col"
         >
+          <SectionBadge label="SERVICES" />
           <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
             Expertise &amp; Services
           </h2>
