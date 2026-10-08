@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Link from "next/link";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
@@ -9,10 +9,27 @@ interface NavigationProps {
   isRevealed?: boolean;
 }
 
+function subscribeDesktop(callback: () => void) {
+  const mql = window.matchMedia("(min-width: 1024px)");
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+function getDesktopSnapshot() {
+  return window.matchMedia("(min-width: 1024px)").matches;
+}
+function getServerDesktopSnapshot() {
+  return true;
+}
+
 export function Navigation({ isRevealed = true }: NavigationProps) {
   const [timeStr, setTimeStr] = useState<string>("00:00 PM");
-  const [isScrolledDown, setIsScrolledDown] = useState<boolean>(false);
+  const isDesktop = useSyncExternalStore(
+    subscribeDesktop,
+    getDesktopSnapshot,
+    getServerDesktopSnapshot
+  );
 
+  // Live Asia/Dhaka clock
   useEffect(() => {
     function updateClock() {
       try {
@@ -34,70 +51,148 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Reference scroll behavior: hides on scroll down, reveals when scrolled back to top
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolledDown(window.scrollY > 40);
-    };
+  // Continuous Aurexa-style scroll interpolation
+  const { scrollY } = useScroll();
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Scroll interpolation range: 0px -> 170px for full compaction
+  const rawProgress = useTransform(scrollY, [0, 170], [0, 1], { clamp: true });
+  const smoothProgress = useSpring(rawProgress, {
+    stiffness: 260,
+    damping: 28,
+    mass: 0.45,
+    restDelta: 0.001,
+  });
+
+  // Motion values for smooth hardware-accelerated transformation
+  // Desktop logo scale: 1.0 -> 0.44 (shrinks from ~46px visual height down to sleek ~20px)
+  const logoScaleDesktop = useTransform(smoothProgress, [0, 1], [1, 0.44]);
+  // Mobile logo scale: 1.0 -> 0.78
+  const logoScaleMobile = useTransform(smoothProgress, [0, 1], [1, 0.78]);
+
+  // Header vertical padding interpolation
+  const paddingYDesktop = useTransform(smoothProgress, [0, 1], ["28px", "14px"]);
+  const paddingYMobile = useTransform(smoothProgress, [0, 1], ["18px", "12px"]);
+
+  // Glassmorphic background and border interpolation
+  const bgOpacity = useTransform(smoothProgress, [0, 1], [0, 0.82]);
+  const borderOpacity = useTransform(smoothProgress, [0, 1], [0, 0.09]);
+  const blurPx = useTransform(smoothProgress, [0, 1], [0, 20]);
+  const shadowOpacity = useTransform(smoothProgress, [0, 1], [0, 0.5]);
+
+  const activeLogoScale = isDesktop ? logoScaleDesktop : logoScaleMobile;
+  const activePaddingY = isDesktop ? paddingYDesktop : paddingYMobile;
+
+  // Background color string with animated opacity
+  const backgroundColor = useTransform(
+    bgOpacity,
+    (v) => `rgba(8, 8, 8, ${v.toFixed(3)})`
+  );
+  const borderBottomColor = useTransform(
+    borderOpacity,
+    (v) => `rgba(255, 255, 255, ${v.toFixed(3)})`
+  );
+  const backdropFilter = useTransform(
+    blurPx,
+    (v) => `blur(${v.toFixed(1)}px)`
+  );
+  const boxShadow = useTransform(
+    shadowOpacity,
+    (v) =>
+      v > 0.01
+        ? `0 10px 30px -10px rgba(0, 0, 0, ${(v * 0.8).toFixed(2)})`
+        : "none"
+  );
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -86 }}
+      initial={{ opacity: 0, y: -24 }}
       animate={{
         opacity: isRevealed ? 1 : 0,
-        y: isScrolledDown ? -86 : isRevealed ? 0 : -86,
+        y: isRevealed ? 0 : -24,
       }}
       transition={{
-        duration: 0.6,
+        duration: 0.7,
         ease: [0.25, 1, 0.5, 1],
-        delay: 0.1,
+        delay: 0.15,
       }}
-      className="fixed top-0 left-0 right-0 z-40 w-full px-4 sm:px-6 md:px-8 py-5 mix-blend-difference pointer-events-auto"
+      style={{
+        backgroundColor,
+        borderBottom: "1px solid",
+        borderBottomColor,
+        backdropFilter,
+        WebkitBackdropFilter: backdropFilter,
+        boxShadow,
+        paddingTop: activePaddingY,
+        paddingBottom: activePaddingY,
+      }}
+      className="fixed top-0 left-0 right-0 z-40 w-full px-5 sm:px-8 md:px-12 lg:px-16 pointer-events-auto transition-colors duration-150"
     >
-      <nav className="w-full flex items-start justify-between font-mono-custom text-[15px] sm:text-[16px] leading-[1.2] text-white">
-        {/* Brand */}
-        <div className="flex-1">
+      <nav className="w-full max-w-[1440px] mx-auto flex items-center justify-between text-white">
+        {/* BRAND / LOGO: Aurexa-style large initial brand -> smooth compaction */}
+        <div className="flex-1 flex items-center justify-start min-w-0">
           <Link
             href="/"
-            className="tracking-wider uppercase hover:opacity-80 transition-opacity"
+            aria-label={`${PORTFOLIO_DATA.brand.displayName} Homepage`}
+            className="group inline-flex items-center select-none"
           >
-            {PORTFOLIO_DATA.brand.displayName}
+            <motion.div
+              style={{
+                scale: activeLogoScale,
+                transformOrigin: "left center",
+              }}
+              className="will-change-transform flex items-center"
+            >
+              <span className="font-sans font-black text-[20px] sm:text-[26px] md:text-[34px] lg:text-[46px] leading-none tracking-[-0.03em] uppercase text-white whitespace-nowrap group-hover:text-white/85 transition-colors">
+                {PORTFOLIO_DATA.brand.displayName}
+              </span>
+              {/* Subtle registered mark accentuating the bold agency mark */}
+              <span className="ml-1 text-[10px] sm:text-[11px] lg:text-[14px] font-mono-custom text-white/50 font-normal leading-none self-start -mt-0.5">
+                ®
+              </span>
+            </motion.div>
           </Link>
         </div>
 
-        {/* Location & Live Time (Desktop / Tablet) */}
-        <div className="hidden md:flex flex-col flex-1 pl-4">
-          <span className="text-[#a1a1a1] text-[13px] sm:text-[14px]">
+        {/* CENTER-LEFT: Status & Availability (Aurexa-style pulsing beacon) */}
+        <div className="hidden xl:flex items-center gap-2.5 px-6 font-mono-custom text-[13px] text-[#a1a1a1]">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span className="tracking-wide">Available for Projects</span>
+        </div>
+
+        {/* CENTER: Location & Live Time (Desktop) */}
+        <div className="hidden md:flex flex-col text-left font-mono-custom px-6 border-l border-white/[0.08]">
+          <span className="text-[#8e8e8e] text-[12px] uppercase tracking-wider">
             Chittagong, BD
           </span>
-          <span className="font-medium text-[#fafafa] tracking-wide mt-0.5">
+          <span className="font-medium text-[#f0f0f0] text-[13px] tracking-wide mt-0.5">
             {timeStr}
           </span>
         </div>
 
-        {/* Project Inquiries Email (Desktop) */}
-        <div className="hidden lg:flex flex-col flex-1 pl-4">
-          <span className="text-[#a1a1a1] text-[13px] sm:text-[14px]">
+        {/* CENTER-RIGHT: Project Inquiries Email (Desktop) */}
+        <div className="hidden lg:flex flex-col text-left font-mono-custom px-6 border-l border-white/[0.08]">
+          <span className="text-[#8e8e8e] text-[12px] uppercase tracking-wider">
             Project Inquiries
           </span>
           <a
             href={`mailto:${PORTFOLIO_DATA.brand.email}`}
-            className="hover-underline-link mt-0.5 tracking-wide text-white"
+            className="hover-underline-link mt-0.5 text-[13px] tracking-wide text-white"
           >
             {PORTFOLIO_DATA.brand.email}
           </a>
         </div>
 
-        {/* Contact Action */}
-        <div className="flex items-center gap-4 text-right">
-          <span className="md:hidden text-[13px] text-[#a1a1a1]">{timeStr}</span>
+        {/* RIGHT: Live Time (Mobile) + Action CTA Pill */}
+        <div className="flex items-center gap-3 sm:gap-4 font-mono-custom text-right ml-4">
+          <span className="md:hidden text-[12px] text-[#a1a1a1] tracking-wider">
+            {timeStr}
+          </span>
           <a
             href={`mailto:${PORTFOLIO_DATA.brand.email}`}
-            className="hover-underline-link text-white tracking-wider"
+            className="inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/[0.07] hover:bg-white/[0.15] border border-white/10 hover:border-white/25 text-white text-[13px] tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             Contact
           </a>
