@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Link from "next/link";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
 
 interface NavigationProps {
   isRevealed?: boolean;
@@ -64,13 +65,15 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
   });
 
   // Motion values for smooth hardware-accelerated transformation
-  // Desktop logo scale: 1.0 -> 0.44 (shrinks from ~46px visual height down to sleek ~20px)
-  const logoScaleDesktop = useTransform(smoothProgress, [0, 1], [1, 0.44]);
+  // Desktop logo scale: 1.0 -> 0.42 (compresses from 539x78 down to 226x32.7)
+  const logoScaleDesktop = useTransform(smoothProgress, [0, 1], [1, 0.42]);
   // Mobile logo scale: 1.0 -> 0.78
   const logoScaleMobile = useTransform(smoothProgress, [0, 1], [1, 0.78]);
 
-  // Header vertical padding interpolation
-  const paddingYDesktop = useTransform(smoothProgress, [0, 1], ["28px", "14px"]);
+  // Header vertical padding:
+  // Initial: 26px top & bottom (generous top whitespace matching Aurexa reference)
+  // Scrolled: 14px top & bottom (sleek compact header)
+  const paddingYDesktop = useTransform(smoothProgress, [0, 1], ["26px", "14px"]);
   const paddingYMobile = useTransform(smoothProgress, [0, 1], ["18px", "12px"]);
 
   // Glassmorphic background and border interpolation
@@ -127,34 +130,28 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
       }}
       className="fixed top-0 left-0 right-0 z-40 w-full px-5 sm:px-8 md:px-12 lg:px-16 pointer-events-auto transition-colors duration-150"
     >
-      <nav className="w-full max-w-[1440px] mx-auto flex items-center justify-between text-white">
-        {/* BRAND / LOGO: Aurexa-style large initial brand -> smooth compaction */}
-        <div className="flex-1 flex items-center justify-start min-w-0">
+      <nav className="w-full max-w-[1440px] mx-auto flex items-start justify-between text-white">
+        {/* BRAND / LOGO: Aurexa-style oversized editorial brand -> smooth compaction */}
+        <div className="flex-1 flex items-start justify-start min-w-0">
           <Link
             href="/"
             aria-label={`${PORTFOLIO_DATA.brand.displayName} Homepage`}
-            className="group inline-flex items-center select-none"
+            className="group inline-flex items-start select-none"
           >
             <motion.div
               style={{
                 scale: activeLogoScale,
-                transformOrigin: "left center",
+                transformOrigin: "left top",
               }}
-              className="will-change-transform flex items-center"
+              className="will-change-transform flex items-start"
             >
-              <span className="font-sans font-black text-[20px] sm:text-[26px] md:text-[34px] lg:text-[46px] leading-none tracking-[-0.03em] uppercase text-white whitespace-nowrap group-hover:text-white/85 transition-colors">
-                {PORTFOLIO_DATA.brand.displayName}
-              </span>
-              {/* Subtle registered mark accentuating the bold agency mark */}
-              <span className="ml-1 text-[10px] sm:text-[11px] lg:text-[14px] font-mono-custom text-white/50 font-normal leading-none self-start -mt-0.5">
-                ®
-              </span>
+              <KamrulBrandWordmark className="w-[200px] sm:w-[300px] md:w-[420px] lg:w-[539px] h-auto text-white group-hover:text-white/85 transition-colors" />
             </motion.div>
           </Link>
         </div>
 
         {/* CENTER-LEFT: Status & Availability (Aurexa-style pulsing beacon) */}
-        <div className="hidden xl:flex items-center gap-2.5 px-6 font-mono-custom text-[13px] text-[#a1a1a1]">
+        <div className="hidden xl:flex items-center gap-2.5 px-6 font-mono-custom text-[13px] text-[#a1a1a1] pt-1.5">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -163,7 +160,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
         </div>
 
         {/* CENTER: Location & Live Time (Desktop) */}
-        <div className="hidden md:flex flex-col text-left font-mono-custom px-6 border-l border-white/[0.08]">
+        <div className="hidden md:flex flex-col text-left font-mono-custom px-6 border-l border-white/[0.08] pt-1">
           <span className="text-[#8e8e8e] text-[12px] uppercase tracking-wider">
             Chittagong, BD
           </span>
@@ -173,7 +170,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
         </div>
 
         {/* CENTER-RIGHT: Project Inquiries Email (Desktop) */}
-        <div className="hidden lg:flex flex-col text-left font-mono-custom px-6 border-l border-white/[0.08]">
+        <div className="hidden lg:flex flex-col text-left font-mono-custom px-6 border-l border-white/[0.08] pt-1">
           <span className="text-[#8e8e8e] text-[12px] uppercase tracking-wider">
             Project Inquiries
           </span>
@@ -186,7 +183,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
         </div>
 
         {/* RIGHT: Live Time (Mobile) + Action CTA Pill */}
-        <div className="flex items-center gap-3 sm:gap-4 font-mono-custom text-right ml-4">
+        <div className="flex items-center gap-3 sm:gap-4 font-mono-custom text-right ml-4 pt-1">
           <span className="md:hidden text-[12px] text-[#a1a1a1] tracking-wider">
             {timeStr}
           </span>
