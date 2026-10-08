@@ -41,7 +41,7 @@ export interface StatItem {
 export const PORTFOLIO_DATA = {
   brand: {
     fullName: "Kamrul Islam",
-    displayName: "KAMRUL I",
+    displayName: "KAMRUL",
     curtainName: "KAMRUL ISLAM",
     domain: "kamrulislam.bd",
     title: "Video Editor | AI Content Creator | Web Developer | IT Professional",

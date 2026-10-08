@@ -10,7 +10,7 @@ export function AwardsSection() {
   const counters = PORTFOLIO_DATA.counters;
 
   return (
-    <section className="w-full pt-20 md:pt-28 pb-32 md:pb-48">
+    <section id="recognitions" className="w-full pt-20 md:pt-28 pb-32 md:pb-48">
       <HairlineRule className="mb-14 md:mb-20" />
 
       {/* Split Section: Title (Left) + Table (Right) */}

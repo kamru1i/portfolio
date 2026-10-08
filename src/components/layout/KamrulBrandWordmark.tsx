@@ -13,16 +13,16 @@ interface KamrulBrandWordmarkProps {
  * with heavyweight geometric stems, aerodynamic cuts, and razor-sharp vector fidelity.
  */
 export function KamrulBrandWordmark({
-  className = "w-[539px] h-[78px]",
+  className = "w-[440px] h-[78px]",
   fill = "currentColor",
 }: KamrulBrandWordmarkProps) {
   return (
     <svg
-      viewBox="0 0 539 78"
+      viewBox="0 0 440 78"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="KAMRUL I"
+      aria-label="KAMRUL"
       role="img"
     >
       {/* --- K --- */}
@@ -35,50 +35,26 @@ export function KamrulBrandWordmark({
         fill={fill}
       />
 
-      {/* --- M --- */}
+      {/* --- M (Right stem at 228-250 is shared with R) --- */}
       <path
-        d="M170 0H192L210 46L228 0H250V78H230V24L216 58H204L190 24V78H170V0Z"
+        d="M170 0H192L210 46L228 0H250V78H228V24L216 58H204L190 24V78H170V0Z"
         fill={fill}
       />
 
-      {/* --- R --- */}
+      {/* --- R (Branches off shared stem at X=250, zero double-stem artifact) --- */}
       <path
-        d="M246 0H306C319 0 327 9 327 23C327 34 320 41 310 44L328 78H304L288 48H268V78H246V0ZM268 16V33H301C305 33 307 30 307 25C307 20 305 16 301 16H268Z"
+        d="M248 0H286C299 0 307 9 307 23C307 33 300 41 290 43L308 78H284L268 46H248V0ZM248 15V31H282C286 31 288 28 288 23C288 18 286 15 282 15H248Z"
         fill={fill}
       />
 
       {/* --- U --- */}
       <path
-        d="M324 0H346V54C346 61 349 64 355 64C361 64 364 61 364 54V0H386V54C386 70 375 78 355 78C335 78 324 70 324 54V0Z"
+        d="M316 0H338V54C338 61 341 64 346 64C351 64 354 61 354 54V0H376V54C376 70 365 78 346 78C327 78 316 70 316 54V0Z"
         fill={fill}
       />
 
       {/* --- L --- */}
-      <path d="M394 0H416V62H448V78H394V0Z" fill={fill} />
-
-      {/* --- I (Distinct Pillar) --- */}
-      <path d="M464 0H488V78H464V0Z" fill={fill} />
-
-      {/* --- Registered Trademark Mark ® --- */}
-      <circle
-        cx="516"
-        cy="14"
-        r="8"
-        stroke={fill}
-        strokeWidth="1.5"
-        fill="none"
-      />
-      <text
-        x="516"
-        y="17"
-        fontSize="8.5"
-        fontFamily="sans-serif"
-        fontWeight="900"
-        fill={fill}
-        textAnchor="middle"
-      >
-        R
-      </text>
+      <path d="M384 0H406V62H436V78H384V0Z" fill={fill} />
     </svg>
   );
 }
