@@ -6,14 +6,12 @@ import Link from "next/link";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
 interface NavigationProps {
-  initialDelay?: number;
+  isRevealed?: boolean;
 }
 
-export function Navigation({ initialDelay = 2.3 }: NavigationProps) {
+export function Navigation({ isRevealed = true }: NavigationProps) {
   const [timeStr, setTimeStr] = useState<string>("00:00 PM");
   const [isScrolledDown, setIsScrolledDown] = useState<boolean>(false);
-
-  const [hasInitialAnimated, setHasInitialAnimated] = useState<boolean>(false);
 
   useEffect(() => {
     function updateClock() {
@@ -36,14 +34,6 @@ export function Navigation({ initialDelay = 2.3 }: NavigationProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Set initial animation complete after initialDelay
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setHasInitialAnimated(true);
-    }, (initialDelay + 0.5) * 1000);
-    return () => clearTimeout(t);
-  }, [initialDelay]);
-
   // Reference scroll behavior: hides on scroll down, reveals when scrolled back to top
   useEffect(() => {
     const handleScroll = () => {
@@ -58,13 +48,13 @@ export function Navigation({ initialDelay = 2.3 }: NavigationProps) {
     <motion.header
       initial={{ opacity: 0, y: -86 }}
       animate={{
-        opacity: 1,
-        y: isScrolledDown ? -86 : 0,
+        opacity: isRevealed ? 1 : 0,
+        y: isScrolledDown ? -86 : isRevealed ? 0 : -86,
       }}
       transition={{
-        duration: 0.45,
+        duration: 0.6,
         ease: [0.25, 1, 0.5, 1],
-        delay: hasInitialAnimated ? 0 : initialDelay,
+        delay: 0.1,
       }}
       className="fixed top-0 left-0 right-0 z-40 w-full px-4 sm:px-6 md:px-8 py-5 mix-blend-difference pointer-events-auto"
     >

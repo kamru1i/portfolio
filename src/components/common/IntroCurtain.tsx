@@ -1,32 +1,41 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 
 interface IntroCurtainProps {
   brandName?: string;
-  onFinish?: () => void;
+  onReveal?: () => void;
+  onComplete?: () => void;
 }
 
 export function IntroCurtain({
   brandName = "KAMRUL ISLAM",
-  onFinish,
+  onReveal,
+  onComplete,
 }: IntroCurtainProps) {
   const [stage, setStage] = useState<"enter" | "exit" | "done">("enter");
-  const onFinishRef = useRef(onFinish);
-  onFinishRef.current = onFinish;
+  const onRevealRef = useRef(onReveal);
+  onRevealRef.current = onReveal;
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    // Stage 1: letter reveal finishes around 1400ms
+    // Stage 1: Brand text reveals via blurIn stagger, holds until 1650ms
     const timerExit = setTimeout(() => {
       setStage("exit");
-    }, 1700);
+      if (onRevealRef.current) {
+        onRevealRef.current();
+      }
+    }, 1650);
 
-    // Stage 2: curtain finishes sliding down at ~2600ms
+    // Stage 2: Curtain finishes sliding down completely at 2550ms
     const timerDone = setTimeout(() => {
       setStage("done");
-      if (onFinishRef.current) onFinishRef.current();
-    }, 2650);
+      if (onCompleteRef.current) {
+        onCompleteRef.current();
+      }
+    }, 2550);
 
     return () => {
       clearTimeout(timerExit);
@@ -39,56 +48,54 @@ export function IntroCurtain({
   const characters = brandName.split("");
 
   return (
-    <AnimatePresence>
-      <motion.div
-        key="curtain"
-        className={`fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black overflow-hidden select-none ${
-          stage === "exit" ? "pointer-events-none" : "pointer-events-auto"
-        }`}
-        initial={{ y: 0 }}
-        animate={
-          stage === "exit"
-            ? {
-                y: "100%",
-                transition: {
-                  duration: 0.95,
-                  ease: [0.76, 0, 0.24, 1], // Expo-like smooth curtain slide
-                },
-              }
-            : { y: 0 }
-        }
-      >
-        <div className="flex flex-wrap items-center justify-center px-4 max-w-full">
-          <h1 className="font-gambarino text-4xl sm:text-6xl md:text-8xl lg:text-[100px] tracking-[-0.01em] uppercase text-white flex flex-wrap justify-center leading-[0.95em]">
-            {characters.map((char, index) => (
-              <motion.span
-                key={index}
-                className="inline-block"
-                style={{ whiteSpace: char === " " ? "pre" : "normal" }}
-                initial={{
-                  opacity: 0,
-                  filter: "blur(14px)",
-                  scale: 1.15,
-                  y: 18,
-                }}
-                animate={{
-                  opacity: 1,
-                  filter: "blur(0px)",
-                  scale: 1,
-                  y: 0,
-                }}
-                transition={{
-                  duration: 0.75,
-                  delay: 0.2 + index * 0.045,
-                  ease: [0.25, 1, 0.5, 1],
-                }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
-            ))}
-          </h1>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key="intro-curtain"
+      className={`fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black overflow-hidden select-none ${
+        stage === "exit" ? "pointer-events-none" : "pointer-events-auto"
+      }`}
+      initial={{ y: 0 }}
+      animate={
+        stage === "exit"
+          ? {
+              y: "100%",
+              transition: {
+                duration: 0.85,
+                ease: [0.76, 0, 0.24, 1], // Exact theatrical curtain slide curve
+              },
+            }
+          : { y: 0 }
+      }
+    >
+      <div className="flex flex-wrap items-center justify-center px-4 max-w-full">
+        <h1 className="font-gambarino text-4xl sm:text-6xl md:text-8xl lg:text-[100px] tracking-[-0.01em] uppercase text-white flex flex-wrap justify-center leading-[0.95em]">
+          {characters.map((char, index) => (
+            <motion.span
+              key={index}
+              className="inline-block"
+              style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+              initial={{
+                opacity: 0,
+                filter: "blur(12px)",
+                scale: 1.12,
+                y: 14,
+              }}
+              animate={{
+                opacity: 1,
+                filter: "blur(0px)",
+                scale: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.75,
+                delay: 0.15 + index * 0.05,
+                ease: [0.645, 0.045, 0.355, 1], // Exact cubic-bezier from reference
+              }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </motion.span>
+          ))}
+        </h1>
+      </div>
+    </motion.div>
   );
 }

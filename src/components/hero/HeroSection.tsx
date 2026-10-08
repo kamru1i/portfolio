@@ -2,57 +2,53 @@
 
 import { motion } from "framer-motion";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { HeroTitle } from "./HeroTitle";
 import { Rotating3DCylinder } from "./Rotating3DCylinder";
 
 interface HeroSectionProps {
-  initialDelay?: number;
+  isRevealed?: boolean;
 }
 
-export function HeroSection({ initialDelay = 2.4 }: HeroSectionProps) {
+export function HeroSection({ isRevealed = true }: HeroSectionProps) {
   return (
-    <section className="relative w-full min-h-[92vh] flex flex-col items-center justify-start pt-24 sm:pt-28 md:pt-32 pb-16 px-4 overflow-hidden">
-      {/* Massive Editorial Display Wordmark */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          type: "spring",
-          damping: 30,
-          stiffness: 180,
-          delay: initialDelay,
-        }}
-        className="w-full text-center select-none"
-      >
-        <h1 className="font-gambarino text-[46px] lg:text-[80px] xl:text-[100px] leading-[0.9] tracking-[-0.01em] text-white uppercase mx-auto">
-          {PORTFOLIO_DATA.hero.wordmark}
-        </h1>
-      </motion.div>
+    <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-start pt-24 sm:pt-28 md:pt-32 pb-16 px-4 overflow-hidden">
+      {/* Massive Editorial Display Wordmark with Character-Staggered 3D Reveal */}
+      <div className="w-full text-center select-none">
+        <HeroTitle text={PORTFOLIO_DATA.hero.wordmark} isRevealed={isRevealed} />
+      </div>
 
-      {/* Subtitle Statement */}
+      {/* Subtitle Statement: Natural Follow-up Sequence */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 22, filter: "blur(4px)" }}
+        animate={
+          isRevealed
+            ? { opacity: 1, y: 0, filter: "blur(0px)" }
+            : { opacity: 0, y: 22, filter: "blur(4px)" }
+        }
         transition={{
-          duration: 0.9,
-          delay: initialDelay + 0.2,
+          duration: 0.85,
+          delay: 0.45,
           ease: [0.25, 1, 0.5, 1],
         }}
-        className="mt-6 md:mt-8 max-w-[640px] px-4 text-center"
+        className="mt-6 md:mt-8 max-w-[640px] px-4 text-center select-none"
       >
         <p className="font-mono-custom text-[14px] sm:text-[16px] leading-[1.6] text-[#a1a1a1]">
           {PORTFOLIO_DATA.hero.subtitle}
         </p>
       </motion.div>
 
-      {/* 3D Rotating Cylinder Carousel */}
+      {/* 3D Rotating Cylinder Carousel: Smooth Rise & Scale into Active Stage */}
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 35, scale: 0.96 }}
+        animate={
+          isRevealed
+            ? { opacity: 1, y: 0, scale: 1 }
+            : { opacity: 0, y: 35, scale: 0.96 }
+        }
         transition={{
-          type: "spring",
-          damping: 28,
-          stiffness: 160,
-          delay: initialDelay + 0.35,
+          duration: 0.95,
+          delay: 0.65,
+          ease: [0.25, 1, 0.5, 1],
         }}
         className="w-full mt-6 md:mt-10 flex justify-center"
       >

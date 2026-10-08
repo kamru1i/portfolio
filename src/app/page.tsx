@@ -13,24 +13,28 @@ import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
 export default function HomePage() {
-  const [introFinished, setIntroFinished] = useState<boolean>(false);
+  const [isRevealed, setIsRevealed] = useState<boolean>(false);
+  const [isCurtainComplete, setIsCurtainComplete] = useState<boolean>(false);
 
   return (
     <>
       {/* Intro Curtain Loader */}
-      <IntroCurtain
-        brandName={PORTFOLIO_DATA.brand.curtainName}
-        onFinish={() => setIntroFinished(true)}
-      />
+      {!isCurtainComplete && (
+        <IntroCurtain
+          brandName={PORTFOLIO_DATA.brand.curtainName}
+          onReveal={() => setIsRevealed(true)}
+          onComplete={() => setIsCurtainComplete(true)}
+        />
+      )}
 
       {/* Fixed Global Navigation */}
-      <Navigation initialDelay={introFinished ? 0.2 : 2.3} />
+      <Navigation isRevealed={isRevealed} />
 
       {/* Main Page Scroll Canvas */}
       <main className="relative z-10 w-full bg-black min-h-screen mb-[450px] md:mb-[510px] lg:mb-[634px] shadow-[0_40px_80px_rgba(0,0,0,0.95)]">
         <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 md:px-8">
           {/* Section 1: Hero */}
-          <HeroSection initialDelay={introFinished ? 0.3 : 2.4} />
+          <HeroSection isRevealed={isRevealed} />
 
           {/* Section 2: Selected Works */}
           <WorksHeader />
