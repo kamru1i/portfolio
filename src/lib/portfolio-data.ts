@@ -242,18 +242,18 @@ export const PORTFOLIO_DATA = {
   ] as ProjectItem[],
 
   manifesto: {
+    statement:
+      "I craft digital media and systems that balance precision, visual rhythm and resilience. Every video edit is approached with storytelling instinct, every line of code with architectural rigor, and every technical operation with dependable craftsmanship.",
     lines: [
-      "I craft digital media and systems that balance",
-      "precision, visual rhythm and resilience. Every video",
-      "edit is approached with storytelling instinct,",
-      "every line of code with architectural rigor, and every",
-      "technical operation with dependable craftsmanship.",
+      "I craft digital media and systems that balance precision, visual rhythm and resilience.",
+      "Every video edit is approached with storytelling instinct, every line of code with architectural rigor,",
+      "and every technical operation with dependable craftsmanship.",
     ],
     bio1Html: `Outside of work, I spend time <strong>exploring</strong> visual storytelling and emerging generative techniques that help me <strong>sharpen</strong> and <strong>evolve</strong>. Whether analyzing <strong>cinematic cuts</strong>, studying motion pacing, or refining <strong>AI workflows</strong>, I seek disciplines that bring <strong>depth</strong>. These experiments often become the <strong>inspiration</strong> behind every timeline I cut and every platform I deploy.`,
     bio2Html: `I <strong>believe</strong> great technical work begins with disciplined execution. <strong>Curiosity</strong>, <strong>precision</strong> and continuous <strong>learning</strong> shape the way I approach both <strong>creative post-production</strong> and <strong>IT infrastructure</strong>. Every project adds a new layer to my <strong>expertise</strong>, ensuring digital solutions that are <strong>reliable</strong>, <strong>timeless</strong>, and deeply <strong>valuable</strong> to the organizations that rely on them.`,
     ctaText: "Let's Talk",
     ctaHref: "mailto:kamrulislamabk@gmail.com",
-    portraitSrc: "/images/kamrul-portrait.jpg",
+    portraitSrc: "/images/Kamrul I.png",
   },
 
   services: [

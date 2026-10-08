@@ -14,26 +14,28 @@ export function ManifestoSection() {
   // Scroll scrub for statement typography illumination
   const { scrollYProgress } = useScroll({
     target: statementRef,
-    offset: ["start 80%", "end 35%"],
+    offset: ["start 85%", "end 40%"],
   });
 
-  const lines = PORTFOLIO_DATA.manifesto.lines;
+  const statement = PORTFOLIO_DATA.manifesto.statement;
+  const words = statement.split(/\s+/).filter(Boolean);
 
   return (
     <section id="about" ref={containerRef} className="w-full pt-20 md:pt-28 pb-20">
       <HairlineRule className="mb-14 md:mb-20" />
 
-      {/* Large Scroll-Illuminated Manifesto Statement matching Gambarino 70px */}
-      <div ref={statementRef} className="relative w-full max-w-[1360px] mb-24 md:mb-32">
-        <h2 className="font-gambarino text-3xl sm:text-5xl md:text-6xl lg:text-[70px] leading-[1.02] tracking-[-0.03em] font-normal text-left">
-          {lines.map((line, lineIndex) => {
-            const start = lineIndex / lines.length;
-            const end = (lineIndex + 1) / lines.length;
+      {/* Large Scroll-Illuminated Manifesto Statement with natural responsive wrapping */}
+      <div ref={statementRef} className="relative w-full max-w-[1360px] mb-20 md:mb-28 lg:mb-32">
+        <h2 className="font-gambarino text-3xl sm:text-5xl md:text-6xl lg:text-[68px] xl:text-[72px] leading-[1.12] sm:leading-[1.1] md:leading-[1.08] lg:leading-[1.05] tracking-[-0.03em] font-normal text-left text-pretty">
+          {words.map((word, index) => {
+            const total = words.length;
+            const start = index / (total + 3);
+            const end = (index + 2.5) / (total + 3);
 
             return (
-              <ManifestoLine
-                key={lineIndex}
-                line={line}
+              <ManifestoWord
+                key={index}
+                word={word}
                 scrollProgress={scrollYProgress}
                 start={start}
                 end={end}
@@ -52,17 +54,18 @@ export function ManifestoSection() {
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
           transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
-          className="col-span-12 md:col-span-5 relative w-full aspect-[450/590] max-w-[450px] rounded-[12px] overflow-hidden bg-[#0d0d0d] select-none"
+          className="col-span-12 md:col-span-5 relative w-full aspect-square max-w-[440px] rounded-[16px] overflow-hidden bg-[#0c0c0c] border border-white/[0.08] select-none"
         >
           <Image
             src={PORTFOLIO_DATA.manifesto.portraitSrc}
             alt="Kamrul Islam"
             fill
-            className="object-cover grayscale contrast-125 brightness-95"
-            sizes="(max-width: 768px) 100vw, 450px"
+            className="object-contain p-2 sm:p-3 grayscale contrast-115 brightness-95"
+            sizes="(max-width: 768px) 100vw, 440px"
+            priority
           />
           {/* Subtle gradient vignette */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none rounded-[16px]" />
         </motion.div>
 
         {/* Bio Paragraphs & Contact CTA (Right, col-start-7 for exact 563px width) */}
@@ -95,13 +98,13 @@ export function ManifestoSection() {
   );
 }
 
-function ManifestoLine({
-  line,
+function ManifestoWord({
+  word,
   scrollProgress,
   start,
   end,
 }: {
-  line: string;
+  word: string;
   scrollProgress: any;
   start: number;
   end: number;
@@ -116,9 +119,9 @@ function ManifestoLine({
   return (
     <motion.span
       style={{ opacity, color }}
-      className="block transition-colors duration-150"
+      className="inline-block transition-colors duration-150 mr-[0.26em]"
     >
-      {line}
+      {word}
     </motion.span>
   );
 }

@@ -83,7 +83,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider w-fit">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 <span>
-                  {service.index} // {service.category}
+                  {`${service.index} // ${service.category}`}
                 </span>
               </div>
 
