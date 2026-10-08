@@ -1,63 +1,96 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { OdometerCounters } from "./OdometerCounters";
 
 export function AwardsSection() {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const milestones = PORTFOLIO_DATA.milestones;
   const counters = PORTFOLIO_DATA.counters;
 
   return (
-    <section id="recognitions" className="w-full pt-20 md:pt-28 pb-32 md:pb-48">
+    <section id="recognitions" className="w-full pt-20 md:pt-28 pb-32 md:pb-48 select-none">
       <HairlineRule className="mb-14 md:mb-20" />
 
-      {/* Split Section: Title (Left) + Table (Right) */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-8 items-start">
-        {/* Title (Gambarino 60px) */}
-        <div className="md:col-span-5">
-          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-[60px] text-white leading-[1.05] tracking-tight">
-            Milestones &amp;
-            <br />
-            Recognitions
+      {/* Header: Patrick Jane Title (Left) + Aurexa Subtitle (Right) */}
+      <div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
+        {/* Left: Patrick Jane Style Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10% 0px" }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex flex-col"
+        >
+          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
+            Milestones &amp; Recognitions
           </h2>
-        </div>
+        </motion.div>
 
-        {/* Career Progression Table */}
-        <div className="md:col-span-7 flex flex-col w-full">
-          {/* Table Column Headers in Gambarino 20px */}
-          <div className="grid grid-cols-12 gap-4 pb-4 border-b border-white/15 font-gambarino text-[18px] sm:text-[20px] text-white uppercase tracking-wider">
-            <span className="col-span-3">YEAR</span>
-            <span className="col-span-4">ORGANIZATION</span>
-            <span className="col-span-5">ROLE / ACHIEVEMENT</span>
-          </div>
+        {/* Right: Aurexa-Style Supporting Subtitle */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10% 0px" }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          className="max-w-md lg:max-w-lg md:text-right"
+        >
+          <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed">
+            Career progression, academic milestones, and operational achievements across enterprise IT, web systems, and digital production.
+          </p>
+        </motion.div>
+      </div>
 
-          {/* Table Data Rows */}
-          <div className="flex flex-col divide-y divide-white/10">
-            {milestones.map((item, idx) => (
-              <div
-                key={idx}
-                className="grid grid-cols-12 gap-4 py-4 sm:py-5 font-mono-custom text-[14px] sm:text-[15px] leading-relaxed group transition-colors"
-              >
-                <span className="col-span-3 text-[#a1a1a1] group-hover:text-white transition-colors">
+      {/* Stacked Milestone Rows in Aurexa-Inspired Pattern */}
+      <div
+        className="w-full flex flex-col border-t border-b border-white/10 divide-y divide-white/10"
+        onMouseLeave={() => setHoveredIdx(null)}
+      >
+        {milestones.map((item, idx) => {
+          const isHovered = hoveredIdx === idx;
+          const isAnyHovered = hoveredIdx !== null;
+
+          return (
+            <div
+              key={idx}
+              onMouseEnter={() => setHoveredIdx(idx)}
+              className={`group relative w-full py-7 sm:py-8 md:py-10 px-2 sm:px-4 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8 transition-all duration-300 ${
+                isAnyHovered && !isHovered ? "opacity-40" : "opacity-100"
+              } ${isHovered ? "bg-white/[0.02] rounded-[12px]" : ""}`}
+            >
+              {/* Left Column: Year & Period */}
+              <div className="w-[120px] sm:w-[150px] md:w-[180px] flex-shrink-0 flex items-center gap-3">
+                <span className="font-mono-custom text-sm sm:text-base text-white/90 font-medium tracking-wider">
                   {item.year}
                 </span>
-                <span className="col-span-4 text-[#a1a1a1] group-hover:text-white transition-colors">
-                  {item.organization}
-                </span>
-                <div className="col-span-5 flex flex-col">
-                  <span className="text-[#a1a1a1] group-hover:text-white transition-colors">
-                    {item.role}
-                  </span>
-                  <span className="text-[12px] text-[#666666] group-hover:text-[#999999] mt-0.5 transition-colors">
-                    {item.highlight}
+                <span className="h-px w-6 bg-white/20 hidden sm:inline-block" />
+              </div>
+
+              {/* Center / Main Column: Organization & Role Hierarchy */}
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono-custom text-xs uppercase tracking-widest text-[#888] group-hover:text-emerald-400/90 transition-colors">
+                    {item.organization}
                   </span>
                 </div>
+                <h3 className="font-sans text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white font-normal tracking-tight transition-colors">
+                  {item.role}
+                </h3>
+                <p className="font-mono-custom text-xs sm:text-sm text-[#777] mt-1.5 leading-relaxed group-hover:text-[#aaa] transition-colors">
+                  {item.highlight}
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
+
+              {/* Right Column: Index Numbering */}
+              <div className="w-[40px] sm:w-[60px] text-right flex-shrink-0 font-mono-custom text-sm sm:text-base text-[#666] group-hover:text-white transition-colors">
+                {String(idx + 1).padStart(2, "0")}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Hairline Divider Before 3 Large Counters */}

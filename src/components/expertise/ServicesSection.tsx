@@ -29,18 +29,33 @@ export function ServicesSection() {
     >
       <HairlineRule className="mb-14 md:mb-20" />
 
-      {/* Header: Editorial Pill Badge + Subtitle Quote */}
-      <div className="w-full flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12 md:mb-16">
-        {/* Left: Section Pill Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider w-fit">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span>SERVICES</span>
-        </div>
+      {/* Header: Patrick Jane Title (Left) + Aurexa Subtitle (Right) */}
+      <div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
+        {/* Left: Patrick Jane Style Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10% 0px" }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex flex-col"
+        >
+          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
+            Services
+          </h2>
+        </motion.div>
 
-        {/* Right: Editorial Quote */}
-        <p className="max-w-xl text-[#a1a1a1] text-sm sm:text-base md:text-lg font-mono-custom leading-relaxed md:text-right">
-          Crafting high-impact visual narratives, AI-augmented media workflows, modern web platforms, and resilient IT infrastructure.
-        </p>
+        {/* Right: Aurexa-Style Supporting Subtitle */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10% 0px" }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          className="max-w-md lg:max-w-lg md:text-right"
+        >
+          <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed">
+            Crafting high-impact visual narratives, AI-augmented media workflows, modern web platforms, and resilient IT infrastructure.
+          </p>
+        </motion.div>
       </div>
 
       {/* Stacked Service Rows */}
