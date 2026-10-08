@@ -1,11 +1,13 @@
 "use client";
 
+import { motion, MotionValue } from "framer-motion";
 import Image from "next/image";
 import { PortfolioProject } from "@/lib/portfolio-data";
 
 interface ProjectMediaProps {
   project: PortfolioProject;
   isLarge?: boolean;
+  parallaxY?: MotionValue<string>;
   onPlayClick?: () => void;
   onLivePreviewClick?: () => void;
 }
@@ -13,20 +15,19 @@ interface ProjectMediaProps {
 export function ProjectMedia({
   project,
   isLarge = false,
+  parallaxY,
   onPlayClick,
   onLivePreviewClick,
 }: ProjectMediaProps) {
   const isVideo = project.type === "video";
   const isPortraitVideo = isVideo && project.format === "9:16";
 
+  // 9:16 Vertical Reel Video presentation inside Patrick Jane square card frame
   if (isPortraitVideo) {
     return (
-      <div
-        onClick={onPlayClick}
-        className="relative w-full aspect-[4/3] sm:aspect-video md:aspect-[16/10] overflow-hidden rounded-xl bg-gradient-to-b from-[#141414] to-[#080808] border border-white/10 group-hover:border-white/25 transition-all duration-300 flex items-center justify-center p-3 sm:p-5 select-none cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
-      >
-        {/* Ambient Blurred Background to create atmospheric depth without distortion */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-25">
+      <div className="relative w-full aspect-square overflow-hidden bg-[#090909] rounded-none border-0 flex items-center justify-center p-3 sm:p-5 select-none">
+        {/* Subtle Ambient Blurred Backdrop preserving atmospheric depth */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
           <Image
             src={project.thumbnail}
             alt=""
@@ -37,30 +38,19 @@ export function ProjectMedia({
           />
         </div>
 
-        {/* Top Format Badge */}
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 font-mono-custom text-[11px] text-white/90">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span>9:16 Reel</span>
-        </div>
-
-        {/* Year Badge */}
-        <div className="absolute top-3 left-3 z-20 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 font-mono-custom text-[11px] text-white/70">
-          {project.year}
-        </div>
-
-        {/* Centered 9:16 Portrait Reel Container */}
-        <div className="relative h-full aspect-[9/16] rounded-lg overflow-hidden border border-white/20 shadow-[0_16px_40px_rgba(0,0,0,0.85)] z-10 transition-transform duration-500 group-hover:scale-[1.02]">
+        {/* Centered 9:16 Portrait Reel Container with True Vertical Aspect Ratio */}
+        <div className="relative h-[92%] aspect-[9/16] rounded-none overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] z-10 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105 border border-white/10">
           <Image
             src={project.thumbnail}
             alt={project.title}
             fill
-            sizes="(max-width: 768px) 50vw, 320px"
+            sizes={isLarge ? "(max-width: 768px) 100vw, 420px" : "(max-width: 768px) 100vw, 240px"}
             className="object-cover"
           />
 
           {/* Hover Play Button Overlay */}
-          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-lg pl-0.5 shadow-2xl transition-transform duration-300 group-hover:scale-110">
+          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white text-black flex items-center justify-center text-xl pl-1 shadow-2xl transition-transform duration-300 group-hover:scale-110">
               ▶
             </div>
           </div>
@@ -69,52 +59,45 @@ export function ProjectMedia({
     );
   }
 
-  // 16:9 Video or Web Landscape Media Presentation
+  // 16:9 Video or Web Landscape Media Presentation inside Patrick Jane square card frame
   return (
-    <div
-      onClick={isVideo ? onPlayClick : undefined}
-      className={`relative w-full aspect-video overflow-hidden rounded-xl bg-[#0c0c0c] border border-white/10 group-hover:border-white/25 transition-all duration-300 select-none shadow-[0_10px_30px_rgba(0,0,0,0.6)] ${
-        isVideo ? "cursor-pointer" : ""
-      }`}
-    >
-      <Image
-        src={project.thumbnail}
-        alt={project.title}
-        fill
-        sizes={isLarge ? "(max-width: 768px) 100vw, 800px" : "(max-width: 768px) 100vw, 450px"}
-        className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
-      />
+    <div className="relative w-full aspect-square overflow-hidden bg-black rounded-none border-0 select-none">
+      {/* Parallax Image Frame matching Patrick Jane exact motion */}
+      <motion.div
+        style={parallaxY ? { y: parallaxY } : undefined}
+        className="absolute inset-x-0 -top-[20%] h-[140%] w-full will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
+      >
+        <Image
+          src={project.thumbnail}
+          alt={project.title}
+          fill
+          className="object-cover"
+          sizes={isLarge ? "(max-width: 768px) 100vw, 704px" : "(max-width: 768px) 100vw, 352px"}
+          priority={isLarge}
+        />
+      </motion.div>
 
-      {/* Top Metadata Badges */}
-      <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 font-mono-custom text-[11px] text-white/80">
-        {project.year}
-      </div>
-
-      <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 font-mono-custom text-[11px] text-white/90">
-        {isVideo ? (project.format || "16:9") : "Web"}
-      </div>
-
-      {/* Video Hover Overlay */}
+      {/* Video Hover Overlay with Sleek Play Button */}
       {isVideo && (
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-          <div className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center text-xl pl-1 shadow-2xl transition-transform duration-300 group-hover:scale-110">
+        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white text-black flex items-center justify-center text-xl sm:text-2xl pl-1 shadow-2xl transition-transform duration-300 group-hover:scale-110">
             ▶
           </div>
         </div>
       )}
 
-      {/* Web Desktop Hover Action Overlay */}
+      {/* Web Desktop Hover Action Overlay matching Patrick Jane minimalism */}
       {!isVideo && (
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center gap-3 p-4 z-10 backdrop-blur-[2px]">
+        <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 p-4 z-10">
           {project.githubUrl && (
             <a
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="px-4 py-2 rounded-full bg-black/75 hover:bg-black text-white font-mono-custom text-xs border border-white/20 transition-all flex items-center gap-1.5 shadow-lg hover:scale-105"
+              className="px-4 py-2 rounded-full bg-black/80 hover:bg-black text-white font-mono-custom text-xs border border-white/20 transition-all flex items-center gap-1.5 shadow-lg hover:scale-105"
             >
-              <span>GitHub / Project</span>
+              <span>GitHub</span>
               <span>↗</span>
             </a>
           )}

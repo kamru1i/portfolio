@@ -15,124 +15,28 @@ export function ProjectsAndWorksSection() {
   const [activeWebProject, setActiveWebProject] = useState<PortfolioProject | null>(null);
 
   const projects = PORTFOLIO_DATA.showcaseProjects || [];
-  const videoProjects = projects.filter((p) => p.type === "video");
-  const webProjects = projects.filter((p) => p.type === "web");
+  
+  // Video projects ordered to match Patrick Jane proportions:
+  // Card 1 (Small): Biqolpo (Latent Stories)
+  // Card 2 (Large): Syston Autos Cinema
+  // Card 3 (Center Large): B&F Cars Automotive (9:16 vertical reel)
+  const videoProjects = [
+    projects.find((p) => p.id === "biqolpo-ai-video"),
+    projects.find((p) => p.id === "syston-autos-video"),
+    projects.find((p) => p.id === "bf-cars-video"),
+  ].filter(Boolean) as PortfolioProject[];
+
+  // Web projects ordered to match Patrick Jane proportions:
+  // Card 1 (Small): Architectural Portfolio
+  // Card 2 (Large): Velocity Interface System
+  // Card 3 (Center Large): JobMatchingBD Career Portal
+  const webProjects = [
+    projects.find((p) => p.id === "portfolio-architectural-web"),
+    projects.find((p) => p.id === "velocity-interface-web"),
+    projects.find((p) => p.id === "jobmatching-portal-web"),
+  ].filter(Boolean) as PortfolioProject[];
 
   const currentProjects = activeTab === "video" ? videoProjects : webProjects;
-
-  /**
-   * Render projects using the approved asymmetric Selected Works layout
-   * (Row 1: Asymmetric pair, Row 2: Centered spotlight, Row 3+: Alternating pairs)
-   */
-  const renderAsymmetricGrid = (items: PortfolioProject[]) => {
-    const rows: React.ReactNode[] = [];
-    let i = 0;
-    let cycle = 0;
-
-    while (i < items.length) {
-      if (cycle === 0) {
-        // Row 1: Left (5-cols) + Right (7-cols offset)
-        const p1 = items[i];
-        const p2 = items[i + 1];
-
-        rows.push(
-          <div
-            key={`row-${activeTab}-${i}`}
-            className="w-full grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 lg:gap-14 items-start"
-          >
-            {p1 && (
-              <div className="col-span-12 md:col-span-5 lg:col-span-5">
-                <WorkCard
-                  project={p1}
-                  isLarge={false}
-                  onPlayVideo={(p) => setActiveVideoProject(p)}
-                  onPreviewWeb={(p) => setActiveWebProject(p)}
-                />
-              </div>
-            )}
-
-            {p2 && (
-              <div className="col-span-12 md:col-span-7 md:col-start-6 lg:col-span-7 lg:col-start-6">
-                <WorkCard
-                  project={p2}
-                  isLarge={true}
-                  onPlayVideo={(p) => setActiveVideoProject(p)}
-                  onPreviewWeb={(p) => setActiveWebProject(p)}
-                />
-              </div>
-            )}
-          </div>
-        );
-
-        i += p2 ? 2 : 1;
-        cycle = 1;
-      } else if (cycle === 1) {
-        // Row 2: Centered Spotlight (8-cols, col-start-3)
-        const p = items[i];
-        if (p) {
-          rows.push(
-            <div
-              key={`row-${activeTab}-${i}`}
-              className="w-full grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 lg:gap-14 items-start"
-            >
-              <div className="col-span-12 md:col-span-8 md:col-start-3 lg:col-span-8 lg:col-start-3">
-                <WorkCard
-                  project={p}
-                  isLarge={true}
-                  onPlayVideo={(p) => setActiveVideoProject(p)}
-                  onPreviewWeb={(p) => setActiveWebProject(p)}
-                />
-              </div>
-            </div>
-          );
-        }
-        i += 1;
-        cycle = 2;
-      } else {
-        // Row 3: Left (7-cols) + Right (5-cols offset)
-        const p1 = items[i];
-        const p2 = items[i + 1];
-
-        rows.push(
-          <div
-            key={`row-${activeTab}-${i}`}
-            className="w-full grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 lg:gap-14 items-start"
-          >
-            {p1 && (
-              <div className="col-span-12 md:col-span-7 lg:col-span-7">
-                <WorkCard
-                  project={p1}
-                  isLarge={true}
-                  onPlayVideo={(p) => setActiveVideoProject(p)}
-                  onPreviewWeb={(p) => setActiveWebProject(p)}
-                />
-              </div>
-            )}
-
-            {p2 && (
-              <div className="col-span-12 md:col-span-5 md:col-start-8 lg:col-span-5 lg:col-start-8">
-                <WorkCard
-                  project={p2}
-                  isLarge={false}
-                  onPlayVideo={(p) => setActiveVideoProject(p)}
-                  onPreviewWeb={(p) => setActiveWebProject(p)}
-                />
-              </div>
-            )}
-          </div>
-        );
-
-        i += p2 ? 2 : 1;
-        cycle = 0;
-      }
-    }
-
-    return (
-      <div className="w-full flex flex-col gap-20 sm:gap-28 md:gap-36 pb-12">
-        {rows}
-      </div>
-    );
-  };
 
   return (
     <section
@@ -142,40 +46,44 @@ export function ProjectsAndWorksSection() {
       {/* Anchor alias to support legacy #works links */}
       <div id="works" className="absolute -top-24 pointer-events-none" />
 
-      <HairlineRule className="mb-14 md:mb-20" />
+      {/* Hairline Divider Rule */}
+      <HairlineRule className="mb-10 md:mb-14" />
 
-      {/* Section Header: Patrick Jane Title (Left) + Subtitle (Right) with SectionBadge */}
-      <div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-14">
-        {/* Left: Badge + Patrick Jane Headline */}
+      {/* Section Header: Patrick Jane Title (Left) + Subtitle (Right) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-8 sm:mb-10">
+        {/* Left: Section Badge + Patrick Jane Headline */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: 80 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
-          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-          className="flex flex-col"
+          transition={{ duration: 0.85, ease: [0.25, 0.1, 0.25, 1] }}
+          className="md:col-span-6 flex flex-col"
         >
           <SectionBadge label="PROJECTS" />
-          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
+          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.08] font-normal uppercase">
             {PORTFOLIO_DATA.worksHeader.title}
           </h2>
         </motion.div>
 
-        {/* Right: Natural text wrapping subtitle */}
+        {/* Right: Editorial Narrative Statement matching Patrick Jane */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: 80 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
-          transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-          className="max-w-md lg:max-w-lg md:text-right"
+          transition={{ duration: 0.85, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+          className="md:col-span-6 md:pt-14"
         >
-          <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed">
-            A curated body of commercial video edits, AI-assisted productions, responsive web interfaces, and enterprise digital operations.
-          </p>
+          <p
+            className="font-mono-custom text-[15px] sm:text-[16px] leading-[1.6] text-[#a1a1a1] [&_strong]:text-white [&_strong]:font-medium"
+            dangerouslySetInnerHTML={{
+              __html: PORTFOLIO_DATA.worksHeader.statementHtml,
+            }}
+          />
         </motion.div>
       </div>
 
       {/* Left-Aligned Category Tabs with Low Visual Emphasis */}
-      <div className="w-full flex items-center justify-start mb-12 sm:mb-16">
+      <div className="w-full flex items-center justify-start mt-6 mb-16 sm:mb-20 md:mb-24">
         <div
           role="tablist"
           aria-label="Filter projects by category"
@@ -221,17 +129,91 @@ export function ProjectsAndWorksSection() {
         </div>
       </div>
 
-      {/* Projects Grid Container with Smooth Tab Transition */}
+      {/* Projects Grid Container: Exact Patrick Jane Selected Works Asymmetric Layout */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-          className="w-full"
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="w-full flex flex-col gap-24 sm:gap-32 md:gap-40 pb-20"
         >
-          {renderAsymmetricGrid(currentProjects)}
+          {/* Row 1: Card 1 (Left 352px / 3-cols) + Card 2 (Right 704px / 6-cols col-start-7) */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+            {currentProjects[0] && (
+              <div className="col-span-12 md:col-span-3">
+                <WorkCard
+                  project={currentProjects[0]}
+                  isLarge={false}
+                  onPlayVideo={(p) => setActiveVideoProject(p)}
+                  onPreviewWeb={(p) => setActiveWebProject(p)}
+                />
+              </div>
+            )}
+
+            {currentProjects[1] && (
+              <div className="col-span-12 md:col-span-6 md:col-start-7">
+                <WorkCard
+                  project={currentProjects[1]}
+                  isLarge={true}
+                  onPlayVideo={(p) => setActiveVideoProject(p)}
+                  onPreviewWeb={(p) => setActiveWebProject(p)}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Row 2: Card 3 (Centered 704px / 6-cols col-start-4) */}
+          {currentProjects[2] && (
+            <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+              <div className="col-span-12 md:col-span-6 md:col-start-4">
+                <WorkCard
+                  project={currentProjects[2]}
+                  isLarge={true}
+                  onPlayVideo={(p) => setActiveVideoProject(p)}
+                  onPreviewWeb={(p) => setActiveWebProject(p)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Row 3: Card 4 (Left 704px / 6-cols) + Card 5 (Right 352px / 3-cols col-start-10) with Explore More */}
+          {(currentProjects[3] || currentProjects[4]) && (
+            <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+              {currentProjects[3] && (
+                <div className="col-span-12 md:col-span-6">
+                  <WorkCard
+                    project={currentProjects[3]}
+                    isLarge={true}
+                    onPlayVideo={(p) => setActiveVideoProject(p)}
+                    onPreviewWeb={(p) => setActiveWebProject(p)}
+                  />
+                </div>
+              )}
+
+              {currentProjects[4] && (
+                <div className="col-span-12 md:col-span-3 md:col-start-10 flex flex-col justify-between">
+                  <WorkCard
+                    project={currentProjects[4]}
+                    isLarge={false}
+                    onPlayVideo={(p) => setActiveVideoProject(p)}
+                    onPreviewWeb={(p) => setActiveWebProject(p)}
+                  />
+
+                  {/* Explore More CTA matching Patrick Jane reference */}
+                  <div className="mt-16 sm:mt-24 pt-4">
+                    <a
+                      href="#works"
+                      className="font-mono-custom text-[15px] sm:text-[16px] text-white hover-underline-link tracking-wide"
+                    >
+                      Explore More
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
 
