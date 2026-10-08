@@ -147,7 +147,7 @@ async function main() {
     await sleep(2900);
 
     const metrics = await p.evaluate(() => {
-      const h1 = document.querySelector("h1");
+      const h1 = document.querySelector("main h1") || document.querySelector("h1");
       const h1Style = h1 ? window.getComputedStyle(h1) : null;
       const footer = document.querySelector("footer");
       const footerR = footer ? footer.getBoundingClientRect() : null;
