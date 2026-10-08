@@ -9,6 +9,7 @@ import { WorksGrid } from "@/components/works/WorksGrid";
 import { ManifestoSection } from "@/components/about/ManifestoSection";
 import { ServicesSection } from "@/components/expertise/ServicesSection";
 import { AwardsSection } from "@/components/recognitions/AwardsSection";
+import { FaqSection } from "@/components/faq/FaqSection";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
@@ -48,6 +49,9 @@ export default function HomePage() {
 
           {/* Section 5: Milestones, Recognitions & Counters */}
           <AwardsSection />
+
+          {/* Section 6: Frequently Asked Questions */}
+          <FaqSection />
         </div>
       </main>
 

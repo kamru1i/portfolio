@@ -16,6 +16,7 @@ const MENU_LINKS = [
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Recognitions", href: "#recognitions" },
+  { label: "FAQ", href: "#faq" },
   { label: "Contact", href: `mailto:${PORTFOLIO_DATA.brand.email}` },
 ];
 

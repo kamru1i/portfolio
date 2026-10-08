@@ -76,6 +76,12 @@ export interface StatItem {
   label: string;
 }
 
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 export const PORTFOLIO_DATA = {
   brand: {
     fullName: "Kamrul Islam",
@@ -843,6 +849,83 @@ export const PORTFOLIO_DATA = {
     { target: 5, suffix: "+", label: "Years in IT & Operations" },
     { target: 100, suffix: "%", label: "Project Delivery Rate" },
   ] as StatItem[],
+
+  faq: {
+    badge: "FAQ",
+    title: "HAVE QUESTIONS? CHECK OUT THE FAQS",
+    subtitle:
+      "Direct insights into my post-production pipeline, technical toolchains, AI workflows, and project collaboration.",
+    contactCard: {
+      name: "Talk with Kamrul",
+      role: "Lead Video Editor & IT Specialist",
+      ctaText: "Get in touch",
+      email: "kamrulislamabk@gmail.com",
+      status: "Available for select freelance & full-time roles",
+      avatarSrc: "/images/Kamrul I.png",
+    },
+    items: [
+      {
+        id: "faq-video-editing",
+        question: "What types of video editing can you handle?",
+        answer:
+          "I specialize in end-to-end commercial and brand video editing, including promotional reels, corporate overviews, automotive showcase videos, social-first short-form content, and documentary-style narratives. My editing workflow covers pacing, narrative cuts, dynamic motion graphics, color grading, sound design, and custom title integration.",
+      },
+      {
+        id: "faq-audio-enhancement",
+        question: "Do you provide audio enhancement and noise reduction?",
+        answer:
+          "Yes. Clean, balanced audio is an integral part of my post-production workflow. I handle dialogue isolation, background noise reduction, vocal clarity EQ, ambient sound staging, and loudness normalization across YouTube, broadcast, and social delivery standards using Adobe Audition and DaVinci Resolve Fairlight.",
+      },
+      {
+        id: "faq-ai-content",
+        question: "Can you create AI-assisted video and visual content?",
+        answer:
+          "Yes. I integrate state-of-the-art generative tools—including Runway, Midjourney, and ElevenLabs—to produce synthetic B-roll, concept storyboards, photorealistic environments, and specialized voiceovers, blending them seamlessly with traditional cinematic footage.",
+      },
+      {
+        id: "faq-social-media",
+        question: "Can you prepare videos for social media platforms?",
+        answer:
+          "Absolutely. I deliver platform-optimized edits tailored for TikTok, Instagram Reels, YouTube Shorts (9:16 vertical), and standard widescreen YouTube (16:9). This includes high-retention pacing, engaging captions, animated lower thirds, and custom thumbnail curation.",
+      },
+      {
+        id: "faq-web-dev",
+        question: "What web development technologies do you work with?",
+        answer:
+          "My core front-end stack is React, Next.js, TypeScript, and Tailwind CSS. Backed by a BSc in Computer Science & Engineering, I build responsive, component-driven web applications and portfolios with smooth Framer Motion interactions and solid SEO architecture.",
+      },
+      {
+        id: "faq-wordpress",
+        question: "Do you also work with WordPress websites?",
+        answer:
+          "Yes. I have professional experience managing and building custom WordPress installations, including Elementor-based layouts, child theme development, plugin configuration, database optimization, and secure domain/hosting migrations.",
+      },
+      {
+        id: "faq-it-support",
+        question: "What kind of IT support can you provide?",
+        answer:
+          "With 5+ years across corporate IT management and customer technical support, I manage enterprise DNS records, SSL certificates, business email infrastructure (Google Workspace/cPanel), cloud backups, system maintenance, and workstation troubleshooting.",
+      },
+      {
+        id: "faq-end-to-end",
+        question: "Can you work on a project from concept to final delivery?",
+        answer:
+          "Yes. I frequently manage end-to-end productions—from initial briefing, script breakdown, and visual storyboarding to asset collection, rough assembly cuts, audio mastering, revision rounds, and final export delivery across multiple formats.",
+      },
+      {
+        id: "faq-footage-ai",
+        question: "Can you work with existing footage as well as AI-generated assets?",
+        answer:
+          "Yes. Many of my projects involve taking raw client-provided camera footage or screen captures and elevating them with generative backgrounds, AI-enhanced audio, kinetic typography, and motion overlays to achieve a cohesive, high-budget aesthetic.",
+      },
+      {
+        id: "faq-focus",
+        question: "What kind of projects are you most focused on?",
+        answer:
+          "My primary focus is on high-impact video editing, commercial brand storytelling, and interactive digital experiences that combine creative post-production with modern front-end engineering.",
+      },
+    ] as FaqItem[],
+  },
 
   footer: {
     navLinks: [
