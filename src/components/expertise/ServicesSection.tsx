@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA, ServiceItem } from "@/lib/portfolio-data";
+import { EditorialListCard } from "@/components/common/EditorialListCard";
 
 export function ServicesSection() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -59,33 +60,31 @@ export function ServicesSection() {
         </motion.div>
       </div>
 
-      {/* Stacked Service Rows */}
+      {/* Stacked Service Cards in Aurexa/FAQ Unified Pattern */}
       <div
-        className="w-full flex flex-col border-t border-b border-white/10 divide-y divide-white/10"
+        className="w-full flex flex-col gap-3.5 sm:gap-4"
         onMouseLeave={() => {
           setHoveredId(null);
           setMouseRelativeX(0);
         }}
       >
-        {services.map((service, index) => {
+        {services.map((service) => {
           const isHovered = hoveredId === service.id;
           const isAnyHovered = hoveredId !== null;
 
           return (
-            <div
+            <EditorialListCard
               key={service.id}
+              href={service.href}
+              isHovered={isHovered}
+              isDimmed={isAnyHovered && !isHovered}
               onMouseEnter={() => setHoveredId(service.id)}
               onMouseMove={handleMouseMove}
-              className={`relative w-full min-h-[100px] sm:min-h-[120px] md:min-h-[140px] flex items-center transition-opacity duration-300 ${
-                isAnyHovered && !isHovered ? "opacity-35" : "opacity-100"
-              }`}
+              ariaLabel={`${service.title} - View details`}
+              className="min-h-[100px] sm:min-h-[120px] md:min-h-[130px] flex items-center"
             >
-              {/* Idle State: Clean Minimal Editorial Row */}
-              <Link
-                href={service.href}
-                className="w-full py-8 sm:py-10 md:py-12 px-2 sm:px-4 flex items-center justify-between text-white group cursor-pointer"
-                aria-label={`${service.title} - View details`}
-              >
+              {/* Idle State: Clean Minimal Editorial Row inside Card */}
+              <div className="w-full py-6 sm:py-8 md:py-9 px-5 sm:px-8 flex items-center justify-between text-white group cursor-pointer">
                 {/* Left Category Label */}
                 <div className="w-[120px] sm:w-[180px] md:w-[220px] flex-shrink-0 text-[#777] font-mono-custom text-xs sm:text-sm tracking-widest uppercase transition-colors group-hover:text-white/80">
                   {service.category}
@@ -93,7 +92,7 @@ export function ServicesSection() {
 
                 {/* Center Title */}
                 <div className="flex-1 text-center md:text-center px-4">
-                  <h3 className="font-sans text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal tracking-tight transition-transform duration-200 group-hover:scale-[1.01]">
+                  <h3 className="font-sans text-2xl sm:text-4xl md:text-5xl lg:text-5xl text-white font-normal tracking-tight transition-transform duration-200 group-hover:scale-[1.01]">
                     {service.title}
                   </h3>
                 </div>
@@ -102,7 +101,7 @@ export function ServicesSection() {
                 <div className="w-[40px] sm:w-[60px] text-right flex-shrink-0 text-[#777] font-mono-custom text-sm sm:text-base transition-colors group-hover:text-white">
                   {service.index}
                 </div>
-              </Link>
+              </div>
 
               {/* Active State: Aurexa-Style Pill Image + Title Sliding Marquee Ribbon */}
               <AnimatePresence>
@@ -112,58 +111,52 @@ export function ServicesSection() {
                     animate={{ opacity: 1, scaleY: 1 }}
                     exit={{ opacity: 0, scaleY: 0.94 }}
                     transition={{ duration: 0.28, ease: [0.25, 1, 0.5, 1] }}
-                    className="absolute inset-0 z-20 bg-[#191919] border border-white/15 rounded-[12px] sm:rounded-[16px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.7)] flex items-center pointer-events-auto"
+                    className="absolute inset-0 z-20 bg-[#1e1e1e] border border-white/20 rounded-[14px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.7)] flex items-center pointer-events-auto"
                   >
-                    <Link
-                      href={service.href}
-                      className="w-full h-full flex items-center overflow-hidden cursor-pointer"
-                      aria-label={`${service.title} - View details`}
+                    {/* Animated Horizontal Track */}
+                    <motion.div
+                      animate={{
+                        x: ["0%", "-50%"],
+                      }}
+                      transition={{
+                        x: {
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          duration: 16,
+                          ease: "linear",
+                        },
+                      }}
+                      style={{
+                        transform: `translateX(${mouseRelativeX}px)`,
+                      }}
+                      className="flex items-center gap-6 sm:gap-10 whitespace-nowrap will-change-transform py-2 pl-4"
                     >
-                      {/* Animated Horizontal Track */}
-                      <motion.div
-                        animate={{
-                          x: ["0%", "-50%"],
-                        }}
-                        transition={{
-                          x: {
-                            repeat: Infinity,
-                            repeatType: "loop",
-                            duration: 16,
-                            ease: "linear",
-                          },
-                        }}
-                        style={{
-                          transform: `translateX(${mouseRelativeX}px)`,
-                        }}
-                        className="flex items-center gap-6 sm:gap-10 whitespace-nowrap will-change-transform py-2 pl-4"
-                      >
-                        {/* Repeat Ribbon Units: [Image] Title [Image] Title [Image] Title */}
-                        {[0, 1, 2, 3].map((rep) => (
-                          <div key={rep} className="flex items-center gap-6 sm:gap-10 flex-shrink-0">
-                            {/* Pill / Stadium Shaped Service-Specific Image */}
-                            <div className="relative w-[180px] sm:w-[240px] md:w-[280px] h-[64px] sm:h-[80px] md:h-[94px] rounded-full overflow-hidden flex-shrink-0 border border-white/20 bg-black/60 shadow-inner">
-                              <Image
-                                src={service.images[rep % service.images.length] || service.image}
-                                alt={`${service.title} visual preview`}
-                                fill
-                                sizes="(max-width: 768px) 240px, 280px"
-                                className="object-cover"
-                                priority
-                              />
-                            </div>
-
-                            {/* Service Title in Ribbon */}
-                            <span className="font-sans text-2xl sm:text-3xl md:text-5xl text-white font-normal tracking-tight flex-shrink-0">
-                              {service.title}
-                            </span>
+                      {/* Repeat Ribbon Units: [Image] Title [Image] Title [Image] Title */}
+                      {[0, 1, 2, 3].map((rep) => (
+                        <div key={rep} className="flex items-center gap-6 sm:gap-10 flex-shrink-0">
+                          {/* Pill / Stadium Shaped Service-Specific Image */}
+                          <div className="relative w-[180px] sm:w-[240px] md:w-[280px] h-[64px] sm:h-[80px] md:h-[94px] rounded-full overflow-hidden flex-shrink-0 border border-white/20 bg-black/60 shadow-inner">
+                            <Image
+                              src={service.images[rep % service.images.length] || service.image}
+                              alt={`${service.title} visual preview`}
+                              fill
+                              sizes="(max-width: 768px) 240px, 280px"
+                              className="object-cover"
+                              priority
+                            />
                           </div>
-                        ))}
-                      </motion.div>
-                    </Link>
+
+                          {/* Service Title in Ribbon */}
+                          <span className="font-sans text-2xl sm:text-3xl md:text-5xl text-white font-normal tracking-tight flex-shrink-0">
+                            {service.title}
+                          </span>
+                        </div>
+                      ))}
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </EditorialListCard>
           );
         })}
       </div>

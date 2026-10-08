@@ -47,25 +47,24 @@ export function ManifestoSection() {
 
       {/* Dual Column Lower Block: Portrait (Left) + Bio Narrative (Right with generous gap) */}
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-0 items-start">
-        {/* Creator Portrait with Noir Grading & Wipe Reveal */}
+        {/* Creator Portrait: Full-color, naturally blended into page background & global grain without container box */}
         <motion.div
           ref={portraitRef}
-          initial={{ opacity: 0, scale: 0.96, y: 25 }}
+          initial={{ opacity: 0, scale: 0.98, y: 20 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
           transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
-          className="col-span-12 md:col-span-5 relative w-full aspect-square max-w-[440px] rounded-[16px] overflow-hidden bg-[#0c0c0c] border border-white/[0.08] select-none"
+          className="col-span-12 md:col-span-5 relative w-full aspect-square max-w-[420px] select-none mx-auto md:mx-0 flex items-center justify-center"
         >
           <Image
             src={PORTFOLIO_DATA.manifesto.portraitSrc}
             alt="Kamrul Islam"
-            fill
-            className="object-contain p-2 sm:p-3 grayscale contrast-115 brightness-95"
-            sizes="(max-width: 768px) 100vw, 440px"
+            width={420}
+            height={420}
+            className="w-full h-auto max-h-[440px] object-contain"
+            sizes="(max-width: 768px) 340px, 420px"
             priority
           />
-          {/* Subtle gradient vignette */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none rounded-[16px]" />
         </motion.div>
 
         {/* Bio Paragraphs & Contact CTA (Right, col-start-7 for exact 563px width) */}

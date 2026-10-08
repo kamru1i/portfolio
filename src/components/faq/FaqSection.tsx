@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 
 export function FaqSection() {
   const faqData = PORTFOLIO_DATA.faq;
@@ -39,8 +40,8 @@ export function FaqSection() {
             </div>
 
             {/* Patrick Jane Editorial Serif Headline */}
-            <h2 className="font-gambarino text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[58px] text-white tracking-tight leading-[1.08] font-normal uppercase text-balance">
-              HAVE QUESTIONS?<br className="hidden sm:inline" /> CHECK OUT THE FAQS
+            <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase text-balance">
+              {faqData.title}
             </h2>
 
             {/* Aurexa Supporting Subtitle */}
@@ -174,19 +175,20 @@ function FaqContactCard({ contactCard }: ContactCardProps) {
     <div className="w-full max-w-md rounded-2xl bg-[#161616] border border-white/[0.08] p-5 sm:p-6 flex flex-col gap-4 shadow-[0_12px_36px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-white/15">
       {/* Profile Avatar & Info Row */}
       <div className="flex items-center gap-4">
-        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-white/15 flex-shrink-0 bg-neutral-900 shadow-inner">
+        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-white/20 flex-shrink-0 shadow-inner">
           <Image
             src={contactCard.avatarSrc}
-            alt={contactCard.name}
+            alt="Kamrul Islam"
             fill
-            className="object-cover object-top filter grayscale contrast-110"
+            className="object-cover object-top"
             sizes="56px"
           />
         </div>
-        <div className="flex flex-col">
-          <span className="font-sans font-medium text-lg text-white">
-            {contactCard.name}
-          </span>
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
+            <span className="font-sans font-medium text-lg text-white">Talk with</span>
+            <KamrulBrandWordmark className="h-[18px] w-auto inline-block text-white" />
+          </div>
           <span className="font-mono-custom text-xs text-[#888]">
             {contactCard.role}
           </span>

@@ -16,6 +16,24 @@ export interface ProjectItem {
   links?: { label: string; url: string }[];
 }
 
+export interface PortfolioProject {
+  id: string;
+  type: "video" | "web";
+  title: string;
+  client?: string;
+  year: string;
+  description: string;
+  thumbnail: string;
+  videoUrl?: string;
+  videoType?: "local" | "youtube" | "vimeo";
+  githubUrl?: string;
+  liveUrl?: string;
+  canEmbed?: boolean;
+  tags: string[];
+  published: boolean;
+  order: number;
+}
+
 export interface ServiceCapability {
   title: string;
   description: string;
@@ -150,7 +168,7 @@ export const PORTFOLIO_DATA = {
   },
 
   worksHeader: {
-    title: "Selected Works",
+    title: "Projects & Works",
     statementHtml: `A <strong>curated body</strong> of <strong>high-impact video edits</strong>, <strong>AI-assisted productions</strong>, <strong>full-stack web interfaces</strong>, and <strong>enterprise IT systems</strong> engineered for <strong>clarity</strong>, <strong>rhythm</strong>, and <strong>dependability</strong>.`,
   },
 
@@ -246,6 +264,102 @@ export const PORTFOLIO_DATA = {
       ],
     },
   ] as ProjectItem[],
+
+  // Future-proof, typed project model separating data from presentation (ready for future database / API integration)
+  showcaseProjects: [
+    {
+      id: "syston-autos-video",
+      type: "video",
+      title: "Syston Autos Cinema",
+      client: "Syston Autos Ltd",
+      year: "2024–2025",
+      description:
+        "High-energy automotive showcase series with precision cut pacing, engine audio enhancement, cinematic color grading, and dynamic motion graphics across 6 episodes.",
+      thumbnail: "/images/work-2-syston.png",
+      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      videoType: "local",
+      tags: ["Premiere Pro", "After Effects", "Sound Design", "Color Grading"],
+      published: true,
+      order: 1,
+    },
+    {
+      id: "biqolpo-ai-video",
+      type: "video",
+      title: "Biqolpo — Latent Stories",
+      client: "Biqolpo",
+      year: "2024–2026",
+      description:
+        "Experimental generative narratives blending synthetic visual concept art with cinematic pacing, AI voiceover mastering, and temporal motion synthesis.",
+      thumbnail: "/images/work-1-biqolpo.png",
+      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      videoType: "local",
+      tags: ["Google Veo", "Runway Gen-2", "DaVinci Resolve", "AI Compositing"],
+      published: true,
+      order: 2,
+    },
+    {
+      id: "bf-cars-video",
+      type: "video",
+      title: "B&F Cars Automotive",
+      client: "B&F Cars",
+      year: "2024–2025",
+      description:
+        "Fast-paced social media reels and showroom presentations featuring speed ramping, kinetic typography, vehicle feature highlights, and multi-platform vertical exports.",
+      thumbnail: "/images/work-5-bfcars.png",
+      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+      videoType: "local",
+      tags: ["CapCut Pro", "Premiere Pro", "Motion Graphics", "9:16 Vertical"],
+      published: true,
+      order: 3,
+    },
+    {
+      id: "velocity-interface-web",
+      type: "web",
+      title: "Velocity Interface System",
+      client: "Velocity Digital Inc.",
+      year: "2023–2024",
+      description:
+        "Modular, component-driven frontend architecture built with React, TypeScript, and Tailwind CSS. Features fluid UI state transitions, responsive design systems, and REST API data pipelines.",
+      thumbnail: "/images/work-3-web.png",
+      githubUrl: "https://github.com/kamrul-islam-dev",
+      liveUrl: "https://react.dev",
+      canEmbed: false,
+      tags: ["React.js", "TypeScript", "Tailwind CSS", "REST APIs"],
+      published: true,
+      order: 4,
+    },
+    {
+      id: "portfolio-architectural-web",
+      type: "web",
+      title: "Kamrul Islam — Architectural Portfolio",
+      client: "Independent",
+      year: "2026",
+      description:
+        "High-fidelity personal developer portfolio engineered with Next.js 16 App Router, Turbopack, Framer Motion transitions, custom SVG vector wordmarks, and responsive design systems.",
+      thumbnail: "/images/hero-card-4.png",
+      githubUrl: "https://github.com/kamru1i/portfolio",
+      liveUrl: "https://kamrulislam.bd",
+      canEmbed: true,
+      tags: ["Next.js", "TypeScript", "Framer Motion", "Tailwind CSS"],
+      published: true,
+      order: 5,
+    },
+    {
+      id: "jobmatching-portal-web",
+      type: "web",
+      title: "JobMatchingBD Career Portal",
+      client: "JobMatchingBD.com",
+      year: "2022–2023",
+      description:
+        "Production WordPress portal managing candidate registrations, dynamic job listings, custom Elementor archive templates, database indexing, and secure domain/hosting operations.",
+      thumbnail: "/images/work-4-it.png",
+      liveUrl: "https://wordpress.org",
+      canEmbed: false,
+      tags: ["WordPress", "PHP / MySQL", "Elementor Pro", "DNS / SSL"],
+      published: true,
+      order: 6,
+    },
+  ] as PortfolioProject[],
 
   manifesto: {
     statement:
@@ -852,7 +966,7 @@ export const PORTFOLIO_DATA = {
 
   faq: {
     badge: "FAQ",
-    title: "HAVE QUESTIONS? CHECK OUT THE FAQS",
+    title: "Have Questions?",
     subtitle:
       "Direct insights into my post-production pipeline, technical toolchains, AI workflows, and project collaboration.",
     contactCard: {

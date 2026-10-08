@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { EditorialListCard } from "@/components/common/EditorialListCard";
 import { OdometerCounters } from "./OdometerCounters";
 
 export function AwardsSection() {
@@ -44,9 +45,9 @@ export function AwardsSection() {
         </motion.div>
       </div>
 
-      {/* Stacked Milestone Rows in Aurexa-Inspired Pattern */}
+      {/* Stacked Milestone Cards in Aurexa/FAQ Unified Pattern */}
       <div
-        className="w-full flex flex-col border-t border-b border-white/10 divide-y divide-white/10"
+        className="w-full flex flex-col gap-3.5 sm:gap-4"
         onMouseLeave={() => setHoveredIdx(null)}
       >
         {milestones.map((item, idx) => {
@@ -54,41 +55,43 @@ export function AwardsSection() {
           const isAnyHovered = hoveredIdx !== null;
 
           return (
-            <div
+            <EditorialListCard
               key={idx}
+              isHovered={isHovered}
+              isDimmed={isAnyHovered && !isHovered}
               onMouseEnter={() => setHoveredIdx(idx)}
-              className={`group relative w-full py-7 sm:py-8 md:py-10 px-2 sm:px-4 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8 transition-all duration-300 ${
-                isAnyHovered && !isHovered ? "opacity-40" : "opacity-100"
-              } ${isHovered ? "bg-white/[0.02] rounded-[12px]" : ""}`}
+              className="py-6 sm:py-7 md:py-8 px-5 sm:px-8"
             >
-              {/* Left Column: Year & Period */}
-              <div className="w-[120px] sm:w-[150px] md:w-[180px] flex-shrink-0 flex items-center gap-3">
-                <span className="font-mono-custom text-sm sm:text-base text-white/90 font-medium tracking-wider">
-                  {item.year}
-                </span>
-                <span className="h-px w-6 bg-white/20 hidden sm:inline-block" />
-              </div>
-
-              {/* Center / Main Column: Organization & Role Hierarchy */}
-              <div className="flex-1 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono-custom text-xs uppercase tracking-widest text-[#888] group-hover:text-emerald-400/90 transition-colors">
-                    {item.organization}
+              <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8">
+                {/* Left Column: Year & Period */}
+                <div className="w-[120px] sm:w-[150px] md:w-[180px] flex-shrink-0 flex items-center gap-3">
+                  <span className="font-mono-custom text-sm sm:text-base text-white/90 font-medium tracking-wider">
+                    {item.year}
                   </span>
+                  <span className="h-px w-6 bg-white/20 hidden sm:inline-block" />
                 </div>
-                <h3 className="font-sans text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white font-normal tracking-tight transition-colors">
-                  {item.role}
-                </h3>
-                <p className="font-mono-custom text-xs sm:text-sm text-[#777] mt-1.5 leading-relaxed group-hover:text-[#aaa] transition-colors">
-                  {item.highlight}
-                </p>
-              </div>
 
-              {/* Right Column: Index Numbering */}
-              <div className="w-[40px] sm:w-[60px] text-right flex-shrink-0 font-mono-custom text-sm sm:text-base text-[#666] group-hover:text-white transition-colors">
-                {String(idx + 1).padStart(2, "0")}
+                {/* Center / Main Column: Organization & Role Hierarchy */}
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-mono-custom text-xs uppercase tracking-widest text-[#888] group-hover:text-emerald-400/90 transition-colors">
+                      {item.organization}
+                    </span>
+                  </div>
+                  <h3 className="font-sans text-xl sm:text-2xl md:text-3xl text-white font-normal tracking-tight transition-colors">
+                    {item.role}
+                  </h3>
+                  <p className="font-mono-custom text-xs sm:text-sm text-[#777] mt-1.5 leading-relaxed group-hover:text-[#aaa] transition-colors">
+                    {item.highlight}
+                  </p>
+                </div>
+
+                {/* Right Column: Index Numbering */}
+                <div className="w-[40px] sm:w-[60px] text-right flex-shrink-0 font-mono-custom text-sm sm:text-base text-[#666] group-hover:text-white transition-colors">
+                  {String(idx + 1).padStart(2, "0")}
+                </div>
               </div>
-            </div>
+            </EditorialListCard>
           );
         })}
       </div>

@@ -12,7 +12,7 @@ interface FullScreenMenuProps {
 
 const MENU_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Works", href: "#works" },
+  { label: "Projects & Works", href: "#projects" },
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Recognitions", href: "#recognitions" },
