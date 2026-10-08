@@ -65,12 +65,12 @@ async function runQA() {
       }
     }
 
-    // Verify Card 5 renders 9:16 vertical reel container
-    const card5Reel = page.locator('#projects [data-project-id="bf-cars-video"] .aspect-\\[9\\/16\\]');
-    const has916Reel = await card5Reel.isVisible();
-    console.log(`  Card 5 9:16 vertical container check: ${has916Reel ? "YES" : "NO"}`);
-    if (!has916Reel) {
-      throw new Error("Card 5 did not render 9:16 vertical reel container!");
+    // Verify Card 5 renders full-bleed square aspect frame matching Patrick Jane reference
+    const card5Media = page.locator('#projects [data-project-id="bf-cars-video"] .aspect-square');
+    const hasSquareMedia = await card5Media.isVisible();
+    console.log(`  Card 5 full-bleed square media check: ${hasSquareMedia ? "YES" : "NO"}`);
+    if (!hasSquareMedia) {
+      throw new Error("Card 5 did not render square media container!");
     }
 
     // Verify Explore More Link

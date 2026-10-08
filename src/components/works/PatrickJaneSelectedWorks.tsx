@@ -74,10 +74,10 @@ export function PatrickJaneSelectedWorks({
               />
 
               {/* Explore More link matching Patrick Jane reference */}
-              <div className="mt-12 sm:mt-16 pt-2">
+              <div className="mt-14 sm:mt-20 pt-1">
                 <a
-                  href="#works"
-                  className="font-gambarino text-[18px] sm:text-[20px] text-white hover-underline-link tracking-wide"
+                  href="#projects"
+                  className="font-mono-custom text-[15px] sm:text-[16px] text-white hover-underline-link tracking-normal"
                 >
                   Explore More
                 </a>
