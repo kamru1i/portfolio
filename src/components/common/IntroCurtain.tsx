@@ -60,7 +60,7 @@ export function IntroCurtain({
       animate={
         stage === "exit"
           ? {
-              y: "100%",
+              y: "-100%",
               transition: {
                 duration: 0.85,
                 ease: [0.76, 0, 0.24, 1], // Exact theatrical curtain slide curve
