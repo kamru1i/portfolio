@@ -16,12 +16,50 @@ export interface ProjectItem {
   links?: { label: string; url: string }[];
 }
 
-export interface ServiceItem {
-  id: string;
-  index: string;
+export interface ServiceCapability {
   title: string;
   description: string;
+}
+
+export interface ServiceExperience {
+  role: string;
+  organization: string;
+  period: string;
+  summary: string;
+}
+
+export interface ServiceWorkflowStep {
+  step: string;
+  title: string;
+  description: string;
+}
+
+export interface ServiceProjectHighlight {
+  title: string;
+  client: string;
+  role: string;
+  summary: string;
+  image?: string;
+  link?: string;
+}
+
+export interface ServiceItem {
+  id: string;
+  slug: string;
+  href: string;
+  index: string;
+  category: string;
+  title: string;
+  headline: string;
+  description: string;
+  introduction: string;
+  bulletHighlights: string[];
+  capabilities: ServiceCapability[];
   tools: string[];
+  workflow: ServiceWorkflowStep[];
+  experience: ServiceExperience[];
+  projects?: ServiceProjectHighlight[];
+  images: string[];
   image: string;
 }
 
@@ -220,49 +258,544 @@ export const PORTFOLIO_DATA = {
 
   services: [
     {
-      id: "video",
+      id: "video-editing",
+      slug: "video-editing",
+      href: "/services/video-editing",
       index: "01",
-      title: "VIDEO EDITING & POST-PRODUCTION",
+      category: "VIDEO EDITING",
+      title: "Video Editing & Post-Production",
+      headline:
+        "Crafting high-impact cinematic edits, narrative rhythm, and platform-optimized video productions.",
       description:
-        "Storytelling, narrative flow, rhythm, noise reduction, audio mixing, color correction & grading, motion graphics, and platform delivery.",
-      tools: ["Premiere Pro", "DaVinci Resolve", "After Effects", "CapCut", "Audacity"],
-      image: "/images/service-1.png",
+        "Comprehensive post-production from raw footage assembly to sound design, noise cleanup, color grading, motion graphics, and multi-platform delivery.",
+      introduction:
+        "Transforming raw footage into polished, engaging, and purpose-driven video content. From cutting and sequencing to pacing, rhythm, audio synchronization, voice cleanup, color grading, motion graphics, and platform delivery, every edit is executed with narrative instinct and technical discipline.",
+      bulletHighlights: [
+        "/ Storytelling & Narrative Flow",
+        "/ Noise Reduction & Audio Enhancement",
+        "/ Motion Graphics & Color Grading",
+        "/ Multi-Platform Social Optimization",
+      ],
+      capabilities: [
+        {
+          title: "Storytelling & Narrative Flow",
+          description:
+            "Structuring footage with purposeful rhythm, pacing, timing, and narrative continuity tailored to target audiences and brand voice.",
+        },
+        {
+          title: "Audio Editing & Voice Cleanup",
+          description:
+            "Precision noise reduction, sound synchronization, audio enhancement, volume balancing, SFX integration, and dialogue clarity.",
+        },
+        {
+          title: "Color Correction & Color Grading",
+          description:
+            "Balancing exposure, contrast, tone matching, and creating cinematic grades for compelling visual mood and consistency.",
+        },
+        {
+          title: "Motion Graphics & Animated Text",
+          description:
+            "Designing dynamic titles, lower thirds, callouts, text overlays, kinetic typography, and graphic compositing.",
+        },
+        {
+          title: "Visual Effects & Compositing",
+          description:
+            "Keyframing, masking, compositing, aspect-ratio reframing, speed ramping, and visual cleanup for polished productions.",
+        },
+        {
+          title: "Social Media Video Optimization",
+          description:
+            "Formatting for vertical reels, shorts, landscape broadcasts, high-CTR thumbnail creation, and platform-specific exports.",
+        },
+      ],
+      tools: [
+        "Adobe Premiere Pro",
+        "Adobe After Effects",
+        "DaVinci Resolve",
+        "CapCut",
+        "Final Cut Pro",
+        "Adobe Photoshop",
+        "Adobe Illustrator",
+        "Adobe Podcast",
+        "Audacity",
+      ],
+      workflow: [
+        {
+          step: "01",
+          title: "Ingestion & Narrative Assembly",
+          description:
+            "Reviewing raw footage, selecting hero takes, and building the fundamental story arc and timeline pacing.",
+        },
+        {
+          step: "02",
+          title: "Audio Surgery & Sound Design",
+          description:
+            "Eliminating background noise, balancing levels, synchronizing multi-track audio, and layering SFX and music.",
+        },
+        {
+          step: "03",
+          title: "Color Grading & Visual Tone",
+          description:
+            "Matching shot exposures, correcting white balance, and crafting consistent chromatic mood and depth.",
+        },
+        {
+          step: "04",
+          title: "Motion Graphics & Kinetic Polish",
+          description:
+            "Integrating animated text, lower thirds, captions, custom graphics, and subtle visual transitions.",
+        },
+        {
+          step: "05",
+          title: "Mastering & Platform Delivery",
+          description:
+            "Final quality control, aspect-ratio formatting (9:16, 16:9, 1:1), and high-fidelity rendering.",
+        },
+      ],
+      experience: [
+        {
+          role: "Video Editor",
+          organization: "B&F Corporate",
+          period: "1 Year",
+          summary:
+            "Led commercial video editing, post-production audio mixing, color grading, motion graphics, and social media publishing across corporate channels.",
+        },
+      ],
+      projects: [
+        {
+          title: "Biqolpo",
+          client: "Biqolpo",
+          role: "AI-Assisted Video Editing & Content Creation",
+          summary:
+            "Visual storytelling, creative editing, AI-generated asset integration, and final content refinement.",
+          image: "/images/work-1-biqolpo.png",
+        },
+        {
+          title: "Syston Autos Ltd",
+          client: "Syston Autos Ltd",
+          role: "Social Media Video Editing",
+          summary:
+            "Short-form automotive promotional content, social-first editing, pacing, transitions, and platform delivery.",
+          image: "/images/work-2-syston.png",
+        },
+        {
+          title: "B&F Cars",
+          client: "B&F Cars",
+          role: "Automotive Promotional Content",
+          summary:
+            "Commercial vehicle showcases, short-form editing, visual presentation, and social media optimization.",
+          image: "/images/work-5-bfcars.png",
+        },
+      ],
+      images: [
+        "/images/work-1-biqolpo.png",
+        "/images/work-2-syston.png",
+        "/images/work-5-bfcars.png",
+      ],
+      image: "/images/work-1-biqolpo.png",
     },
     {
-      id: "ai",
+      id: "ai-assisted-content",
+      slug: "ai-assisted-content",
+      href: "/services/ai-assisted-content",
       index: "02",
-      title: "AI-ASSISTED CONTENT CREATION",
+      category: "AI CONTENT CREATION",
+      title: "AI-Assisted Content Creation",
+      headline:
+        "Augmenting creative workflows with advanced AI video synthesis, prompt engineering, and hybrid post-production refinement.",
       description:
-        "Concept design, script writing, scene planning, AI video & image generation, voiceover synthesis, asset blending, and post-refinement.",
-      tools: ["Gemini Omni Flash", "Google Veo", "ChatGPT Sora", "Kling 3.0", "Higgsfield Soul"],
-      image: "/images/service-2.png",
+        "End-to-end AI creative pipeline: concept generation, scriptwriting, scene planning, AI asset synthesis, and timeline integration.",
+      introduction:
+        "Leveraging cutting-edge generative AI models to conceptualize, generate, and assemble creative assets into polished productions. Combining algorithmic generation with manual editing rigor ensures that synthetic footage, scenes, voiceovers, and imagery meet strict narrative continuity and quality standards.",
+      bulletHighlights: [
+        "/ AI Video & Scene Generation",
+        "/ Prompt-Based Creative Concepting",
+        "/ Synthetic Voice & Audio Design",
+        "/ Hybrid Asset Blending & Editing",
+      ],
+      capabilities: [
+        {
+          title: "AI Video & Scene Generation",
+          description:
+            "Prompt-based generation of realistic and stylistic scenes, character actions, and cinematic camera movements using state-of-the-art video models.",
+        },
+        {
+          title: "AI Image & Asset Synthesis",
+          description:
+            "Generating tailored backgrounds, key visuals, textures, and bespoke creative assets for video compositing and digital platforms.",
+        },
+        {
+          title: "Script Writing & Scene Planning",
+          description:
+            "Translating briefs into structured scripts, scene breakdowns, shot lists, and prompt architectures designed for generative models.",
+        },
+        {
+          title: "AI Voiceover & Audio Synthesis",
+          description:
+            "Generating natural, expressive synthetic voiceovers, narration, and background elements, followed by audio cleanup and timing alignment.",
+        },
+        {
+          title: "Hybrid Asset Blending & Editing",
+          description:
+            "Seamlessly merging AI-generated visuals with real-world footage, graphics, titles, and sound design in professional NLE timelines.",
+        },
+        {
+          title: "Iterative Prompt Refinement",
+          description:
+            "Fine-tuning prompt structures, negative prompts, camera directives, and style tokens to maintain aesthetic consistency across scenes.",
+        },
+      ],
+      tools: [
+        "Gemini Omni Flash",
+        "Google Veo",
+        "ChatGPT Sora",
+        "Kling 3.0",
+        "Google Nano Banana",
+        "ChatGPT Image 2",
+        "Higgsfield Soul",
+        "Kling",
+        "Adobe Premiere Pro",
+        "CapCut",
+      ],
+      workflow: [
+        {
+          step: "01",
+          title: "Creative Concept & Story Direction",
+          description:
+            "Defining the creative vision, target tone, narrative arc, and selecting appropriate generative models.",
+        },
+        {
+          step: "02",
+          title: "Script & Prompt Architecture",
+          description:
+            "Writing scene-by-scene scripts, camera instructions, lighting directives, and prompt matrices.",
+        },
+        {
+          step: "03",
+          title: "Generative Asset Synthesis",
+          description:
+            "Executing multi-pass generation of video sequences, keyframe imagery, and synthetic voiceovers.",
+        },
+        {
+          step: "04",
+          title: "Timeline Integration & Assembly",
+          description:
+            "Ingesting synthetic assets into NLE software, cutting to rhythm, and harmonizing colors across shots.",
+        },
+        {
+          step: "05",
+          title: "Post-Processing & Quality Polish",
+          description:
+            "Applying audio enhancement, title cards, motion blur, and final platform encoding.",
+        },
+      ],
+      experience: [
+        {
+          role: "AI-Assisted Video Editor & Content Creator",
+          organization: "B&F Corporate & Client Engagements",
+          period: "1+ Years",
+          summary:
+            "Developed AI-assisted video workflows, prompt engineering systems, and blended synthetic scenes with commercial footage.",
+        },
+      ],
+      projects: [
+        {
+          title: "Biqolpo AI Production",
+          client: "Biqolpo",
+          role: "AI-Assisted Content Production",
+          summary:
+            "Generative video workflows, prompt design, AI asset integration, and timeline narrative assembly.",
+          image: "/images/hero-card-1.png",
+        },
+        {
+          title: "Visual Narrative Concepting",
+          client: "Creative Experiments",
+          role: "Concept & Asset Synthesis",
+          summary:
+            "Exploration of hybrid AI visual techniques, motion consistency, and prompt-driven scene composition.",
+          image: "/images/hero-card-2.png",
+        },
+      ],
+      images: [
+        "/images/hero-card-1.png",
+        "/images/hero-card-2.png",
+        "/images/work-4-it.png",
+      ],
+      image: "/images/hero-card-1.png",
     },
     {
-      id: "web",
+      id: "web-development",
+      slug: "web-development",
+      href: "/services/web-development",
       index: "03",
-      title: "FULL-STACK & WEB DEVELOPMENT",
+      category: "WEB DEVELOPMENT",
+      title: "Web Development",
+      headline:
+        "Engineering performant, responsive web applications, modern React ecosystems, and tailored WordPress platforms.",
       description:
-        "Responsive UI engineering, React.js, Next.js, TypeScript, Tailwind CSS, Node.js, Express, MongoDB, Supabase, and WordPress/Elementor.",
-      tools: ["Next.js", "React.js", "TypeScript", "Tailwind CSS", "Node.js", "WordPress"],
-      image: "/images/service-3.png",
+        "Modern front-end and full-stack development with React, Next.js, TypeScript, Tailwind CSS, Node.js, and dedicated WordPress/Elementor capabilities.",
+      introduction:
+        "Building modern, fast, and accessible digital products from responsive single-page web apps to scalable full-stack platforms and customizable CMS websites. Bridging design vision with clean, modular code, robust backend integration, and dependable deployment pipelines.",
+      bulletHighlights: [
+        "/ React.js, Next.js & TypeScript",
+        "/ Modern Tailwind CSS Architecture",
+        "/ Full-Stack MERN & REST APIs",
+        "/ WordPress & Elementor Pro Customization",
+      ],
+      capabilities: [
+        {
+          title: "Front-End Engineering",
+          description:
+            "Developing responsive interfaces using HTML5, CSS3, JavaScript (ES6+), React.js, Next.js, and TypeScript with clean modular architecture.",
+        },
+        {
+          title: "Modern UI Styling & Design Systems",
+          description:
+            "Crafting responsive design systems with Tailwind CSS, Shadcn/UI, DaisyUI, and Bootstrap with faithful Figma-to-interface translation.",
+        },
+        {
+          title: "Full-Stack & REST API Integration",
+          description:
+            "Connecting front-ends to Node.js, Express.js, MongoDB, Supabase (PostgreSQL), Firebase, and secure RESTful endpoints with JWT authentication.",
+        },
+        {
+          title: "WordPress & Elementor Development",
+          description:
+            "Building, customizing, and maintaining WordPress sites using Elementor & Elementor Pro, bespoke child themes, and tailored plugins.",
+        },
+        {
+          title: "CMS Maintenance & Security Hardening",
+          description:
+            "Routine plugin updates, file/database backup routines, performance caching, malware cleanup, and basic WordPress security maintenance.",
+        },
+        {
+          title: "Deployment & Version Control",
+          description:
+            "Deploying production apps on Vercel and Netlify, collaborative Git/GitHub branching workflows, and cPanel/GoDaddy hosting administration.",
+        },
+      ],
+      tools: [
+        "React.js",
+        "Next.js",
+        "TypeScript",
+        "JavaScript (ES6)",
+        "Tailwind CSS",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "Supabase",
+        "WordPress",
+        "Elementor Pro",
+        "Git / GitHub",
+        "Vercel",
+        "Figma",
+      ],
+      workflow: [
+        {
+          step: "01",
+          title: "Architecture & Requirement Scoping",
+          description:
+            "Analyzing functional requirements, data models, UI component hierarchies, and hosting infrastructure.",
+        },
+        {
+          step: "02",
+          title: "UI Implementation & Component Building",
+          description:
+            "Translating design mockups into modular, accessible, responsive React components with Tailwind CSS.",
+        },
+        {
+          step: "03",
+          title: "Backend & API Integration",
+          description:
+            "Connecting state management, form validation, dynamic data endpoints, and authentication tokens.",
+        },
+        {
+          step: "04",
+          title: "Testing, Cross-Browser QA & Optimization",
+          description:
+            "Auditing responsive breakpoints, optimizing asset loading, and verifying cross-browser performance.",
+        },
+        {
+          step: "05",
+          title: "CI/CD Deployment & Domain Setup",
+          description:
+            "Deploying on Vercel/Netlify or cPanel, configuring SSL/DNS records, and establishing maintenance schedules.",
+        },
+      ],
+      experience: [
+        {
+          role: "Front-End Developer",
+          organization: "Velocity Digital Inc.",
+          period: "1.5 Years",
+          summary:
+            "Built responsive web applications, converted Figma designs into reusable React components, and integrated REST APIs.",
+        },
+        {
+          role: "WordPress Developer",
+          organization: "JobMatchingBD.com",
+          period: "1 Year",
+          summary:
+            "Maintained corporate job portal, managed listings, resolved functional bugs, and optimized WordPress speed and plugin compatibility.",
+        },
+        {
+          role: "Web Development & Management",
+          organization: "B&F Corporate",
+          period: "2 Years",
+          summary:
+            "Developed new web platforms, managed company domains, hosting, SSL certificates, and cPanel Webmail systems.",
+        },
+      ],
+      projects: [
+        {
+          title: "Enterprise Web Platforms",
+          client: "B&F Corporate & Velocity Digital",
+          role: "Front-End & Full-Stack Development",
+          summary:
+            "Responsive web applications, component engineering, performance tuning, and CMS architecture.",
+          image: "/images/work-3-web.png",
+        },
+        {
+          title: "Job Portal Platform",
+          client: "JobMatchingBD.com",
+          role: "WordPress Developer",
+          summary:
+            "Custom WordPress development, listing automation, performance optimization, and routine maintenance.",
+          image: "/images/hero-card-4.png",
+        },
+      ],
+      images: [
+        "/images/work-3-web.png",
+        "/images/hero-card-4.png",
+        "/images/hero-card-5.png",
+      ],
+      image: "/images/work-3-web.png",
     },
     {
-      id: "it",
+      id: "it-support",
+      slug: "it-support",
+      href: "/services/it-support",
       index: "04",
-      title: "IT OPERATIONS & INFRASTRUCTURE",
+      category: "IT INFRASTRUCTURE",
+      title: "IT Support & Digital Infrastructure",
+      headline:
+        "Delivering dependable workstation maintenance, secure network environments, hosting management, and CCTV monitoring.",
       description:
-        "cPanel hosting administration, domain & DNS configuration, SSL lifecycle, enterprise email, VPN management, LAN troubleshooting, and CCTV.",
-      tools: ["cPanel", "GoDaddy", "DNS / SSL", "Outlook", "Office 365", "VPN / LAN"],
-      image: "/images/service-4.png",
-    },
-    {
-      id: "motion",
-      index: "05",
-      title: "MOTION GRAPHICS & SOUND DESIGN",
-      description:
-        "Kinetic typography, multi-layered visual effects, speed ramping, sound design synthesis, audio restoration, and broadcast finishing.",
-      tools: ["After Effects", "DaVinci Fairlight", "Audition", "Cinema 4D"],
-      image: "/images/service-5.png",
+        "End-to-end technical support: Windows & hardware troubleshooting, network & VPN configuration, cPanel hosting, DNS & SSL lifecycle, and CCTV systems.",
+      introduction:
+        "Providing reliable technical operations and digital infrastructure support for businesses. From hardware diagnostics, Windows OS configuration, and Outlook mail troubleshooting to cPanel hosting maintenance, domain DNS resolution, SSL lifecycle, and CCTV surveillance monitoring.",
+      bulletHighlights: [
+        "/ Office PC & Hardware Troubleshooting",
+        "/ Network, Wi-Fi & VPN Management",
+        "/ cPanel, DNS, SSL & Webmail Hosting",
+        "/ CCTV Camera Setup & Security Monitoring",
+      ],
+      capabilities: [
+        {
+          title: "Workstation & OS Support",
+          description:
+            "Windows setup, installation, driver configuration, system optimization, software licensing, and hardware diagnostics.",
+        },
+        {
+          title: "Office 365 & Outlook Management",
+          description:
+            "Configuring employee email accounts, Outlook data file synchronization, troubleshooting email delivery, and user support.",
+        },
+        {
+          title: "Network, LAN & VPN Administration",
+          description:
+            "Setting up office Wi-Fi, Ethernet cabling, router configuration, LAN troubleshooting, and secure remote VPN access.",
+        },
+        {
+          title: "Web Hosting, DNS & SSL Management",
+          description:
+            "cPanel and GoDaddy administration, DNS records (A, MX, CNAME, TXT), SSL certificate provisioning, and hosting renewals.",
+        },
+        {
+          title: "Website Security & Malware Scanning",
+          description:
+            "Routine malware scans, website cleanup, vulnerability assessment, form testing, and availability monitoring.",
+        },
+        {
+          title: "CCTV Setup & Monitoring",
+          description:
+            "Basic security camera installation, DVR/NVR configuration, remote video feeds, footage archiving, and monitoring.",
+        },
+      ],
+      tools: [
+        "Windows OS",
+        "Microsoft Outlook",
+        "Office 365",
+        "cPanel",
+        "GoDaddy",
+        "DNS & SSL",
+        "VPN Clients",
+        "CCTV Systems",
+        "LAN / Wi-Fi Tools",
+        "Data Backup Tools",
+      ],
+      workflow: [
+        {
+          step: "01",
+          title: "Issue Intake & Diagnostics",
+          description:
+            "Logging technical issue reports, assessing hardware/software status, and prioritizing resolution severity.",
+        },
+        {
+          step: "02",
+          title: "Troubleshooting & Root Cause Isolation",
+          description:
+            "Testing network routes, driver conflicts, OS logs, DNS propagation, or hardware failures.",
+        },
+        {
+          step: "03",
+          title: "Configuration & Implementation",
+          description:
+            "Applying system updates, reinstalling software, configuring Outlook/VPN, or replacing physical components.",
+        },
+        {
+          step: "04",
+          title: "Verification & Connectivity Testing",
+          description:
+            "Confirming email delivery, network throughput, SSL validity, and system stability under user workflow.",
+        },
+        {
+          step: "05",
+          title: "Documentation & Preventative Maintenance",
+          description:
+            "Recording incident resolutions, scheduling automated backups, and updating hardware maintenance logs.",
+        },
+      ],
+      experience: [
+        {
+          role: "Assistant IT Manager",
+          organization: "B&F Corporate",
+          period: "2 Years (Promoted from IT Executive)",
+          summary:
+            "Managed office IT technical operations, employee workstations, VPN access, website hosting, cPanel Webmail, and CCTV systems.",
+        },
+        {
+          role: "Technical Customer Support",
+          organization: "Robi Helpline & Banglalink Helpline",
+          period: "4 Years",
+          summary:
+            "Diagnosed customer technical issues, internet/network escalations, and CRM case tracking.",
+        },
+      ],
+      projects: [
+        {
+          title: "Enterprise IT & Hosting Operations",
+          client: "B&F Corporate",
+          role: "Assistant IT Manager",
+          summary:
+            "Workstation fleet maintenance, domain renewals, cPanel hosting, SSL installations, and CCTV surveillance.",
+          image: "/images/work-4-it.png",
+        },
+      ],
+      images: [
+        "/images/work-4-it.png",
+        "/images/hero-card-3.png",
+        "/images/work-1-biqolpo.png",
+      ],
+      image: "/images/work-4-it.png",
     },
   ] as ServiceItem[],
 

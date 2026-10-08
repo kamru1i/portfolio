@@ -1,112 +1,156 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import Image from "next/image";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA, ServiceItem } from "@/lib/portfolio-data";
 
 export function ServicesSection() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [mouseRelativeX, setMouseRelativeX] = useState<number>(0);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const services = PORTFOLIO_DATA.services;
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const xRatio = (e.clientX - rect.left) / rect.width; // 0 to 1
+    // Map to a smooth subtle parallax offset: -60px to +60px
+    setMouseRelativeX((xRatio - 0.5) * 120);
   };
 
   return (
     <section
-      id="expertise"
+      id="services"
       ref={sectionRef}
-      onMouseMove={handleMouseMove}
-      className="relative w-full pt-20 md:pt-28 pb-20 select-none"
+      className="relative w-full pt-20 md:pt-28 pb-20 select-none scroll-mt-24"
     >
       <HairlineRule className="mb-14 md:mb-20" />
 
-      {/* Split Section: Title (Left) + 5 Rows (Right) */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
-        {/* Section Heading (Left, Gambarino 60px) */}
-        <div className="md:col-span-5">
-          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-[60px] text-white uppercase leading-[1.05] tracking-tight">
-            EXPERTISE &amp;
-            <br />
-            SERVICES
-          </h2>
+      {/* Header: Editorial Pill Badge + Subtitle Quote */}
+      <div className="w-full flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12 md:mb-16">
+        {/* Left: Section Pill Badge */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider w-fit">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>SERVICES</span>
         </div>
 
-        {/* 5 Sleek Service Rows (Right) */}
-        <div className="md:col-span-7 flex flex-col w-full divide-y divide-white/15 border-t border-white/15">
-          {services.map((service, index) => {
-            const isHovered = hoveredIndex === index;
-
-            return (
-              <div
-                key={service.id}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                className="group relative w-full h-[52px] sm:h-[58px] flex items-center justify-between font-mono-custom text-[15px] sm:text-[16px] cursor-pointer transition-colors"
-              >
-                {/* Title */}
-                <span
-                  className={`tracking-wider uppercase transition-colors duration-200 ${
-                    isHovered ? "text-white" : "text-[#a1a1a1] group-hover:text-white"
-                  }`}
-                >
-                  {service.title}
-                </span>
-
-                {/* Index Number */}
-                <span
-                  className={`font-medium transition-colors duration-200 pl-4 ${
-                    isHovered ? "text-white" : "text-[#a1a1a1] group-hover:text-white"
-                  }`}
-                >
-                  {service.index}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+        {/* Right: Editorial Quote */}
+        <p className="max-w-xl text-[#a1a1a1] text-sm sm:text-base md:text-lg font-mono-custom leading-relaxed md:text-right">
+          Crafting high-impact visual narratives, AI-augmented media workflows, modern web platforms, and resilient IT infrastructure.
+        </p>
       </div>
 
-      {/* Floating Image Cursor Follower on Hover */}
-      <AnimatePresence>
-        {hoveredIndex !== null && services[hoveredIndex] && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              x: mousePos.x - 140,
-              y: mousePos.y - 95,
-            }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{
-              type: "spring",
-              damping: 24,
-              stiffness: 280,
-              mass: 0.3,
-            }}
-            className="pointer-events-none absolute z-30 hidden md:block w-[280px] h-[190px] rounded-[10px] overflow-hidden border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.8)] bg-[#111111]"
-          >
-            <Image
-              src={services[hoveredIndex].image}
-              alt={services[hoveredIndex].title}
-              fill
-              className="object-cover"
-              sizes="280px"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Stacked Service Rows */}
+      <div
+        className="w-full flex flex-col border-t border-b border-white/10 divide-y divide-white/10"
+        onMouseLeave={() => {
+          setHoveredId(null);
+          setMouseRelativeX(0);
+        }}
+      >
+        {services.map((service, index) => {
+          const isHovered = hoveredId === service.id;
+          const isAnyHovered = hoveredId !== null;
+
+          return (
+            <div
+              key={service.id}
+              onMouseEnter={() => setHoveredId(service.id)}
+              onMouseMove={handleMouseMove}
+              className={`relative w-full min-h-[100px] sm:min-h-[120px] md:min-h-[140px] flex items-center transition-opacity duration-300 ${
+                isAnyHovered && !isHovered ? "opacity-35" : "opacity-100"
+              }`}
+            >
+              {/* Idle State: Clean Minimal Editorial Row */}
+              <Link
+                href={service.href}
+                className="w-full py-8 sm:py-10 md:py-12 px-2 sm:px-4 flex items-center justify-between text-white group cursor-pointer"
+                aria-label={`${service.title} - View details`}
+              >
+                {/* Left Category Label */}
+                <div className="w-[120px] sm:w-[180px] md:w-[220px] flex-shrink-0 text-[#777] font-mono-custom text-xs sm:text-sm tracking-widest uppercase transition-colors group-hover:text-white/80">
+                  {service.category}
+                </div>
+
+                {/* Center Title */}
+                <div className="flex-1 text-center md:text-center px-4">
+                  <h3 className="font-sans text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal tracking-tight transition-transform duration-200 group-hover:scale-[1.01]">
+                    {service.title}
+                  </h3>
+                </div>
+
+                {/* Right Index */}
+                <div className="w-[40px] sm:w-[60px] text-right flex-shrink-0 text-[#777] font-mono-custom text-sm sm:text-base transition-colors group-hover:text-white">
+                  {service.index}
+                </div>
+              </Link>
+
+              {/* Active State: Aurexa-Style Pill Image + Title Sliding Marquee Ribbon */}
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, scaleY: 0.94 }}
+                    animate={{ opacity: 1, scaleY: 1 }}
+                    exit={{ opacity: 0, scaleY: 0.94 }}
+                    transition={{ duration: 0.28, ease: [0.25, 1, 0.5, 1] }}
+                    className="absolute inset-0 z-20 bg-[#191919] border border-white/15 rounded-[12px] sm:rounded-[16px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.7)] flex items-center pointer-events-auto"
+                  >
+                    <Link
+                      href={service.href}
+                      className="w-full h-full flex items-center overflow-hidden cursor-pointer"
+                      aria-label={`${service.title} - View details`}
+                    >
+                      {/* Animated Horizontal Track */}
+                      <motion.div
+                        animate={{
+                          x: ["0%", "-50%"],
+                        }}
+                        transition={{
+                          x: {
+                            repeat: Infinity,
+                            repeatType: "loop",
+                            duration: 16,
+                            ease: "linear",
+                          },
+                        }}
+                        style={{
+                          transform: `translateX(${mouseRelativeX}px)`,
+                        }}
+                        className="flex items-center gap-6 sm:gap-10 whitespace-nowrap will-change-transform py-2 pl-4"
+                      >
+                        {/* Repeat Ribbon Units: [Image] Title [Image] Title [Image] Title */}
+                        {[0, 1, 2, 3].map((rep) => (
+                          <div key={rep} className="flex items-center gap-6 sm:gap-10 flex-shrink-0">
+                            {/* Pill / Stadium Shaped Service-Specific Image */}
+                            <div className="relative w-[180px] sm:w-[240px] md:w-[280px] h-[64px] sm:h-[80px] md:h-[94px] rounded-full overflow-hidden flex-shrink-0 border border-white/20 bg-black/60 shadow-inner">
+                              <Image
+                                src={service.images[rep % service.images.length] || service.image}
+                                alt={`${service.title} visual preview`}
+                                fill
+                                sizes="(max-width: 768px) 240px, 280px"
+                                className="object-cover"
+                                priority
+                              />
+                            </div>
+
+                            {/* Service Title in Ribbon */}
+                            <span className="font-sans text-2xl sm:text-3xl md:text-5xl text-white font-normal tracking-tight flex-shrink-0">
+                              {service.title}
+                            </span>
+                          </div>
+                        ))}
+                      </motion.div>
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }

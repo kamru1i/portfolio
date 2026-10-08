@@ -14,7 +14,7 @@ const MENU_LINKS = [
   { label: "Home", href: "/" },
   { label: "Works", href: "#works" },
   { label: "About", href: "#about" },
-  { label: "Services", href: "#expertise" },
+  { label: "Services", href: "#services" },
   { label: "Recognitions", href: "#recognitions" },
   { label: "Contact", href: `mailto:${PORTFOLIO_DATA.brand.email}` },
 ];
