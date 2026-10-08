@@ -1,74 +1,83 @@
 import { chromium } from "playwright";
-import * as fs from "fs";
 
 async function main() {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1440, height: 1080 } });
-  
-  await page.goto("https://aurexa.framer.website/", { waitUntil: "networkidle", timeout: 45000 });
+  await page.goto("https://aurexa.framer.website/", { waitUntil: "networkidle" });
 
-  // Locate [data-framer-name="Section - Projects"]
-  const projectSectionData = await page.evaluate(() => {
-    const section = document.querySelector('[data-framer-name="Section - Projects"]');
-    if (!section) return null;
+  const sec = page.locator('[data-framer-name="Section - Projects"]');
+  await sec.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
 
-    const rect = section.getBoundingClientRect();
-    const style = window.getComputedStyle(section);
+  await sec.screenshot({ path: "scripts/qa/aurexa-exact-projects-section.png" });
 
-    // Recursively extract all direct structural components inside Section - Projects
-    function inspectNode(el) {
-      const elStyle = window.getComputedStyle(el);
-      const elRect = el.getBoundingClientRect();
-      const framerName = el.getAttribute('data-framer-name');
-      
-      const children = Array.from(el.children).map(inspectNode);
-
+  const info = await sec.evaluate(el => {
+    // Collect all children and their roles
+    const rect = el.getBoundingClientRect();
+    const children = Array.from(el.children).map(c => {
+      const cRect = c.getBoundingClientRect();
       return {
-        tag: el.tagName,
-        framerName,
-        className: el.className,
-        rect: {
-          width: Math.round(elRect.width),
-          height: Math.round(elRect.height),
-          top: Math.round(elRect.top),
-          left: Math.round(elRect.left),
-        },
-        styles: {
-          display: elStyle.display,
-          flexDirection: elStyle.flexDirection,
-          gridTemplateColumns: elStyle.gridTemplateColumns,
-          gap: elStyle.gap,
-          padding: elStyle.padding,
-          borderRadius: elStyle.borderRadius,
-          border: elStyle.border,
-          backgroundColor: elStyle.backgroundColor,
-          color: elStyle.color,
-          fontSize: elStyle.fontSize,
-          fontFamily: elStyle.fontFamily,
-          fontWeight: elStyle.fontWeight,
-          lineHeight: elStyle.lineHeight,
-          letterSpacing: elStyle.letterSpacing,
-        },
-        text: el.children.length === 0 ? el.innerText?.trim() : undefined,
-        imgSrc: el.tagName === 'IMG' ? el.src : undefined,
-        href: el.tagName === 'A' ? el.href : undefined,
-        children: children.filter(c => c !== null)
+        tag: c.tagName,
+        className: c.className,
+        rect: { width: cRect.width, height: cRect.height, top: cRect.top, left: cRect.left },
+        framerName: c.getAttribute('data-framer-name'),
+        computed: {
+          display: window.getComputedStyle(c).display,
+          position: window.getComputedStyle(c).position,
+          flexDirection: window.getComputedStyle(c).flexDirection,
+          gridTemplateColumns: window.getComputedStyle(c).gridTemplateColumns,
+        }
+      };
+    });
+
+    // Also find all cards inside this section
+    const cards = Array.from(el.querySelectorAll('a')).filter(a => a.querySelector('img'));
+    const cardsInfo = cards.slice(0, 6).map(c => {
+      const img = c.querySelector('img');
+      const title = c.innerText.split('\n')[0];
+      const cRect = c.getBoundingClientRect();
+      return {
+        title,
+        fullText: c.innerText,
+        imgSrc: img ? img.src : null,
+        rect: { width: Math.round(cRect.width), height: Math.round(cRect.height) },
+        borderRadius: window.getComputedStyle(c).borderRadius,
+      };
+    });
+
+    // Find the right sticky element
+    const rightSide = Array.from(el.querySelectorAll('*')).find(node => {
+      return node.textContent.includes('Case studies') && node.textContent.includes('A collection of strategic design projects');
+    });
+
+    let rightSideInfo = null;
+    if (rightSide) {
+      let stickyNode = rightSide;
+      while (stickyNode && window.getComputedStyle(stickyNode).position !== 'sticky' && stickyNode.parentElement !== el) {
+        if (window.getComputedStyle(stickyNode.parentElement).position === 'sticky') {
+          stickyNode = stickyNode.parentElement;
+          break;
+        }
+        stickyNode = stickyNode.parentElement;
+      }
+      rightSideInfo = {
+        text: rightSide.innerText,
+        tag: stickyNode.tagName,
+        position: window.getComputedStyle(stickyNode).position,
+        top: window.getComputedStyle(stickyNode).top,
+        width: window.getComputedStyle(stickyNode).width,
       };
     }
 
-    return inspectNode(section);
+    return {
+      sectionRect: { width: rect.width, height: rect.height },
+      children,
+      cardsInfo,
+      rightSideInfo,
+    };
   });
 
-  fs.writeFileSync("scripts/qa/aurexa-projects-section.json", JSON.stringify(projectSectionData, null, 2));
-  console.log("Section data saved.");
-
-  // Scroll to section and screenshot
-  const sectionLocator = page.locator('[data-framer-name="Section - Projects"]');
-  await sectionLocator.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1000);
-  await sectionLocator.screenshot({ path: "scripts/qa/aurexa-projects-section.png" });
-  console.log("Screenshot of Section - Projects saved to scripts/qa/aurexa-projects-section.png");
-
+  console.log("Section - Projects detailed info:", JSON.stringify(info, null, 2));
   await browser.close();
 }
 

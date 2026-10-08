@@ -18,7 +18,6 @@ export function ProjectsAndWorksSection() {
   const projects = PORTFOLIO_DATA.showcaseProjects || [];
 
   // Filter dynamically by type and sort by order attribute
-  // Future-proof for CMS / database queries
   const videoProjects = projects
     .filter((p) => p.type === "video")
     .sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -36,43 +35,10 @@ export function ProjectsAndWorksSection() {
       <div id="works" className="absolute -top-24 pointer-events-none" />
 
       {/* Hairline Divider Rule */}
-      <HairlineRule className="mb-10 md:mb-14" />
+      <HairlineRule className="mb-8 md:mb-10" />
 
-      {/* Section Header: Patrick Jane Title (Left) + Subtitle (Right) */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-8 sm:mb-10">
-        {/* Left: Section Badge + Patrick Jane Headline */}
-        <motion.div
-          initial={{ opacity: 0, x: 80 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-10% 0px" }}
-          transition={{ duration: 0.85, ease: [0.25, 0.1, 0.25, 1] }}
-          className="md:col-span-6 flex flex-col"
-        >
-          <SectionBadge label="PROJECTS" />
-          <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.08] font-normal uppercase">
-            {PORTFOLIO_DATA.worksHeader.title}
-          </h2>
-        </motion.div>
-
-        {/* Right: Editorial Narrative Statement matching Patrick Jane */}
-        <motion.div
-          initial={{ opacity: 0, x: 80 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-10% 0px" }}
-          transition={{ duration: 0.85, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-          className="md:col-span-6 md:pt-14"
-        >
-          <p
-            className="font-mono-custom text-[15px] sm:text-[16px] leading-[1.6] text-[#a1a1a1] [&_strong]:text-white [&_strong]:font-medium"
-            dangerouslySetInnerHTML={{
-              __html: PORTFOLIO_DATA.worksHeader.statementHtml,
-            }}
-          />
-        </motion.div>
-      </div>
-
-      {/* Left-Aligned Category Tabs with Low Visual Emphasis */}
-      <div className="w-full flex items-center justify-start mt-6 mb-14 sm:mb-18 md:mb-20">
+      {/* Category Tabs Switcher: Video (Patrick Jane) vs Web (Aurexa) */}
+      <div className="w-full flex items-center justify-start mb-10 sm:mb-14">
         <div
           role="tablist"
           aria-label="Filter projects by category"
@@ -118,30 +84,72 @@ export function ProjectsAndWorksSection() {
         </div>
       </div>
 
-      {/* Distinct Presentation Systems: Patrick Jane for Video, Aurexa for Web */}
+      {/* Distinct Reference Presentation Systems: Patrick Jane for Video, Aurexa for Web */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -15 }}
-          transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-          className="w-full"
-        >
-          {activeTab === "video" && (
+        {activeTab === "video" ? (
+          <motion.div
+            key="video-tab-content"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            className="w-full"
+          >
+            {/* Patrick Jane Section Header */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-12 sm:mb-16">
+              {/* Left: Section Badge + Patrick Jane Headline */}
+              <motion.div
+                initial={{ opacity: 0, x: 60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-10% 0px" }}
+                transition={{ duration: 0.85, ease: [0.25, 0.1, 0.25, 1] }}
+                className="md:col-span-6 flex flex-col"
+              >
+                <SectionBadge label="PROJECTS" />
+                <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.08] font-normal uppercase">
+                  {PORTFOLIO_DATA.worksHeader.title}
+                </h2>
+              </motion.div>
+
+              {/* Right: Editorial Narrative Statement matching Patrick Jane */}
+              <motion.div
+                initial={{ opacity: 0, x: 60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-10% 0px" }}
+                transition={{ duration: 0.85, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+                className="md:col-span-6 md:pt-14"
+              >
+                <p
+                  className="font-mono-custom text-[15px] sm:text-[16px] leading-[1.6] text-[#a1a1a1] [&_strong]:text-white [&_strong]:font-medium"
+                  dangerouslySetInnerHTML={{
+                    __html: PORTFOLIO_DATA.worksHeader.statementHtml,
+                  }}
+                />
+              </motion.div>
+            </div>
+
+            {/* Patrick Jane 5-Card Selected Works Grid */}
             <PatrickJaneSelectedWorks
               projects={videoProjects}
               onPlayVideo={(p) => setActiveVideoProject(p)}
             />
-          )}
-
-          {activeTab === "web" && (
+          </motion.div>
+        ) : (
+          <motion.div
+            key="web-tab-content"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            className="w-full"
+          >
+            {/* 100% Aurexa Case Studies Presentation matching user's reference images */}
             <AurexaCaseStudies
               projects={webProjects}
               onPreviewWeb={(p) => setActiveWebProject(p)}
             />
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* In-Site Video Player Modal */}
