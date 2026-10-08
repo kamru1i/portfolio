@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-black">
+    <html lang="en" className="bg-black relative">
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black min-h-screen">
         <SmoothScroll>
           <FilmGrain />

@@ -11,7 +11,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ isRevealed = true }: HeroSectionProps) {
   return (
-    <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-start pt-24 sm:pt-28 md:pt-32 pb-16 px-4 overflow-hidden">
+    <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-start pt-20 sm:pt-24 md:pt-28 lg:pt-[102px] pb-12 md:pb-16 px-4 overflow-hidden">
       {/* Massive Editorial Display Wordmark with Character-Staggered 3D Reveal */}
       <div className="w-full text-center select-none">
         <HeroTitle text={PORTFOLIO_DATA.hero.wordmark} isRevealed={isRevealed} />
@@ -30,9 +30,9 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
           delay: 0.45,
           ease: [0.25, 1, 0.5, 1],
         }}
-        className="mt-6 md:mt-8 max-w-[640px] px-4 text-center select-none"
+        className="mt-6 md:mt-7 max-w-[680px] px-4 text-center select-none"
       >
-        <p className="font-mono-custom text-[14px] sm:text-[16px] leading-[1.6] text-[#a1a1a1]">
+        <p className="font-mono-custom text-[14px] sm:text-[16px] leading-[1.4] text-[#a1a1a1]">
           {PORTFOLIO_DATA.hero.subtitle}
         </p>
       </motion.div>
@@ -50,7 +50,7 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
           delay: 0.65,
           ease: [0.25, 1, 0.5, 1],
         }}
-        className="w-full mt-6 md:mt-10 flex justify-center"
+        className="w-full mt-8 md:mt-10 flex justify-center"
       >
         <Rotating3DCylinder />
       </motion.div>

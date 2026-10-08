@@ -212,25 +212,21 @@ export function Rotating3DCylinder({
             return (
               <div
                 key={card.id}
+                className="absolute inset-0"
                 style={{
-                  position: "absolute",
-                  inset: 0,
-                  transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
+                  transform: `rotateY(${angle}deg) translateZ(${radius.toFixed(2)}px)`,
                   transformStyle: "preserve-3d",
                 }}
               >
                 {/* Front Face: High-fidelity image, 16px corner radius, soft depth shadow */}
                 <div
+                  className="absolute inset-0 overflow-hidden"
                   style={{
-                    position: "absolute",
-                    inset: 0,
                     borderRadius: `${cornerRadius}px`,
-                    overflow: "hidden",
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    backgroundColor: "transparent",
                     backgroundImage: `url(${card.src})`,
                     boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
                   }}
@@ -238,17 +234,14 @@ export function Rotating3DCylinder({
 
                 {/* Back Face: Mirrored interior facing cylinder center, dimmed brightness */}
                 <div
+                  className="absolute inset-0 overflow-hidden"
                   style={{
-                    position: "absolute",
-                    inset: 0,
                     borderRadius: `${cornerRadius}px`,
-                    overflow: "hidden",
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     transform: "rotateY(180deg)",
-                    backgroundColor: "transparent",
                     backgroundImage: `url(${card.src})`,
                     filter: `brightness(${innerDim / 10})`,
                   }}

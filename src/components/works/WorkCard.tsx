@@ -26,7 +26,7 @@ export function WorkCard({ project, className = "", isLarge = false }: WorkCardP
   return (
     <div
       ref={containerRef}
-      className={`group flex flex-col w-full cursor-pointer select-none ${className}`}
+      className={`relative group flex flex-col w-full cursor-pointer select-none ${className}`}
     >
       {/* Square Media Frame matching reference (352x352 small, 704x704 large) */}
       <div className="relative w-full aspect-square overflow-hidden bg-black rounded-none border-0">

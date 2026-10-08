@@ -18,7 +18,7 @@ export function HeroTitle({ text, isRevealed, className = "" }: HeroTitleProps) 
   if (shouldReduceMotion) {
     return (
       <h1
-        className={`w-full flex flex-wrap items-start justify-center font-gambarino text-[46px] sm:text-[68px] md:text-[84px] lg:text-[100px] leading-[0.9em] tracking-[-0.01em] text-white uppercase text-center select-none ${className}`}
+        className={`w-full flex flex-wrap items-start justify-center font-gambarino text-[52px] md:text-[110px] xl:text-[180px] text-[clamp(52px,12.5vw,180px)] leading-[0.92em] sm:leading-[0.95em] tracking-[-0.02em] text-white uppercase text-center select-none ${className}`}
       >
         {text}
       </h1>
@@ -27,9 +27,9 @@ export function HeroTitle({ text, isRevealed, className = "" }: HeroTitleProps) 
 
   return (
     <h1
-      className={`w-full flex flex-wrap items-start justify-center font-gambarino text-[46px] sm:text-[68px] md:text-[84px] lg:text-[100px] leading-[0.9em] tracking-[-0.01em] text-white uppercase text-center select-none ${className}`}
+      className={`w-full flex flex-wrap items-start justify-center font-gambarino text-[52px] md:text-[110px] xl:text-[180px] text-[clamp(52px,12.5vw,180px)] leading-[0.92em] sm:leading-[0.95em] tracking-[-0.02em] text-white uppercase text-center select-none ${className}`}
       style={{
-        perspective: "1000px",
+        perspective: "1200px",
       }}
     >
       {words.map((word, wordIndex) => {

@@ -24,7 +24,7 @@ export function ManifestoSection() {
       <HairlineRule className="mb-14 md:mb-20" />
 
       {/* Large Scroll-Illuminated Manifesto Statement matching Gambarino 70px */}
-      <div ref={statementRef} className="w-full max-w-[1360px] mb-24 md:mb-32">
+      <div ref={statementRef} className="relative w-full max-w-[1360px] mb-24 md:mb-32">
         <h2 className="font-gambarino text-3xl sm:text-5xl md:text-6xl lg:text-[70px] leading-[1.02] tracking-[-0.03em] font-normal text-left">
           {lines.map((line, lineIndex) => {
             const start = lineIndex / lines.length;
