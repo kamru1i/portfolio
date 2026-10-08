@@ -15,6 +15,7 @@ export function SectionBadge({
 }: SectionBadgeProps) {
   return (
     <motion.div
+      data-section-badge="true"
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10% 0px" }}

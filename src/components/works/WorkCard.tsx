@@ -53,6 +53,7 @@ export function WorkCard({
   return (
     <div
       ref={containerRef}
+      data-project-id={normalizedProject.id}
       className={`relative group flex flex-col w-full cursor-pointer select-none ${className}`}
       onClick={() => {
         if (isVideo) onPlayVideo?.(normalizedProject);

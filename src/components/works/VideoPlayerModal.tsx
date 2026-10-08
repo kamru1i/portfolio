@@ -120,7 +120,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
-          aria-label={project.title}
+          aria-label={`${project.title} Video Player`}
         >
           {/* Top Bar with Project Meta and Close Button */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#181818]/80">

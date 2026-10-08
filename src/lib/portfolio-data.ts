@@ -20,6 +20,7 @@ export interface PortfolioProject {
   id: string;
   type: "video" | "web";
   title: string;
+  category?: string;
   client?: string;
   year: string;
   description: string;
@@ -31,6 +32,7 @@ export interface PortfolioProject {
   githubUrl?: string;
   liveUrl?: string;
   canEmbed?: boolean;
+  featured?: boolean;
   tags: string[];
   published: boolean;
   order: number;
@@ -270,28 +272,12 @@ export const PORTFOLIO_DATA = {
   // Future-proof, typed project model separating data from presentation (ready for future database / API integration)
   showcaseProjects: [
     {
-      id: "syston-autos-video",
-      type: "video",
-      format: "16:9",
-      aspect: "large",
-      title: "Syston Autos Cinema",
-      client: "Syston Autos Ltd",
-      year: "2024–2025",
-      description:
-        "High-energy automotive showcase series with precision cut pacing, engine audio enhancement, cinematic color grading, and dynamic motion graphics across 6 episodes.",
-      thumbnail: "/images/work-2-syston.png",
-      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      videoType: "local",
-      tags: ["Premiere Pro", "After Effects", "Sound Design", "Color Grading"],
-      published: true,
-      order: 1,
-    },
-    {
       id: "biqolpo-ai-video",
       type: "video",
       format: "16:9",
       aspect: "small",
       title: "Biqolpo — Latent Stories",
+      category: "AI-Assisted Video • Content Creation",
       client: "Biqolpo",
       year: "2024–2026",
       description:
@@ -301,6 +287,24 @@ export const PORTFOLIO_DATA = {
       videoType: "local",
       tags: ["Google Veo", "Runway Gen-2", "DaVinci Resolve", "AI Compositing"],
       published: true,
+      order: 1,
+    },
+    {
+      id: "syston-autos-video",
+      type: "video",
+      format: "16:9",
+      aspect: "large",
+      title: "Syston Autos Cinema",
+      category: "Social Media • Automotive Video",
+      client: "Syston Autos Ltd",
+      year: "2024–2025",
+      description:
+        "High-energy automotive showcase series with precision cut pacing, engine audio enhancement, cinematic color grading, and dynamic motion graphics across 6 episodes.",
+      thumbnail: "/images/work-2-syston.png",
+      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      videoType: "local",
+      tags: ["Premiere Pro", "After Effects", "Sound Design", "Color Grading"],
+      published: true,
       order: 2,
     },
     {
@@ -309,6 +313,7 @@ export const PORTFOLIO_DATA = {
       format: "9:16",
       aspect: "large",
       title: "B&F Cars Automotive",
+      category: "Automotive Social Media • 9:16 Reels",
       client: "B&F Cars",
       year: "2024–2025",
       description:
@@ -325,6 +330,7 @@ export const PORTFOLIO_DATA = {
       type: "web",
       aspect: "large",
       title: "Velocity Interface System",
+      category: "Front-End Engineering • UI Architecture",
       client: "Velocity Digital Inc.",
       year: "2023–2024",
       description:
@@ -342,6 +348,7 @@ export const PORTFOLIO_DATA = {
       type: "web",
       aspect: "small",
       title: "Kamrul Islam — Architectural Portfolio",
+      category: "Full-Stack Development • Next.js 16",
       client: "Independent",
       year: "2026",
       description:
@@ -359,6 +366,7 @@ export const PORTFOLIO_DATA = {
       type: "web",
       aspect: "large",
       title: "JobMatchingBD Career Portal",
+      category: "Full-Stack Web • CMS Platform",
       client: "JobMatchingBD.com",
       year: "2022–2023",
       description:
