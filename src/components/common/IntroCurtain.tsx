@@ -16,9 +16,12 @@ export function IntroCurtain({
 }: IntroCurtainProps) {
   const [stage, setStage] = useState<"enter" | "exit" | "done">("enter");
   const onRevealRef = useRef(onReveal);
-  onRevealRef.current = onReveal;
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    onRevealRef.current = onReveal;
+    onCompleteRef.current = onComplete;
+  }, [onReveal, onComplete]);
 
   useEffect(() => {
     // Stage 1: Brand text reveals via blurIn stagger, holds until 1650ms

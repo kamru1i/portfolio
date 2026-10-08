@@ -31,7 +31,7 @@ export default function HomePage() {
       <Navigation isRevealed={isRevealed} />
 
       {/* Main Page Scroll Canvas */}
-      <main className="relative z-10 w-full bg-black min-h-screen mb-[450px] md:mb-[510px] lg:mb-[634px] shadow-[0_40px_80px_rgba(0,0,0,0.95)]">
+      <main className="relative z-10 w-full bg-black min-h-screen overflow-x-clip mb-[450px] md:mb-[510px] lg:mb-[634px] shadow-[0_40px_80px_rgba(0,0,0,0.95)]">
         <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 md:px-8">
           {/* Section 1: Hero */}
           <HeroSection isRevealed={isRevealed} />
