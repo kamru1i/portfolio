@@ -27,6 +27,7 @@ export function ServicesSection() {
       ref={sectionRef}
       className="relative w-full pt-20 md:pt-28 pb-20 select-none scroll-mt-24"
     >
+      <div id="expertise" className="absolute -top-24 pointer-events-none" />
       <HairlineRule className="mb-14 md:mb-20" />
 
       {/* Header: Patrick Jane Title (Left) + Aurexa Subtitle (Right) */}
@@ -40,7 +41,7 @@ export function ServicesSection() {
           className="flex flex-col"
         >
           <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
-            Services
+            Expertise &amp; Services
           </h2>
         </motion.div>
 
