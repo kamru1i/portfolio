@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useSyncExternalStore } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Link from "next/link";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
@@ -25,28 +24,8 @@ function getServerDesktopSnapshot() {
 }
 
 export function Navigation({ isRevealed = true }: NavigationProps) {
-  const router = useRouter();
   const [timeStr, setTimeStr] = useState<string>("7:00 PM (GMT +6)");
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-
-  // Hidden secret admin login trigger: triple-click on the green status dot
-  const clickCountRef = useRef(0);
-  const lastClickTimeRef = useRef(0);
-
-  const handleGreenDotTripleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const now = Date.now();
-    if (now - lastClickTimeRef.current < 600) {
-      clickCountRef.current += 1;
-      if (clickCountRef.current >= 3) {
-        clickCountRef.current = 0;
-        router.push("/admin/login");
-      }
-    } else {
-      clickCountRef.current = 1;
-    }
-    lastClickTimeRef.current = now;
-  };
 
   const isDesktop = useSyncExternalStore(
     subscribeDesktop,
@@ -184,12 +163,8 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
           <div className="flex items-center gap-5 sm:gap-7 md:gap-8">
             {/* Status & Availability Beacon */}
             <div className="hidden lg:flex items-center gap-2.5 font-mono-custom text-[13px] text-[#b3b3b3]">
-              <span
-                onClick={handleGreenDotTripleClick}
-                className="relative flex h-2 w-2 cursor-pointer p-1 -m-1"
-                title=""
-              >
-                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               <span className="tracking-wide">Available for Projects</span>

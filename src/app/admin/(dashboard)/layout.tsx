@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { verifyAdminSession } from "@/lib/supabase/admin-auth";
 import Link from "next/link";
 import { AdminNavLogout } from "./AdminNavLogout";
+import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 
 export default async function AdminDashboardLayout({
   children,
@@ -23,13 +24,11 @@ export default async function AdminDashboardLayout({
           <div className="flex items-center gap-6">
             <Link
               href="/admin"
-              className="flex items-center gap-2.5 text-white hover:opacity-90 transition-opacity"
+              className="flex items-center gap-3 text-white hover:opacity-90 transition-opacity"
+              aria-label="Kamrul Islam CMS"
             >
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-              <span className="font-gambarino text-lg uppercase tracking-tight">
-                Kamrul Islam
-              </span>
-              <span className="font-mono-custom text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/10">
+              <KamrulBrandWordmark className="h-[22px] sm:h-[24px] w-auto text-white flex-shrink-0" />
+              <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/10 tracking-wider">
                 CMS
               </span>
             </Link>
