@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
@@ -162,6 +163,7 @@ interface ContactCardProps {
     name: string;
     role: string;
     ctaText: string;
+    ctaHref?: string;
     email: string;
     status: string;
     avatarSrc: string;
@@ -202,13 +204,13 @@ function FaqContactCard({ contactCard }: ContactCardProps) {
       </div>
 
       {/* Contact CTA Button */}
-      <a
-        href={`mailto:${contactCard.email}`}
+      <Link
+        href={contactCard.ctaHref || "/contact-us"}
         className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 transition-all duration-200 shadow-md group select-none mt-1"
       >
         <span>{contactCard.ctaText}</span>
         <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-      </a>
+      </Link>
     </div>
   );
 }

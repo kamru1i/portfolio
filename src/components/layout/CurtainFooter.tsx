@@ -204,12 +204,12 @@ export function CurtainFooter() {
         >
           ABOUT
         </Link>
-        <a
-          href={`mailto:${PORTFOLIO_DATA.brand.email}`}
+        <Link
+          href="/contact-us"
           className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           CONTACT US
-        </a>
+        </Link>
       </div>
 
       {/* Lower Metadata & Social Links Bar */}

@@ -17,7 +17,7 @@ const MENU_LINKS = [
   { label: "Services", href: "#services" },
   { label: "Recognitions", href: "#recognitions" },
   { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: `mailto:${PORTFOLIO_DATA.brand.email}` },
+  { label: "Contact", href: "/contact-us" },
 ];
 
 export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
@@ -50,6 +50,8 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
       const element = document.querySelector(href);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.location.href = `/${href}`;
       }
     }
   };

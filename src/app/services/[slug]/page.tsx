@@ -383,12 +383,12 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               </div>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                <a
-                  href={`mailto:${PORTFOLIO_DATA.brand.email}?subject=Inquiry: ${encodeURIComponent(service.title)}`}
+                <Link
+                  href={`/contact-us?service=${encodeURIComponent(service.slug)}`}
                   className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-white text-black font-semibold text-xs sm:text-sm tracking-wider uppercase hover:bg-white/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Inquire About This Service
-                </a>
+                </Link>
               </div>
             </div>
           </section>
