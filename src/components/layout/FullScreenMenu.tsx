@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
@@ -21,6 +22,26 @@ const MENU_LINKS = [
 ];
 
 export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
+  const router = useRouter();
+  const clickCountRef = useRef(0);
+  const lastClickTimeRef = useRef(0);
+
+  const handleGreenDotTripleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 600) {
+      clickCountRef.current += 1;
+      if (clickCountRef.current >= 3) {
+        clickCountRef.current = 0;
+        onClose();
+        router.push("/admin/login");
+      }
+    } else {
+      clickCountRef.current = 1;
+    }
+    lastClickTimeRef.current = now;
+  };
+
   // ESC key listener to dismiss
   useEffect(() => {
     if (!isOpen) return;
@@ -191,8 +212,12 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
 
                 {/* Availability Beacon */}
                 <div className="pt-2 flex items-center gap-2.5 font-mono-custom text-[13px] text-[#b3b3b3]">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span
+                    onClick={handleGreenDotTripleClick}
+                    className="relative flex h-2.5 w-2.5 cursor-pointer p-1 -m-1"
+                    title=""
+                  >
+                    <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                   </span>
                   <span>Available for Projects</span>

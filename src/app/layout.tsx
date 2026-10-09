@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { FilmGrain } from "@/components/common/FilmGrain";
 import { SmoothScroll } from "@/components/common/SmoothScroll";
+import { AdminFloatingPill } from "@/components/common/AdminFloatingPill";
 
 export const metadata: Metadata = {
   title: "Kamrul Islam — Video Editor | AI Creator | Web Developer | IT Professional",
@@ -26,6 +27,7 @@ export default function RootLayout({
         <SmoothScroll>
           <FilmGrain />
           {children}
+          <AdminFloatingPill />
         </SmoothScroll>
       </body>
     </html>
