@@ -107,16 +107,16 @@ export function ContactFormSection({ initialService }: { initialService?: string
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json().catch(() => null);
+
       if (!response.ok) {
-        throw new Error("Unable to deliver message at this time.");
+        throw new Error(data?.error || "Direct server delivery is momentarily unavailable.");
       }
 
       setIsSubmitted(true);
-    } catch {
-      // If the API endpoint encounters any failure, provide direct fallback
-      setSubmitError(
-        "Direct server delivery is momentarily unavailable. You can send your pre-filled brief directly via email."
-      );
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Direct server delivery is momentarily unavailable.";
+      setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -189,10 +189,10 @@ export function ContactFormSection({ initialService }: { initialService?: string
 
               <div>
                 <h3 className="font-sans text-2xl sm:text-3xl font-medium text-white mb-2">
-                  Enquiry Prepared Successfully
+                  Enquiry Delivered Successfully
                 </h3>
                 <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed max-w-lg">
-                  Thank you, <strong className="text-white">{formData.name}</strong>. Your project brief has been logged. I review client submissions daily and will respond to{" "}
+                  Thank you, <strong className="text-white">{formData.name}</strong>. Your enquiry has been delivered directly to <strong className="text-white">inquiry.kamrul@gmail.com</strong>. I review client submissions daily and will respond to{" "}
                   <strong className="text-white">{formData.email}</strong> within 24–48 hours.
                 </p>
               </div>

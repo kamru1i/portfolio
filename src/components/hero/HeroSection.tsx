@@ -12,11 +12,13 @@ interface HeroSectionProps {
 
 export function HeroSection({ isRevealed = true }: HeroSectionProps) {
   return (
-    <section className="relative w-full min-h-[92vh] flex flex-col items-center justify-start pt-28 sm:pt-36 md:pt-40 lg:pt-[160px] pb-16 md:pb-24 px-4 overflow-hidden">
-      {/* Massive Editorial Display Wordmark with Typographic Scramble-Resolution Reveal */}
-      <div className="w-full text-center select-none">
-        <HeroTitle text={PORTFOLIO_DATA.hero.wordmark} isRevealed={isRevealed} />
-      </div>
+    <section className="relative w-full min-h-[100svh] flex flex-col items-center justify-center pt-24 sm:pt-28 lg:pt-24 pb-12 sm:pb-16 lg:pb-16 px-4 overflow-hidden">
+      {/* Coordinated Editorial Hero Composition: Title -> Subtitle -> 3D Cylinder */}
+      <div className="w-full flex flex-col items-center my-auto">
+        {/* Massive Editorial Display Wordmark with Typographic Scramble-Resolution Reveal */}
+        <div className="w-full text-center select-none">
+          <HeroTitle text={PORTFOLIO_DATA.hero.wordmark} isRevealed={isRevealed} />
+        </div>
 
       {/* Subtitle Statement: Coordinated Scramble-Resolution Sequence */}
       <div className="mt-7 md:mt-8 max-w-[680px] px-4 text-center select-none">
@@ -51,6 +53,7 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
       >
         <Rotating3DCylinder />
       </motion.div>
+      </div>
     </section>
   );
 }

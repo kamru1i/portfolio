@@ -218,10 +218,11 @@ export function CurtainFooter() {
         <div className="flex items-center gap-5 font-gambarino text-lg sm:text-xl text-white">
           {PORTFOLIO_DATA.brand.socials.map((social) => (
             <a
-              key={social.label}
+              key={social.name}
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={social.name}
               className="hover-underline-link hover:text-white transition-colors"
             >
               {social.label}
