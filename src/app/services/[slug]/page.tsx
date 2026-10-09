@@ -49,9 +49,13 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
   }
 
   // Find next service for navigation footer
-  const currentIndex = PORTFOLIO_DATA.services.findIndex((s) => s.slug === slug);
+  const currentIndex = PORTFOLIO_DATA.services.findIndex(
+    (s) => s.slug === slug,
+  );
   const nextService =
-    PORTFOLIO_DATA.services[(currentIndex + 1) % PORTFOLIO_DATA.services.length];
+    PORTFOLIO_DATA.services[
+      (currentIndex + 1) % PORTFOLIO_DATA.services.length
+    ];
 
   return (
     <>
@@ -82,9 +86,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               {/* Category Pill Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider w-fit">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <span>
-                  {`${service.index} // ${service.category}`}
-                </span>
+                <span>{`${service.index} // ${service.category}`}</span>
               </div>
 
               {/* Bullet Highlights (Desktop Header) */}

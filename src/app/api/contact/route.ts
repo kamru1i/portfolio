@@ -338,6 +338,7 @@ https://kamrulislam.bd
 
     // 2. Send Automated Courtesy Confirmation Receipt to Client
     let autoReplyDeliveryId: string | null = null;
+    let autoReplyErrorDetail: any = null;
     try {
       const autoReplyResult = await resend.emails.send({
         from: autoReplySender,
@@ -348,6 +349,7 @@ https://kamrulislam.bd
       });
 
       if (autoReplyResult.error) {
+        autoReplyErrorDetail = autoReplyResult.error;
         console.warn("[Auto-Reply Notice]: Client confirmation email could not be sent:", autoReplyResult.error);
       } else {
         autoReplyDeliveryId = autoReplyResult.data?.id || null;
@@ -357,6 +359,7 @@ https://kamrulislam.bd
         });
       }
     } catch (autoReplyErr: any) {
+      autoReplyErrorDetail = autoReplyErr?.message || autoReplyErr;
       console.warn("[Auto-Reply Non-Fatal Exception]:", autoReplyErr?.message || autoReplyErr);
     }
 
@@ -365,6 +368,13 @@ https://kamrulislam.bd
       message: "Enquiry delivered successfully.",
       deliveryId: data?.id,
       autoReplyDeliveryId,
+      ...(autoReplyErrorDetail
+        ? {
+            autoReplyNotice:
+              autoReplyErrorDetail?.message ||
+              "Auto-reply awaiting verified domain at resend.com/domains",
+          }
+        : {}),
     });
   } catch (error: any) {
     console.error("[Contact API Internal Error]:", error);
