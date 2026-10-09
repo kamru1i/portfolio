@@ -32,7 +32,7 @@ export default function HomePage() {
 
       {/* Main Page Scroll Canvas */}
       <main className="relative z-10 w-full bg-black min-h-screen overflow-x-clip mb-[520px] sm:mb-[580px] md:mb-[640px] lg:mb-[700px] shadow-[0_40px_80px_rgba(0,0,0,0.95)]">
-        <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 md:px-8">
+        <div className="mx-auto w-full max-w-[1648px] px-4 sm:px-6 md:px-8">
           {/* Section 1: Hero */}
           <HeroSection isRevealed={isRevealed} />
 

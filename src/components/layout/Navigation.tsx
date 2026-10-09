@@ -69,22 +69,22 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
 
   // Physical container dimensions for zero ghost-layout height
   // Aspect ratio is 440:78 (~5.641)
-  // Desktop: 72px high (406px wide) down to 32px high (180px wide)
-  // Mobile: 38px high (214px wide) down to 26px high (146px wide)
-  const logoHeightDesktop = useTransform(smoothProgress, [0, 1], ["72px", "32px"]);
-  const logoWidthDesktop = useTransform(smoothProgress, [0, 1], ["406px", "180px"]);
+  // Desktop: 52px high (293px wide) down to 28px high (158px wide)
+  // Mobile: 36px high (203px wide) down to 24px high (135px wide)
+  const logoHeightDesktop = useTransform(smoothProgress, [0, 1], ["52px", "28px"]);
+  const logoWidthDesktop = useTransform(smoothProgress, [0, 1], ["293px", "158px"]);
 
-  const logoHeightMobile = useTransform(smoothProgress, [0, 1], ["38px", "26px"]);
-  const logoWidthMobile = useTransform(smoothProgress, [0, 1], ["214px", "146px"]);
+  const logoHeightMobile = useTransform(smoothProgress, [0, 1], ["36px", "24px"]);
+  const logoWidthMobile = useTransform(smoothProgress, [0, 1], ["203px", "135px"]);
 
   const activeLogoHeight = isDesktop ? logoHeightDesktop : logoHeightMobile;
   const activeLogoWidth = isDesktop ? logoWidthDesktop : logoWidthMobile;
 
   // Header vertical padding:
-  // Initial: 24px top & bottom
-  // Scrolled: 12px top & bottom (exact symmetric vertical centering, 60px total bar height)
-  const paddingYDesktop = useTransform(smoothProgress, [0, 1], ["24px", "12px"]);
-  const paddingYMobile = useTransform(smoothProgress, [0, 1], ["16px", "10px"]);
+  // Initial: 16px top & bottom (84px total bar height)
+  // Scrolled: 10px top & bottom (exact symmetric vertical centering, 48px total bar height)
+  const paddingYDesktop = useTransform(smoothProgress, [0, 1], ["16px", "10px"]);
+  const paddingYMobile = useTransform(smoothProgress, [0, 1], ["14px", "8px"]);
   const activePaddingY = isDesktop ? paddingYDesktop : paddingYMobile;
 
   // Glassmorphic background and border interpolation
@@ -138,7 +138,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
         }}
         className="fixed top-0 left-0 right-0 z-50 w-full px-5 sm:px-8 md:px-12 lg:px-16 pointer-events-auto transition-colors duration-200"
       >
-        <nav className="w-full max-w-[1440px] mx-auto flex items-center justify-between text-white">
+        <nav className="w-full max-w-[1648px] mx-auto flex items-center justify-between text-white">
           {/* BRAND / LOGO: Oversized Brutalist Wordmark -> Compact Nav Transformation */}
           <div className="flex-1 flex items-center justify-start min-w-0">
             <Link
