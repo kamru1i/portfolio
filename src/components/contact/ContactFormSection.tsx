@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { TalkWithKamrulCard } from "@/components/common/TalkWithKamrulCard";
 
 interface FormDataState {
   name: string;
@@ -162,30 +162,8 @@ export function ContactFormSection({ initialService }: { initialService?: string
           </p>
         </div>
 
-        {/* Talk with Kamrul Profile Badge matching Aurexa reference */}
-        <div className="flex items-center gap-4 p-3.5 sm:p-4 rounded-2xl bg-[#121212] border border-white/10 w-fit shadow-md">
-          <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/15 bg-neutral-800 flex-shrink-0">
-            <Image
-              src="/images/kamrul-portrait.jpg"
-              alt="Kamrul Islam"
-              fill
-              className="object-cover object-top"
-              sizes="48px"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="font-sans font-medium text-base text-white">
-                Talk with Kamrul
-              </span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-            </div>
-            <span className="font-mono-custom text-xs text-[#888]">
-              Creative Technologist &amp; Video Editor
-            </span>
-          </div>
-        </div>
+        {/* Talk with Kamrul Profile Card matching reference (without CTA button) */}
+        <TalkWithKamrulCard showButton={false} />
       </motion.div>
 
       {/* Right Column: Aurexa-Style Interactive Form */}

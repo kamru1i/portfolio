@@ -1080,7 +1080,7 @@ export const PORTFOLIO_DATA = {
       "Direct insights into my post-production pipeline, technical toolchains, AI workflows, and project collaboration.",
     contactCard: {
       name: "Talk with Kamrul",
-      role: "Lead Video Editor & IT Specialist",
+      role: "Lead Video Editor, Web Developer & IT Specialist",
       ctaText: "Get in touch",
       ctaHref: "/contact-us",
       email: "kamrulislamabk@gmail.com",
