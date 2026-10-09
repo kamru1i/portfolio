@@ -20,6 +20,20 @@ export interface ScrambleRevealTextProps {
 
 const DEFAULT_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;:,.<>?~";
 
+/**
+ * Deterministically generates an initial glyph for SSR and initial hydration.
+ * Pure mathematical function: depends only on character code, position index, and charset.
+ * Guarantees 100% identical markup on server (SSR) and client initial render.
+ */
+function getDeterministicInitialGlyph(char: string, index: number, charset: string): string {
+  if (char === " " || char === "\n" || char === "\t") {
+    return char;
+  }
+  const code = char.charCodeAt(0) || 0;
+  const hash = Math.abs((code * 31 + (index + 1) * 17) % charset.length);
+  return charset[hash];
+}
+
 export function ScrambleRevealText({
   text,
   isRevealed,
@@ -37,7 +51,9 @@ export function ScrambleRevealText({
   const shouldReduceMotion = useReducedMotion();
   const [resolvedIndex, setResolvedIndex] = useState<number>(-1);
   const [activeGlyphs, setActiveGlyphs] = useState<string[]>(() =>
-    Array.from({ length: text.length }, () => characters[Math.floor(Math.random() * characters.length)])
+    Array.from({ length: text.length }, (_, i) =>
+      getDeterministicInitialGlyph(text[i], i, characters)
+    )
   );
   const [hasStarted, setHasStarted] = useState<boolean>(false);
 
@@ -51,6 +67,18 @@ export function ScrambleRevealText({
     onCompleteRef.current = onComplete;
   });
 
+  // Keep glyphs in sync if text or character set changes
+  useEffect(() => {
+    setActiveGlyphs(
+      Array.from({ length: text.length }, (_, i) =>
+        getDeterministicInitialGlyph(text[i], i, characters)
+      )
+    );
+    setResolvedIndex(-1);
+    setHasStarted(false);
+    startTimeRef.current = null;
+  }, [text, characters]);
+
   const getRandomGlyph = useCallback(() => {
     return characters[Math.floor(Math.random() * characters.length)];
   }, [characters]);
@@ -62,6 +90,11 @@ export function ScrambleRevealText({
 
     timerRef.current = setTimeout(() => {
       setHasStarted(true);
+
+      // Immediately randomize glyphs once the animation begins
+      setActiveGlyphs((prev) =>
+        prev.map((_, i) => (text[i] === " " ? " " : getRandomGlyph()))
+      );
 
       // 1. High-frequency glyph shuffle interval for actively scrambling characters
       intervalRef.current = setInterval(() => {
@@ -85,7 +118,14 @@ export function ScrambleRevealText({
           setResolvedIndex((prev) => (targetIndex > prev ? targetIndex : prev));
 
           if (targetIndex >= text.length) {
-            if (intervalRef.current) clearInterval(intervalRef.current);
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+              intervalRef.current = null;
+            }
+            if (rafRef.current) {
+              cancelAnimationFrame(rafRef.current);
+              rafRef.current = null;
+            }
             if (onCompleteRef.current) onCompleteRef.current();
             return;
           }
@@ -98,9 +138,19 @@ export function ScrambleRevealText({
     }, delay * 1000);
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      startTimeRef.current = null;
     };
   }, [
     isRevealed,
