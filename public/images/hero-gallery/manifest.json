@@ -1,0 +1,59 @@
+{
+  "title": "Kamrul Islam Portfolio — 3D Hero Gallery Curated Stock Photography",
+  "updatedAt": "2026-10-09T19:05:35.620Z",
+  "license": "Pexels License (Free to use, Commercial & Non-Commercial)",
+  "cardAspectRatio": "320:390 (0.8205)",
+  "resolution": "800x975 WebP (2.5x retina-ready)",
+  "items": [
+    {
+      "id": "hero-card-1",
+      "src": "/images/hero-gallery/hero-card-1.webp",
+      "discipline": "cinematography",
+      "title": "Professional Cinema Camera Rig",
+      "alt": "Close-up of a professional Sony cinema camera rig with monitor and lens",
+      "photographer": "@MOONLIGHTSHOTZ",
+      "sourceUrl": "https://www.pexels.com/photo/close-up-of-a-professional-camera-11480031/",
+      "licenseUrl": "https://www.pexels.com/license/"
+    },
+    {
+      "id": "hero-card-2",
+      "src": "/images/hero-gallery/hero-card-2.webp",
+      "discipline": "video-editing",
+      "title": "Video Editing Multi-Track Timeline",
+      "alt": "Vivid colorful video editing timeline with audio waveforms in post-production suite",
+      "photographer": "Pexels Contributor",
+      "sourceUrl": "https://www.pexels.com/photo/colorful-monitor-3069868/",
+      "licenseUrl": "https://www.pexels.com/license/"
+    },
+    {
+      "id": "hero-card-3",
+      "src": "/images/hero-gallery/hero-card-3.webp",
+      "discipline": "post-production",
+      "title": "Video Editing Studio Workstation",
+      "alt": "Monochrome post-production suite with Apple Cinema Display editing sequence and keyboard",
+      "photographer": "Pexels Contributor",
+      "sourceUrl": "https://www.pexels.com/photo/laptop-and-computer-on-the-desk-with-video-editing-11025645/",
+      "licenseUrl": "https://www.pexels.com/license/"
+    },
+    {
+      "id": "hero-card-4",
+      "src": "/images/hero-gallery/hero-card-4.webp",
+      "discipline": "creative-digital",
+      "title": "Creative Workspace with Abstract Display",
+      "alt": "Modern creative digital workstation with fluid abstract monitor artwork and ambient lighting",
+      "photographer": "Pexels Contributor",
+      "sourceUrl": "https://www.pexels.com/photo/modern-workspace-with-abstract-monitor-display-29849371/",
+      "licenseUrl": "https://www.pexels.com/license/"
+    },
+    {
+      "id": "hero-card-5",
+      "src": "/images/hero-gallery/hero-card-5.webp",
+      "discipline": "web-development",
+      "title": "Web Engineering & Code Architecture",
+      "alt": "Modern developer desk with laptop displaying syntax-highlighted code editor and workspace",
+      "photographer": "Daniil Komov (dkomov.com)",
+      "sourceUrl": "https://www.pexels.com/photo/modern-workspace-with-laptop-and-coding-screen-34804019/",
+      "licenseUrl": "https://www.pexels.com/license/"
+    }
+  ]
+}

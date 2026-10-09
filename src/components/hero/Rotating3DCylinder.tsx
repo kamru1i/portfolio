@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
-import { generateFallbackThumbnail } from "@/lib/video-metadata";
+import { HERO_GALLERY_IMAGES, HeroGalleryItem } from "@/lib/hero-gallery-config";
 
 interface Rotating3DCylinderProps {
-  initialProjects?: PortfolioProject[];
+  items?: HeroGalleryItem[];
   imageWidth?: number;
   imageHeight?: number;
   tilt?: number;
@@ -16,60 +15,8 @@ interface Rotating3DCylinderProps {
   innerDim?: number;
 }
 
-interface HeroCylinderCard {
-  id: string | number;
-  src: string;
-  alt: string;
-  title?: string;
-}
-
-function getLatestVideoCards(projects: PortfolioProject[]): HeroCylinderCard[] {
-  const publishedVideos = projects
-    .filter((p) => p.type === "video" && p.published !== false)
-    .sort((a, b) => {
-      if (a.publishedAt && b.publishedAt) {
-        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-      }
-      if (a.publishedAt && !b.publishedAt) return -1;
-      if (!a.publishedAt && b.publishedAt) return 1;
-      if (a.createdAt && b.createdAt) {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-      return (a.order || 0) - (b.order || 0);
-    })
-    .slice(0, 5);
-
-  if (publishedVideos.length === 0) {
-    return [
-      { id: "1", src: "/images/hero-card-1.png", alt: "Architectural Editorial Portrait" },
-      { id: "2", src: "/images/hero-card-2.png", alt: "Vibrant Cobalt Blue Collage Cutout" },
-      { id: "3", src: "/images/hero-card-3.png", alt: "Cinematic Film Narrative" },
-      { id: "4", src: "/images/hero-card-4.png", alt: "Atmospheric Amber Motion" },
-      { id: "5", src: "/images/hero-card-5.png", alt: "Grain Monochrome Floral Portrait" },
-    ];
-  }
-
-  return publishedVideos.map((project, idx) => {
-    const provider =
-      project.videoType === "youtube"
-        ? "youtube"
-        : project.videoType === "vimeo"
-        ? "vimeo"
-        : project.videoType === "local"
-        ? "local"
-        : "other";
-
-    return {
-      id: project.id || `video-${idx + 1}`,
-      src: project.thumbnail || generateFallbackThumbnail(project.title, provider),
-      alt: project.title,
-      title: project.title,
-    };
-  });
-}
-
 export function Rotating3DCylinder({
-  initialProjects,
+  items,
   imageWidth = 320,
   imageHeight = 390,
   tilt = -7,
@@ -84,7 +31,7 @@ export function Rotating3DCylinder({
   const animFrameRef = useRef<number | null>(null);
 
   // High-performance physics refs (avoiding React re-renders during RAF and drag)
-  // Initial angle 178deg matches exact reference screenshot with blue collage card and floral silhouette in front view
+  // Initial angle 178deg matches exact reference framing
   const rotRef = useRef<number>(178);
   const velocityRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -94,31 +41,8 @@ export function Rotating3DCylinder({
   // Responsive spacing: 2 on desktop/tablet, 1 on mobile
   const [spacing, setSpacing] = useState<number>(2);
 
-  // Dynamic cards state: starts immediately with verified video projects, syncs with database via /api/projects
-  const [cards, setCards] = useState<HeroCylinderCard[]>(() =>
-    getLatestVideoCards(initialProjects || PORTFOLIO_DATA.showcaseProjects || [])
-  );
-
-  useEffect(() => {
-    let isMounted = true;
-    fetch("/api/projects")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (isMounted && data?.projects && Array.isArray(data.projects)) {
-          const latestCards = getLatestVideoCards(data.projects);
-          if (latestCards.length > 0) {
-            setCards(latestCards);
-          }
-        }
-      })
-      .catch(() => {
-        // Fallback remains active
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  // Use curated stock photography cards (easy to replace via hero-gallery-config.ts)
+  const cards = items && items.length > 0 ? items : HERO_GALLERY_IMAGES;
 
   useEffect(() => {
     const handleResize = () => {
@@ -285,6 +209,7 @@ export function Rotating3DCylinder({
                     backgroundImage: `url(${card.src})`,
                     boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
                   }}
+                  title={card.title || card.alt}
                 />
 
                 {/* Back Face: Mirrored interior facing cylinder center, dimmed brightness */}

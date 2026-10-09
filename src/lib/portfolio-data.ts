@@ -1,5 +1,6 @@
-// Source of truth: Kamrul Islam CV and Professional Portfolio documents
-// Priority: Video Editing & Post-Production -> AI-Assisted Content -> Web Development -> IT Operations
+import { HERO_GALLERY_IMAGES, HeroGalleryItem } from "./hero-gallery-config";
+export { HERO_GALLERY_IMAGES };
+export type { HeroGalleryItem };
 
 export interface ProjectItem {
   id: string;
@@ -174,7 +175,9 @@ export const PORTFOLIO_DATA = {
         accent: "#eab308",
       },
     ],
+    gallery: HERO_GALLERY_IMAGES,
   },
+  heroGallery: HERO_GALLERY_IMAGES,
 
   worksHeader: {
     title: "Projects & Works",
