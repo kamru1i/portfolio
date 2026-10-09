@@ -20,7 +20,7 @@ export function AurexaCaseStudyCard({
           onPreviewWeb(project);
         }
       }}
-      className="relative group w-full h-[500px] sm:h-[530px] rounded-2xl sm:rounded-3xl border border-white/10 hover:border-white/25 bg-[#0e0e0e] overflow-hidden select-none cursor-pointer transition-all duration-500 shadow-[0_12px_40px_rgba(0,0,0,0.5)] flex flex-col justify-between"
+      className="relative group w-full h-[460px] sm:h-[480px] lg:h-[480px] xl:h-[510px] rounded-2xl sm:rounded-3xl border border-white/10 hover:border-white/25 bg-[#0e0e0e] overflow-hidden select-none cursor-pointer transition-all duration-500 shadow-[0_12px_40px_rgba(0,0,0,0.5)] flex flex-col justify-between"
     >
       {/* Background Project Mockup Image with subtle zoom on hover */}
       <div className="absolute inset-0 z-0">
@@ -28,7 +28,7 @@ export function AurexaCaseStudyCard({
           src={project.thumbnail}
           alt={project.title}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1440px) 33vw, 450px"
           className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
         />
 
@@ -37,8 +37,8 @@ export function AurexaCaseStudyCard({
       </div>
 
       {/* Default State: Top Header (Title + Category) matching Image 1 */}
-      <div className="relative z-10 p-6 sm:p-7 flex flex-col transition-transform duration-300 group-hover:-translate-y-1">
-        <h3 className="font-sans text-xl sm:text-2xl font-medium tracking-tight text-white leading-tight">
+      <div className="relative z-10 p-5 sm:p-6 lg:p-6 xl:p-7 flex flex-col transition-transform duration-300 group-hover:-translate-y-1">
+        <h3 className="font-sans text-xl sm:text-2xl lg:text-xl xl:text-2xl font-medium tracking-tight text-white leading-tight">
           {project.title}
         </h3>
         <p className="font-sans text-xs sm:text-sm text-[#a1a1a1] mt-1 font-normal">
@@ -47,25 +47,25 @@ export function AurexaCaseStudyCard({
       </div>
 
       {/* Default State: Bottom Metadata (@Year) matching Image 1 */}
-      <div className="relative z-10 p-6 sm:p-7 flex items-center justify-between transition-transform duration-300 group-hover:translate-y-1">
+      <div className="relative z-10 p-5 sm:p-6 lg:p-6 xl:p-7 flex items-center justify-between transition-transform duration-300 group-hover:translate-y-1">
         <span className="font-mono-custom text-xs sm:text-sm text-[#888]">
           @{project.year || "2026"}
         </span>
       </div>
 
       {/* Aurexa Hover Overlay matching Image 2 (media_1791492077706_19af23f0.png) */}
-      <div className="absolute inset-0 z-20 bg-black/80 backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out flex flex-col justify-between p-6 sm:p-7">
+      <div className="absolute inset-0 z-20 bg-black/80 backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out flex flex-col justify-between p-5 sm:p-6 lg:p-6 xl:p-7">
         {/* Top spacer to balance layout */}
         <div className="w-full" />
 
         {/* Center Content: Impact Narrative Statement */}
         <div className="w-full my-auto">
-          <p className="font-sans text-[17px] sm:text-[19px] font-normal leading-[1.38] text-white/95 line-clamp-4 sm:line-clamp-5">
+          <p className="font-sans text-[15px] sm:text-[17px] lg:text-[15px] xl:text-[16px] font-normal leading-[1.4] text-white/95 line-clamp-4 sm:line-clamp-5">
             {project.description}
           </p>
 
           {/* Thin Hairline Divider Rule */}
-          <div className="w-full h-px bg-white/15 my-5 sm:my-6" />
+          <div className="w-full h-px bg-white/15 my-4 sm:my-5" />
         </div>
 
         {/* Bottom Actions Row: Emblem Icon + Client on Left, Arrow Button on Right */}
@@ -78,7 +78,7 @@ export function AurexaCaseStudyCard({
               <span className="w-1 h-4 bg-neutral-300 rounded-full" />
               <span className="w-1 h-2.5 bg-neutral-400 rounded-full" />
             </div>
-            <span className="font-sans text-sm font-medium text-neutral-300 tracking-wide">
+            <span className="font-sans text-xs sm:text-sm font-medium text-neutral-300 tracking-wide truncate max-w-[120px] sm:max-w-none">
               {project.client || "Emblem"}
             </span>
           </div>
@@ -91,7 +91,7 @@ export function AurexaCaseStudyCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono-custom text-xs border border-white/10 transition-all flex items-center justify-center shadow-sm"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono-custom text-xs border border-white/10 transition-all flex items-center justify-center shadow-sm"
                 aria-label={`View ${project.title} source on GitHub`}
               >
                 <span>GH</span>
@@ -104,7 +104,7 @@ export function AurexaCaseStudyCard({
                 e.stopPropagation();
                 onPreviewWeb(project);
               }}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 hover:bg-white text-white hover:text-black transition-all flex items-center justify-center text-sm shadow-sm group-hover:scale-105"
+              className="w-8 h-8 sm:w-9 sm:h-10 sm:px-3 rounded-xl bg-white/20 hover:bg-white text-white hover:text-black transition-all flex items-center justify-center text-sm shadow-sm group-hover:scale-105"
               aria-label={`Preview live website for ${project.title}`}
             >
               <span>→</span>
