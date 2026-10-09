@@ -27,8 +27,8 @@ export interface PortfolioProject {
   description: string;
   thumbnail: string;
   videoUrl?: string;
-  videoType?: "local" | "youtube" | "vimeo";
-  format?: "16:9" | "9:16";
+  videoType?: "local" | "youtube" | "vimeo" | "tiktok" | "facebook" | "instagram" | "twitter" | "other";
+  format?: "16:9" | "9:16" | "1:1" | "4:3" | "5:4";
   aspect?: "small" | "large" | "medium";
   githubUrl?: string;
   liveUrl?: string;
@@ -37,6 +37,7 @@ export interface PortfolioProject {
   tags: string[];
   published: boolean;
   order: number;
+  manualPriority?: number | null;
   publishedAt?: string;
   createdAt?: string;
 }

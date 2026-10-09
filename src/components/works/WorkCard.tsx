@@ -49,12 +49,13 @@ export function WorkCard({
         };
 
   const isVideo = normalizedProject.type === "video";
+  const isPortraitLarge = normalizedProject.format === "9:16" && isLarge;
 
   return (
     <div
       ref={containerRef}
       data-project-id={normalizedProject.id}
-      className={`relative group flex flex-col w-full cursor-pointer select-none ${className}`}
+      className={`relative group flex flex-col w-full ${isPortraitLarge ? "max-w-[380px] sm:max-w-[420px] mx-auto" : ""} cursor-pointer select-none ${className}`}
       onClick={() => {
         if (isVideo) onPlayVideo?.(normalizedProject);
         else if (normalizedProject.liveUrl) onPreviewWeb?.(normalizedProject);

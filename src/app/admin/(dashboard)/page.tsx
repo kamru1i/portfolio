@@ -14,6 +14,9 @@ export default function AdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
+
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteProject, setConfirmDeleteProject] = useState<ProjectRecord | null>(null);
@@ -40,6 +43,11 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Reset to first page when changing tabs or search query
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery]);
 
   // Compute stats
   const stats = useMemo(() => {
@@ -72,6 +80,14 @@ export default function AdminDashboardPage() {
       return true;
     });
   }, [projects, activeTab, searchQuery]);
+
+  // Paginated slice
+  const totalFiltered = filteredProjects.length;
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+  const paginatedProjects = useMemo(() => {
+    const from = (currentPage - 1) * pageSize;
+    return filteredProjects.slice(from, from + pageSize);
+  }, [filteredProjects, currentPage, pageSize]);
 
   // Toggle publish state
   const handleTogglePublish = async (project: ProjectRecord) => {
@@ -256,7 +272,7 @@ export default function AdminDashboardPage() {
         </div>
       ) : (
         <div className="rounded-2xl bg-[#141416] border border-white/10 overflow-hidden shadow-sm divide-y divide-white/5">
-          {filteredProjects.map((project) => {
+          {paginatedProjects.map((project) => {
             const isVideo = project.type === "video";
             const is916 = project.aspect_ratio === "9:16";
 
@@ -292,6 +308,17 @@ export default function AdminDashboardPage() {
                   {/* Title & Meta */}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
+                      {/* Priority Badge */}
+                      {project.manual_priority ? (
+                        <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-amber-950/60 text-amber-300 border border-amber-800/50 font-medium">
+                          Priority #{project.manual_priority}
+                        </span>
+                      ) : (
+                        <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/[0.04] text-[#888] border border-white/5">
+                          Priority: Date
+                        </span>
+                      )}
+
                       <span className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
                         isVideo
                           ? "bg-sky-950/40 text-sky-300 border-sky-800/40"
@@ -364,6 +391,41 @@ export default function AdminDashboardPage() {
               </div>
             );
           })}
+
+          {/* Pagination Controls Footer */}
+          {totalPages > 1 && (
+            <div className="p-4 bg-black/40 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="font-mono-custom text-xs text-[#888]">
+                Showing <strong className="text-white">{(currentPage - 1) * pageSize + 1}</strong> to{" "}
+                <strong className="text-white">{Math.min(currentPage * pageSize, totalFiltered)}</strong> of{" "}
+                <strong className="text-white">{totalFiltered}</strong> projects
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                >
+                  ← Previous
+                </button>
+
+                <span className="font-mono-custom text-xs text-[#aaa] px-2">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

@@ -7,8 +7,8 @@ export type Json =
   | Json[];
 
 export type ProjectType = "video" | "web";
-export type VideoProvider = "youtube" | "vimeo" | "tiktok" | "facebook" | "instagram" | "local" | "other";
-export type AspectRatio = "16:9" | "9:16";
+export type VideoProvider = "youtube" | "vimeo" | "tiktok" | "facebook" | "instagram" | "twitter" | "local" | "other";
+export type AspectRatio = "16:9" | "9:16" | "1:1" | "4:3" | "5:4";
 
 export interface Database {
   public: {
@@ -34,6 +34,7 @@ export interface Database {
           is_published: boolean;
           published_at: string | null;
           sort_order: number;
+          manual_priority: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -57,6 +58,7 @@ export interface Database {
           is_published?: boolean;
           published_at?: string | null;
           sort_order?: number;
+          manual_priority?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -80,6 +82,7 @@ export interface Database {
           is_published?: boolean;
           published_at?: string | null;
           sort_order?: number;
+          manual_priority?: number | null;
           created_at?: string;
           updated_at?: string;
         };

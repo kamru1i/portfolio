@@ -18,6 +18,9 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
   const [year, setYear] = useState(project.year || "");
   const [description, setDescription] = useState(project.description || "");
   const [tagsInput, setTagsInput] = useState((project.tags || []).join(", "));
+  const [manualPriority, setManualPriority] = useState<string>(
+    project.manual_priority ? project.manual_priority.toString() : project.sort_order && project.sort_order > 0 ? project.sort_order.toString() : ""
+  );
   const [isPublished, setIsPublished] = useState(project.is_published);
 
   // Video states
@@ -26,6 +29,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
   const [videoProvider, setVideoProvider] = useState<VideoProvider | null>(project.video_provider);
   const [videoId, setVideoId] = useState<string | null>(project.video_id);
   const [resolvedThumbnail, setResolvedThumbnail] = useState<string | null>(project.preview_image_url);
+  const [resolutionStatus, setResolutionStatus] = useState<string | null>(null);
   const [resolvingVideo, setResolvingVideo] = useState(false);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
@@ -60,6 +64,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
       setVideoProvider(meta.provider);
       setVideoId(meta.videoId);
       setResolvedThumbnail(meta.thumbnailUrl);
+      setResolutionStatus(meta.status || null);
       if (meta.aspectRatio) {
         setAspectRatio(meta.aspectRatio);
       }
@@ -84,6 +89,11 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
         throw new Error("Live URL is required for Web projects.");
       }
 
+      const parsedPriority = manualPriority.trim() ? parseInt(manualPriority.trim(), 10) : null;
+      if (parsedPriority !== null && (isNaN(parsedPriority) || parsedPriority <= 0)) {
+        throw new Error("Display priority must be a positive integer (e.g. 1, 2, 3...) or left blank.");
+      }
+
       const tags = tagsInput
         .split(",")
         .map((t) => t.trim())
@@ -96,6 +106,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
         year: year.trim() || null,
         description: description.trim(),
         tags,
+        manual_priority: parsedPriority,
         is_published: isPublished,
         ...(isVideo
           ? {
@@ -221,7 +232,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
               <div className="p-4 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-center gap-4">
                 <div
                   className={`relative ${
-                    aspectRatio === "9:16" ? "w-20 h-36" : "w-40 h-24"
+                    aspectRatio === "9:16" ? "w-20 h-36" : aspectRatio === "1:1" ? "w-24 h-24" : "w-40 h-24"
                   } rounded-lg overflow-hidden bg-black flex-shrink-0 border border-white/15`}
                 >
                   <Image
@@ -232,20 +243,27 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
                     className="object-cover"
                   />
                 </div>
-                <div className="space-y-1 text-center sm:text-left">
-                  <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/50">
-                    Resolved Thumbnail ✓
-                  </span>
-                  <div className="font-mono-custom text-xs text-[#aaa] mt-1">
-                    Provider: <strong className="text-white uppercase">{videoProvider}</strong>
+                <div className="space-y-1.5 text-center sm:text-left flex-1">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <span className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
+                      resolutionStatus === "available"
+                        ? "bg-emerald-950/60 text-emerald-300 border-emerald-800/50"
+                        : "bg-sky-950/60 text-sky-300 border-sky-800/50"
+                    }`}>
+                      {resolutionStatus === "available" ? "Direct Thumbnail ✓" : "Resolved Thumbnail ✓"}
+                    </span>
+                    <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">
+                      {videoProvider?.toUpperCase()}
+                    </span>
                   </div>
-                  {videoId && (
-                    <div className="font-mono-custom text-xs text-[#aaa]">
-                      Video ID: <strong className="text-white">{videoId}</strong>
-                    </div>
-                  )}
+
                   <div className="font-mono-custom text-xs text-[#aaa]">
-                    Aspect Ratio: <strong className="text-white">{aspectRatio}</strong>
+                    Active Ratio: <strong className="text-white">{aspectRatio}</strong>
+                    {videoId && (
+                      <span className="ml-2 text-[#777]">
+                        (ID: <span className="text-white">{videoId}</span>)
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -257,35 +275,59 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
               </div>
             )}
 
-            {/* Aspect Ratio Override */}
+            {/* 5-Option Aspect Ratio Selector */}
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
-                Aspect Ratio Format
-              </label>
-              <div className="grid grid-cols-2 gap-3 max-w-sm">
-                <button
-                  type="button"
-                  onClick={() => setAspectRatio("16:9")}
-                  className={`py-2 px-3 rounded-xl font-mono-custom text-xs border transition-all ${
-                    aspectRatio === "16:9"
-                      ? "bg-white/15 border-white text-white font-medium"
-                      : "bg-white/[0.03] border-white/10 text-[#888] hover:text-white"
-                  }`}
-                >
-                  16:9 Landscape
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAspectRatio("9:16")}
-                  className={`py-2 px-3 rounded-xl font-mono-custom text-xs border transition-all ${
-                    aspectRatio === "9:16"
-                      ? "bg-white/15 border-white text-white font-medium"
-                      : "bg-white/[0.03] border-white/10 text-[#888] hover:text-white"
-                  }`}
-                >
-                  9:16 Portrait / Reel
-                </button>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
+                  Aspect Ratio Format *
+                </label>
+                <span className="font-mono-custom text-[11px] text-[#666]">
+                  Active: <strong className="text-white">{aspectRatio}</strong>
+                </span>
               </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                {(
+                  [
+                    { id: "16:9", label: "16:9", sub: "Landscape", box: "w-8 h-4.5" },
+                    { id: "9:16", label: "9:16", sub: "Portrait", box: "w-4 h-7" },
+                    { id: "1:1", label: "1:1", sub: "Square", box: "w-5.5 h-5.5" },
+                    { id: "4:3", label: "4:3", sub: "Standard", box: "w-7 h-5" },
+                    { id: "5:4", label: "5:4", sub: "Near-Square", box: "w-6.5 h-5" },
+                  ] as const
+                ).map((opt) => {
+                  const isSelected = aspectRatio === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setAspectRatio(opt.id as AspectRatio)}
+                      className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${
+                        isSelected
+                          ? "bg-white/15 border-white text-white shadow-sm ring-1 ring-white/20"
+                          : "bg-white/[0.02] border-white/10 text-[#888] hover:border-white/20 hover:text-white"
+                      }`}
+                    >
+                      <div
+                        className={`${opt.box} border-2 ${
+                          isSelected ? "border-white bg-white/20" : "border-white/30 bg-white/5"
+                        } rounded-sm flex items-center justify-center`}
+                      />
+                      <div className="text-center">
+                        <span className="font-mono-custom text-xs font-semibold block leading-tight">
+                          {opt.label}
+                        </span>
+                        <span className="font-mono-custom text-[10px] text-[#777] block mt-0.5">
+                          {opt.sub}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
+                Controls thumbnail card proportion in Patrick Jane works grid and video player dialog.
+              </p>
             </div>
           </div>
         ) : (
@@ -421,6 +463,32 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
               onChange={(e) => setTagsInput(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white text-sm font-mono-custom focus:outline-none focus:border-white/30"
             />
+          </div>
+
+          {/* Manual Display Priority */}
+          <div className="pt-4 border-t border-white/5">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
+                Manual Display Priority (Rank)
+              </label>
+              <span className="font-mono-custom text-[11px] text-amber-400">
+                {manualPriority ? `Rank #${manualPriority}` : "Unranked (Automatic Recency)"}
+              </span>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={manualPriority}
+                onChange={(e) => setManualPriority(e.target.value)}
+                placeholder="e.g. 1 (Top priority), 2, 3..."
+                className="w-full sm:w-56 px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+              />
+              <p className="font-mono-custom text-[11px] text-[#777] leading-relaxed">
+                Optional positive integer. Ranked projects (1, 2, 3...) display first on the public website within their tab, followed by unranked projects by newest publication date.
+              </p>
+            </div>
           </div>
         </div>
 

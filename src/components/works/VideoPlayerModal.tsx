@@ -96,7 +96,43 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
 
   if (!project) return null;
 
-  const isPortrait = project.format === "9:16";
+  const getModalPlayerDimensions = (format?: string) => {
+    switch (format) {
+      case "9:16":
+        return {
+          containerMaxW: "max-w-md",
+          stageAspect: "aspect-[9/16] max-h-[72vh]",
+          formatLabel: "9:16 Reel",
+        };
+      case "1:1":
+        return {
+          containerMaxW: "max-w-xl",
+          stageAspect: "aspect-square max-h-[72vh]",
+          formatLabel: "1:1 Square",
+        };
+      case "4:3":
+        return {
+          containerMaxW: "max-w-3xl",
+          stageAspect: "aspect-[4/3] max-h-[72vh]",
+          formatLabel: "4:3 Standard",
+        };
+      case "5:4":
+        return {
+          containerMaxW: "max-w-3xl",
+          stageAspect: "aspect-[5/4] max-h-[72vh]",
+          formatLabel: "5:4 Near-Square",
+        };
+      case "16:9":
+      default:
+        return {
+          containerMaxW: "max-w-5xl",
+          stageAspect: "aspect-video max-h-[72vh]",
+          formatLabel: project.client || "16:9 Video",
+        };
+    }
+  };
+
+  const { containerMaxW, stageAspect, formatLabel } = getModalPlayerDimensions(project.format);
   const url = project.videoUrl || "";
   const provider = detectVideoProvider(url);
 
@@ -134,9 +170,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className={`relative w-full ${
-            isPortrait ? "max-w-md" : "max-w-5xl"
-          } rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col`}
+          className={`relative w-full ${containerMaxW} rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col`}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -146,7 +180,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#181818]/80">
             <div className="flex items-center gap-3">
               <span className="font-mono-custom text-xs uppercase px-2.5 py-1 rounded-full bg-white/10 text-white/80 border border-white/10">
-                {isPortrait ? "9:16 Reel" : project.client || "Video Production"}
+                {formatLabel}
               </span>
               <h3 className="font-sans font-medium text-base sm:text-lg text-white truncate max-w-md">
                 {project.title}
@@ -166,9 +200,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           {/* Video Player Stage with Premiere Pro Rounded Screen Monitor */}
           <div className="w-full bg-[#0d0d0f] p-2.5 sm:p-5 flex items-center justify-center">
             <div
-              className={`relative w-full ${
-                isPortrait ? "aspect-[9/16] max-h-[68vh]" : "aspect-video max-h-[68vh]"
-              } bg-black flex items-center justify-center overflow-hidden group mx-auto rounded-xl sm:rounded-2xl border border-white/15 shadow-[0_15px_40px_rgba(0,0,0,0.8)]`}
+              className={`relative w-full ${stageAspect} bg-black flex items-center justify-center overflow-hidden group mx-auto rounded-xl sm:rounded-2xl border border-white/15 shadow-[0_15px_40px_rgba(0,0,0,0.8)]`}
             >
               {embedUrl ? (
                 /* YouTube / Vimeo Embedded Player */
