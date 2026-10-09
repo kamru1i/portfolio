@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { SectionBadge } from "@/components/common/SectionBadge";
@@ -10,21 +10,41 @@ import { AurexaCaseStudies } from "./AurexaCaseStudies";
 import { VideoPlayerModal } from "./VideoPlayerModal";
 import { ProjectPreviewModal } from "./ProjectPreviewModal";
 
-export function ProjectsAndWorksSection() {
+interface ProjectsAndWorksSectionProps {
+  initialProjects?: PortfolioProject[];
+}
+
+export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSectionProps = {}) {
   const [activeTab, setActiveTab] = useState<"video" | "web">("video");
   const [activeVideoProject, setActiveVideoProject] = useState<PortfolioProject | null>(null);
   const [activeWebProject, setActiveWebProject] = useState<PortfolioProject | null>(null);
 
-  const projects = PORTFOLIO_DATA.showcaseProjects || [];
+  const [projects, setProjects] = useState<PortfolioProject[]>(
+    initialProjects || PORTFOLIO_DATA.showcaseProjects || []
+  );
 
-  // Filter dynamically by type and sort by order attribute
-  const videoProjects = projects
-    .filter((p) => p.type === "video")
-    .sort((a, b) => (a.order || 0) - (b.order || 0));
+  // Fetch updated published projects from database
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/projects")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.projects && data.projects.length > 0) {
+          setProjects(data.projects);
+        }
+      })
+      .catch(() => {
+        // Safe fallback remains active
+      });
 
-  const webProjects = projects
-    .filter((p) => p.type === "web")
-    .sort((a, b) => (a.order || 0) - (b.order || 0));
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Filter dynamically by type and sort
+  const videoProjects = projects.filter((p) => p.type === "video");
+  const webProjects = projects.filter((p) => p.type === "web");
 
   return (
     <section

@@ -9,15 +9,19 @@ interface ProjectPreviewModalProps {
   onClose: () => void;
 }
 
+type ViewportMode = "desktop" | "tablet" | "mobile";
+
 export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalProps) {
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
+  const [viewportMode, setViewportMode] = useState<ViewportMode>("desktop");
 
   // Reset state whenever active project changes
   useEffect(() => {
     if (project) {
       setIframeLoaded(false);
       setHasError(!project.canEmbed);
+      setViewportMode("desktop");
     }
   }, [project]);
 
@@ -46,6 +50,13 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
 
   if (!project) return null;
 
+  const viewportWidthClass =
+    viewportMode === "mobile"
+      ? "w-[375px] max-w-full"
+      : viewportMode === "tablet"
+      ? "w-[768px] max-w-full"
+      : "w-full";
+
   return (
     <AnimatePresence>
       <motion.div
@@ -63,7 +74,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 20 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative w-full max-w-6xl h-[85vh] max-h-[850px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col"
+          className="relative w-full max-w-6xl h-[88vh] max-h-[880px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -73,7 +84,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#181818]/90">
             {/* Left: Window Controls Mockup + Title */}
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5 hidden sm:flex">
+              <div className="items-center gap-1.5 hidden sm:flex">
                 <span className="w-3 h-3 rounded-full bg-[#ff5f56]/80" />
                 <span className="w-3 h-3 rounded-full bg-[#ffbd2e]/80" />
                 <span className="w-3 h-3 rounded-full bg-[#27c93f]/80" />
@@ -88,6 +99,45 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                 </h3>
               </div>
             </div>
+
+            {/* Center: Viewport Mode Switcher (Desktop / Tablet / Mobile) */}
+            {project.canEmbed && project.liveUrl && !hasError && (
+              <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setViewportMode("desktop")}
+                  className={`px-2.5 py-1 rounded-lg font-mono-custom text-[11px] uppercase transition-colors ${
+                    viewportMode === "desktop"
+                      ? "bg-white/15 text-white font-medium"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  Desktop
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewportMode("tablet")}
+                  className={`px-2.5 py-1 rounded-lg font-mono-custom text-[11px] uppercase transition-colors ${
+                    viewportMode === "tablet"
+                      ? "bg-white/15 text-white font-medium"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  Tablet
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewportMode("mobile")}
+                  className={`px-2.5 py-1 rounded-lg font-mono-custom text-[11px] uppercase transition-colors ${
+                    viewportMode === "mobile"
+                      ? "bg-white/15 text-white font-medium"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  Mobile
+                </button>
+              </div>
+            )}
 
             {/* Right: Actions */}
             <div className="flex items-center gap-2 sm:gap-3">
@@ -129,7 +179,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
           {/* Main Preview Area */}
           <div className="relative flex-1 w-full bg-[#0d0d0d] flex items-center justify-center overflow-hidden">
             {project.canEmbed && project.liveUrl && !hasError ? (
-              <>
+              <div className={`relative h-full transition-all duration-300 mx-auto ${viewportWidthClass} flex flex-col items-center justify-center`}>
                 {!iframeLoaded && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0d0d0d] z-10">
                     <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
@@ -144,9 +194,9 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                   onLoad={() => setIframeLoaded(true)}
                   onError={() => setHasError(true)}
                   sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                  className="w-full h-full border-0"
+                  className="w-full h-full border-0 bg-white"
                 />
-              </>
+              </div>
             ) : (
               /* Fallback UI for sites that restrict framing */
               <div className="flex flex-col items-center justify-center text-center p-6 sm:p-12 max-w-lg mx-auto">
@@ -158,40 +208,24 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                 </h4>
                 <p className="font-mono-custom text-xs sm:text-sm text-[#999] leading-relaxed mb-6">
                   This production web application enforces strict browser security headers
-                  (X-Frame-Options / CSP) that prevent direct inline embedding. You can explore the
-                  live implementation directly in a dedicated window.
+                  (<code className="text-white/80 font-mono-custom text-xs">X-Frame-Options</code> or Content Security Policy) that prevent in-iframe embedding. You can inspect the deployed live build directly in a new tab.
                 </p>
-
-                <div className="flex items-center gap-3">
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-6 py-2.5 rounded-full bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 transition-all shadow-md flex items-center gap-2 group"
-                    >
-                      <span>Open Live Site</span>
-                      <span className="transition-transform group-hover:translate-x-0.5">↗</span>
-                    </a>
-                  )}
-
-                  {project.githubUrl && (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-full bg-white/10 text-white font-mono-custom text-xs border border-white/15 hover:bg-white/20 transition-colors flex items-center gap-1.5"
-                    >
-                      <span>View Code</span>
-                      <span>↗</span>
-                    </a>
-                  )}
-                </div>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3 rounded-full bg-white text-black font-sans font-medium text-sm hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-lg"
+                  >
+                    <span>Visit Live Website</span>
+                    <span>↗</span>
+                  </a>
+                )}
               </div>
             )}
           </div>
 
-          {/* Bottom Info Bar */}
+          {/* Footer Meta Bar */}
           <div className="px-5 py-3 border-t border-white/10 bg-[#161616] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <p className="font-mono-custom text-xs text-[#888] truncate max-w-xl">
               {project.description}

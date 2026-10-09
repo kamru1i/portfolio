@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PortfolioProject } from "@/lib/portfolio-data";
+import { extractYouTubeId, extractVimeoId, detectVideoProvider } from "@/lib/video-metadata";
 
 interface VideoPlayerModalProps {
   project: PortfolioProject | null;
@@ -96,6 +97,25 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
   if (!project) return null;
 
   const isPortrait = project.format === "9:16";
+  const url = project.videoUrl || "";
+  const provider = detectVideoProvider(url);
+
+  // Check provider specifics
+  let embedUrl: string | null = null;
+  if (provider === "youtube") {
+    const { videoId } = extractYouTubeId(url);
+    if (videoId) {
+      embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+    }
+  } else if (provider === "vimeo") {
+    const videoId = extractVimeoId(url);
+    if (videoId) {
+      embedUrl = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+    }
+  }
+
+  const isDirectVideo = provider === "local" || (!embedUrl && url.match(/\.(mp4|webm|ogg|mov)$/i));
+  const isSocialExternal = !isDirectVideo && !embedUrl;
 
   return (
     <AnimatePresence>
@@ -149,19 +169,63 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
               isPortrait ? "aspect-[9/16] max-h-[70vh]" : "aspect-video"
             } bg-black flex items-center justify-center overflow-hidden group mx-auto`}
           >
-            {project.videoUrl ? (
-              <video
-                ref={videoRef}
-                src={project.videoUrl}
-                poster={project.thumbnail}
-                autoPlay
-                playsInline
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onEnded={() => setIsPlaying(false)}
-                className="w-full h-full object-contain cursor-pointer"
-                onClick={togglePlay}
+            {embedUrl ? (
+              /* YouTube / Vimeo Embedded Player */
+              <iframe
+                src={embedUrl}
+                title={project.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full border-0"
               />
+            ) : isDirectVideo && url ? (
+              /* Direct MP4 / HTML5 Video Player */
+              <>
+                <video
+                  ref={videoRef}
+                  src={url}
+                  poster={project.thumbnail}
+                  autoPlay
+                  playsInline
+                  onTimeUpdate={handleTimeUpdate}
+                  onLoadedMetadata={handleLoadedMetadata}
+                  onEnded={() => setIsPlaying(false)}
+                  className="w-full h-full object-contain cursor-pointer"
+                  onClick={togglePlay}
+                />
+                {!isPlaying && (
+                  <div
+                    onClick={togglePlay}
+                    className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer pointer-events-auto"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-2xl pl-1 shadow-lg hover:scale-110 transition-transform">
+                      ▶
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : isSocialExternal ? (
+              /* Social Video Fallback (TikTok / Instagram / Facebook) */
+              <div className="flex flex-col items-center justify-center text-center p-8 max-w-md mx-auto">
+                <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl mb-4">
+                  🎬
+                </div>
+                <h4 className="font-sans font-medium text-lg text-white mb-2">
+                  External Social Production
+                </h4>
+                <p className="font-mono-custom text-xs text-[#888] leading-relaxed mb-6">
+                  This {provider.toUpperCase()} video is hosted on an external social network platform.
+                </p>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
+                >
+                  <span>Watch on {provider.toUpperCase()}</span>
+                  <span>↗</span>
+                </a>
+              </div>
             ) : (
               <div className="text-center p-8">
                 <p className="font-mono-custom text-sm text-[#888]">
@@ -169,87 +233,77 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
                 </p>
               </div>
             )}
-
-            {/* In-Video Play/Pause Overlay Icon on hover when paused */}
-            {!isPlaying && (
-              <div
-                onClick={togglePlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer pointer-events-auto"
-              >
-                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-2xl pl-1 shadow-lg hover:scale-110 transition-transform">
-                  ▶
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Bottom Player Controls */}
-          <div className="p-4 sm:p-5 bg-[#161616] flex flex-col gap-3">
-            {/* Scrub Bar */}
-            <div className="w-full flex items-center gap-3">
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={progress}
-                onChange={handleSeek}
-                aria-label="Video seek slider"
-                className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
-              />
-              <span className="font-mono-custom text-xs text-[#888] whitespace-nowrap">
-                {currentTimeStr} / {durationStr}
-              </span>
-            </div>
-
-            {/* Control Buttons & Project Details */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={togglePlay}
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                  className="px-4 py-1.5 rounded-full bg-white text-black font-sans text-xs font-medium hover:bg-neutral-200 transition-colors"
-                >
-                  {isPlaying ? "Pause ❚❚" : "Play ▶"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={toggleMute}
-                  aria-label={isMuted ? "Unmute" : "Mute"}
-                  className="px-3 py-1.5 rounded-full bg-white/10 text-white/80 hover:text-white font-mono-custom text-xs border border-white/10 transition-colors"
-                >
-                  {isMuted ? "Unmute 🔇" : "Mute 🔊"}
-                </button>
+          {/* Bottom Player Controls for direct video */}
+          {isDirectVideo && (
+            <div className="p-4 sm:p-5 bg-[#161616] flex flex-col gap-3">
+              {/* Scrub Bar */}
+              <div className="w-full flex items-center gap-3">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={progress}
+                  onChange={handleSeek}
+                  aria-label="Video seek slider"
+                  className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+                />
+                <span className="font-mono-custom text-xs text-[#888] whitespace-nowrap">
+                  {currentTimeStr} / {durationStr}
+                </span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={toggleFullscreen}
-                  aria-label="Toggle Fullscreen"
-                  className="px-3 py-1.5 rounded-full bg-white/10 text-white/80 hover:text-white font-mono-custom text-xs border border-white/10 transition-colors"
-                >
-                  Fullscreen ⛶
-                </button>
-              </div>
-            </div>
-
-            {/* Short Project Description & Tags */}
-            <div className="pt-2 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <p className="font-mono-custom text-xs text-[#999] leading-relaxed max-w-2xl">
-                {project.description}
-              </p>
-              <div className="flex flex-wrap gap-1.5 flex-shrink-0">
-                {project.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="font-mono-custom text-[11px] text-[#777] bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]"
+              {/* Control Buttons */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={togglePlay}
+                    aria-label={isPlaying ? "Pause" : "Play"}
+                    className="px-4 py-1.5 rounded-full bg-white text-black font-sans text-xs font-medium hover:bg-neutral-200 transition-colors"
                   >
-                    {tag}
-                  </span>
-                ))}
+                    {isPlaying ? "Pause ❚❚" : "Play ▶"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    aria-label={isMuted ? "Unmute" : "Mute"}
+                    className="px-3 py-1.5 rounded-full bg-white/10 text-white/80 hover:text-white font-mono-custom text-xs border border-white/10 transition-colors"
+                  >
+                    {isMuted ? "Unmute 🔇" : "Mute 🔊"}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={toggleFullscreen}
+                    aria-label="Toggle Fullscreen"
+                    className="px-3 py-1.5 rounded-full bg-white/10 text-white/80 hover:text-white font-mono-custom text-xs border border-white/10 transition-colors"
+                  >
+                    Fullscreen ⛶
+                  </button>
+                </div>
               </div>
+            </div>
+          )}
+
+          {/* Description & Tags */}
+          <div className="p-4 sm:p-5 bg-[#141414] border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="font-mono-custom text-xs text-[#999] leading-relaxed max-w-2xl">
+              {project.description}
+            </p>
+            <div className="flex flex-wrap gap-1.5 flex-shrink-0">
+              {project.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-mono-custom text-[11px] text-[#777] bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
         </motion.div>

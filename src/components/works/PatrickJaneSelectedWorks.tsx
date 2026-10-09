@@ -86,6 +86,26 @@ export function PatrickJaneSelectedWorks({
           )}
         </div>
       )}
+
+      {/* Subsequent video projects beyond the initial 5 rendered in editorial pairs */}
+      {projects.length > 5 && (
+        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-12 items-start">
+          {projects.slice(5).map((project, idx) => (
+            <div
+              key={project.id}
+              className={`col-span-12 ${
+                idx % 2 === 0 ? "md:col-span-6" : "md:col-span-6"
+              }`}
+            >
+              <WorkCard
+                project={project}
+                isLarge={true}
+                onPlayVideo={onPlayVideo}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
