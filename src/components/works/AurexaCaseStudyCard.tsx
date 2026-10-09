@@ -21,8 +21,10 @@ export function AurexaCaseStudyCard({
   project,
   onPreviewWeb,
 }: AurexaCaseStudyCardProps) {
-  const isEmbeddable = project.canEmbed !== false && Boolean(project.liveUrl);
+  const isEmbeddable = (project.previewMode ? project.previewMode === "iframe" : project.canEmbed !== false) && Boolean(project.liveUrl);
   const displayDomain = getDisplayDomain(project.liveUrl);
+  const previewImage = project.previewImageUrl || project.thumbnail;
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${displayDomain}&sz=64`;
 
   return (
     <div
@@ -54,8 +56,20 @@ export function AurexaCaseStudyCard({
           <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/30 to-black/90 pointer-events-none transition-opacity duration-300 group-hover:opacity-40" />
         </div>
       ) : (
-        /* Intentional Polished Live Web Preview Canvas for Security-Shielded Sites (No Generic Stock Mockups) */
+        /* Intentional Polished Live Web Preview Canvas for Security-Shielded Sites */
         <div className="absolute inset-0 z-0 overflow-hidden bg-[#0a0b10] rounded-2xl sm:rounded-3xl flex flex-col justify-center items-center p-6 sm:p-8">
+          {/* Ambient Screenshot Layer if available */}
+          {previewImage && (
+            <div className="absolute inset-0 overflow-hidden opacity-30 group-hover:opacity-40 transition-opacity duration-700">
+              <img
+                src={previewImage}
+                alt=""
+                className="w-full h-full object-cover object-top scale-105 group-hover:scale-110 transition-transform duration-700 blur-[1px]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/90" />
+            </div>
+          )}
+
           {/* Subtle Ambient Radial Lighting & Grid Pattern */}
           <div
             className="absolute inset-0 opacity-25 pointer-events-none"
@@ -67,30 +81,47 @@ export function AurexaCaseStudyCard({
           />
 
           {/* Clean Browser-Style Frame Centerpiece */}
-          <div className="relative w-full max-w-sm rounded-2xl bg-black/60 border border-white/10 p-5 shadow-2xl backdrop-blur-sm flex flex-col items-center text-center transition-transform duration-500 group-hover:scale-105">
+          <div className="relative z-10 w-full max-w-sm rounded-2xl bg-black/75 border border-white/15 p-5 shadow-2xl backdrop-blur-md flex flex-col items-center text-center transition-transform duration-500 group-hover:scale-105">
             {/* Top Mini Browser Controls */}
             <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-white/10">
               <div className="flex items-center gap-1.5" aria-hidden="true">
-                <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/70" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/70" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/70" />
               </div>
-              <span className="font-mono-custom text-[11px] text-white/50 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 truncate max-w-[170px]">
-                🔒 {displayDomain}
-              </span>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 max-w-[190px]">
+                <img
+                  src={faviconUrl}
+                  alt=""
+                  className="w-3 h-3 rounded-xs object-contain flex-shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+                <span className="font-mono-custom text-[11px] text-white/70 truncate">
+                  {displayDomain}
+                </span>
+              </div>
             </div>
 
-            {/* Live Web Sphere Icon */}
-            <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-xl mb-3 shadow-inner">
-              🌐
+            {/* Favicon / Emblem centerpiece */}
+            <div className="w-13 h-13 rounded-2xl bg-white/[0.06] border border-white/15 flex items-center justify-center mb-3 shadow-inner p-2.5">
+              <img
+                src={faviconUrl}
+                alt=""
+                className="w-7 h-7 rounded-md object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
             </div>
 
             <p className="font-sans font-medium text-base text-white tracking-tight">
               {project.title}
             </p>
 
-            <span className="mt-1 font-mono-custom text-[11px] text-[#888]">
-              Security-Shielded Live Deployment
+            <span className="mt-1 font-mono-custom text-[11px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-800/30">
+              Security-Shielded Deployment
             </span>
 
             {/* Direct Open Action */}

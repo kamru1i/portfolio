@@ -9,6 +9,7 @@ export type Json =
 export type ProjectType = "video" | "web";
 export type VideoProvider = "youtube" | "vimeo" | "tiktok" | "facebook" | "instagram" | "twitter" | "local" | "other";
 export type AspectRatio = "16:9" | "9:16" | "1:1" | "4:3" | "5:4";
+export type WebPreviewMode = "iframe" | "fallback";
 
 export interface Database {
   public: {
@@ -29,6 +30,7 @@ export interface Database {
           live_url: string | null;
           github_url: string | null;
           can_embed: boolean;
+          preview_mode: WebPreviewMode | null;
           tags: string[];
           preview_image_url: string | null;
           is_published: boolean;
@@ -53,6 +55,7 @@ export interface Database {
           live_url?: string | null;
           github_url?: string | null;
           can_embed?: boolean;
+          preview_mode?: WebPreviewMode | null;
           tags?: string[];
           preview_image_url?: string | null;
           is_published?: boolean;
@@ -77,6 +80,7 @@ export interface Database {
           live_url?: string | null;
           github_url?: string | null;
           can_embed?: boolean;
+          preview_mode?: WebPreviewMode | null;
           tags?: string[];
           preview_image_url?: string | null;
           is_published?: boolean;

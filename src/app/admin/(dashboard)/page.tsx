@@ -7,6 +7,15 @@ import Image from "next/image";
 
 type FilterTab = "all" | "video" | "web" | "published" | "drafts";
 
+function getDisplayDomain(url?: string | null): string {
+  if (!url) return "site";
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url.replace(/^https?:\/\//, "").split("/")[0] || "site";
+  }
+}
+
 export default function AdminDashboardPage() {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -293,6 +302,15 @@ export default function AdminDashboardPage() {
                         unoptimized
                         className="object-cover"
                       />
+                    ) : !isVideo && project.live_url ? (
+                      <img
+                        src={`https://www.google.com/s2/favicons?domain=${getDisplayDomain(project.live_url)}&sz=64`}
+                        alt=""
+                        className="w-6 h-6 object-contain"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
                     ) : (
                       <span className="text-xs text-[#666] font-mono-custom">
                         {isVideo ? "🎬" : "🌐"}
@@ -322,10 +340,20 @@ export default function AdminDashboardPage() {
                       <span className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
                         isVideo
                           ? "bg-sky-950/40 text-sky-300 border-sky-800/40"
-                          : "purple-950/40 text-purple-300 border-purple-800/40"
+                          : "bg-purple-950/40 text-purple-300 border-purple-800/40"
                       }`}>
                         {isVideo ? `Video • ${project.aspect_ratio}` : "Web Project"}
                       </span>
+
+                      {!isVideo && (
+                        <span className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
+                          (project.preview_mode === "fallback" || project.can_embed === false)
+                            ? "bg-amber-950/40 text-amber-300 border-amber-800/40"
+                            : "bg-emerald-950/40 text-emerald-300 border-emerald-800/40"
+                        }`}>
+                          {(project.preview_mode === "fallback" || project.can_embed === false) ? "🛡️ Fallback" : "🖥️ Live Iframe"}
+                        </span>
+                      )}
 
                       {project.client_name && (
                         <span className="font-mono-custom text-[11px] text-[#888]">

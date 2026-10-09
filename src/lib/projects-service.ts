@@ -236,6 +236,10 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
     ? Number(input.manual_priority) 
     : null;
 
+  // Normalize preview mode & embeddability for web projects
+  const previewMode = input.preview_mode || (input.can_embed === false ? "fallback" : "iframe");
+  const canEmbed = input.type === "web" ? previewMode === "iframe" : (input.can_embed ?? false);
+
   const insertData: ProjectInsert = {
     ...input,
     slug,
@@ -244,15 +248,29 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
     video_id: videoId,
     aspect_ratio: aspectRatio,
     manual_priority: manualPriority,
+    preview_mode: input.type === "web" ? previewMode : null,
+    can_embed: canEmbed,
     sort_order: manualPriority ?? (input.sort_order ?? 0),
     published_at: input.is_published ? (input.published_at || now) : null,
   };
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("projects")
     .insert(insertData)
     .select()
     .single();
+
+  // Gracefully retry without preview_mode if column is not yet present on remote DB
+  if (error && error.message && error.message.includes("preview_mode")) {
+    const { preview_mode: _, ...fallbackInsert } = insertData;
+    const retry = await supabase
+      .from("projects")
+      .insert(fallbackInsert)
+      .select()
+      .single();
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     throw new Error(`Failed to create project: ${error.message}`);
@@ -297,6 +315,14 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
     updatePayload.sort_order = manualPriority ?? 0;
   }
 
+  // Synchronize preview_mode and can_embed
+  if (updates.preview_mode !== undefined) {
+    updatePayload.preview_mode = updates.preview_mode;
+    updatePayload.can_embed = updates.preview_mode === "iframe";
+  } else if (updates.can_embed !== undefined) {
+    updatePayload.preview_mode = updates.can_embed ? "iframe" : "fallback";
+  }
+
   // If updating video_url, re-resolve metadata if needed
   if (updates.type === "video" && updates.video_url) {
     const meta = await resolveVideoMetadata(updates.video_url, updates.title || "");
@@ -307,12 +333,25 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
     }
   }
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("projects")
     .update(updatePayload)
     .eq("id", id)
     .select()
     .single();
+
+  // Gracefully retry without preview_mode if column is not yet present on remote DB
+  if (error && error.message && error.message.includes("preview_mode")) {
+    const { preview_mode: _, ...fallbackPayload } = updatePayload;
+    const retry = await supabase
+      .from("projects")
+      .update(fallbackPayload)
+      .eq("id", id)
+      .select()
+      .single();
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     throw new Error(`Failed to update project: ${error.message}`);

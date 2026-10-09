@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { AspectRatio, ProjectRecord, VideoProvider } from "@/types/project";
+import { AspectRatio, ProjectRecord, VideoProvider, WebPreviewMode } from "@/types/project";
 
 export function EditProjectForm({ project }: { project: ProjectRecord }) {
   const router = useRouter();
@@ -36,7 +36,12 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
   // Web states
   const [liveUrl, setLiveUrl] = useState(project.live_url || "");
   const [githubUrl, setGithubUrl] = useState(project.github_url || "");
-  const [canEmbed, setCanEmbed] = useState(project.can_embed);
+  const [previewMode, setPreviewMode] = useState<WebPreviewMode>(
+    project.preview_mode || (project.can_embed === false ? "fallback" : "iframe")
+  );
+  const [webPreviewImageUrl, setWebPreviewImageUrl] = useState(
+    !isVideo ? project.preview_image_url || "" : ""
+  );
 
   // Submission state
   const [submitting, setSubmitting] = useState(false);
@@ -119,7 +124,9 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
           : {
               live_url: liveUrl.trim(),
               github_url: githubUrl.trim() || null,
-              can_embed: canEmbed,
+              can_embed: previewMode === "iframe",
+              preview_mode: previewMode,
+              preview_image_url: webPreviewImageUrl.trim() || null,
               aspect_ratio: "16:9" as AspectRatio,
             }),
       };
@@ -361,22 +368,93 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
               />
             </div>
 
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-              <input
-                type="checkbox"
-                id="canEmbedEdit"
-                checked={canEmbed}
-                onChange={(e) => setCanEmbed(e.target.checked)}
-                className="mt-1 w-4 h-4 rounded border-white/20 accent-white cursor-pointer"
-              />
-              <label htmlFor="canEmbedEdit" className="cursor-pointer">
-                <span className="font-sans text-xs font-medium text-white block">
-                  Permit In-Site Live Iframe Preview
+            {/* Web Preview Mode Selector */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
+                  Web Preview Mode *
+                </label>
+                <span className="font-mono-custom text-[11px] text-[#777]">
+                  Active: <strong className="text-white">{previewMode === "iframe" ? "Live Iframe" : "Fallback Showcase"}</strong>
                 </span>
-                <span className="font-mono-custom text-[11px] text-[#777] block mt-0.5">
-                  Check only if target website does not block iframe embedding with security headers.
-                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Option 1: Live Iframe */}
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode("iframe")}
+                  className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-3 ${
+                    previewMode === "iframe"
+                      ? "bg-white/10 border-white text-white shadow-sm ring-1 ring-white/20"
+                      : "bg-white/[0.02] border-white/10 text-[#888] hover:border-white/20 hover:text-white"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xl">🖥️</span>
+                      <span className="font-mono-custom text-[10px] px-2 py-0.5 rounded-full bg-sky-950/60 text-sky-300 border border-sky-800/50 uppercase">
+                        Interactive
+                      </span>
+                    </div>
+                    <span className="font-sans text-xs font-semibold text-white block">
+                      Live Iframe Preview (Auto)
+                    </span>
+                    <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
+                      Embeds the live website directly. Ideal for sites that permit cross-origin framing and don&apos;t run bot verification.
+                    </p>
+                  </div>
+                  <span className="font-mono-custom text-[10px] text-white/50">
+                    {previewMode === "iframe" ? "● Selected Mode" : "○ Click to select"}
+                  </span>
+                </button>
+
+                {/* Option 2: Fallback Showcase */}
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode("fallback")}
+                  className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-3 ${
+                    previewMode === "fallback"
+                      ? "bg-white/10 border-white text-white shadow-sm ring-1 ring-white/20"
+                      : "bg-white/[0.02] border-white/10 text-[#888] hover:border-white/20 hover:text-white"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xl">🛡️</span>
+                      <span className="font-mono-custom text-[10px] px-2 py-0.5 rounded-full bg-amber-950/60 text-amber-300 border border-amber-800/50 uppercase">
+                        Shielded
+                      </span>
+                    </div>
+                    <span className="font-sans text-xs font-semibold text-white block">
+                      Security-Shielded Fallback Preview
+                    </span>
+                    <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
+                      Recommended for Cloudflare (&ldquo;Please wait while your request is being verified...&rdquo;), Turnstile, or strict CSP. Displays domain favicon, snapshot, and direct Open CTA.
+                    </p>
+                  </div>
+                  <span className="font-mono-custom text-[10px] text-white/50">
+                    {previewMode === "fallback" ? "● Selected Mode" : "○ Click to select"}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Optional Fallback Preview Screenshot/Artwork */}
+            <div>
+              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                Preview Screenshot / Thumbnail Image URL (Optional)
               </label>
+              <input
+                type="text"
+                value={webPreviewImageUrl}
+                onChange={(e) => setWebPreviewImageUrl(e.target.value)}
+                placeholder="/images/aurexa/aurexa-project-3.png or https://..."
+                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
+              />
+              <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
+                Optional visual asset for the fallback showcase. If blank, automatically renders a clean branded canvas with the domain&apos;s live favicon.
+              </p>
             </div>
           </div>
         )}

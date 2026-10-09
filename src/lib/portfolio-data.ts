@@ -26,6 +26,7 @@ export interface PortfolioProject {
   year: string;
   description: string;
   thumbnail: string;
+  previewImageUrl?: string;
   videoUrl?: string;
   videoType?: "local" | "youtube" | "vimeo" | "tiktok" | "facebook" | "instagram" | "twitter" | "other";
   format?: "16:9" | "9:16" | "1:1" | "4:3" | "5:4";
@@ -33,6 +34,7 @@ export interface PortfolioProject {
   githubUrl?: string;
   liveUrl?: string;
   canEmbed?: boolean;
+  previewMode?: "iframe" | "fallback";
   featured?: boolean;
   tags: string[];
   published: boolean;
@@ -425,7 +427,8 @@ export const PORTFOLIO_DATA = {
         "Digital agency platform featuring scalable design architecture, performance optimization, and client management.",
       thumbnail: "/images/aurexa/aurexa-project-3.png",
       liveUrl: "https://webwing.co.uk/",
-      canEmbed: true,
+      canEmbed: false,
+      previewMode: "fallback",
       tags: ["Full Stack", "TypeScript", "Tailwind CSS", "Next.js"],
       published: true,
       order: 3,

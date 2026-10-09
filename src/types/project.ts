@@ -1,7 +1,7 @@
-import { Database, ProjectType, VideoProvider, AspectRatio } from "./database";
+import { Database, ProjectType, VideoProvider, AspectRatio, WebPreviewMode } from "./database";
 import { PortfolioProject } from "@/lib/portfolio-data";
 
-export type { ProjectType, VideoProvider, AspectRatio };
+export type { ProjectType, VideoProvider, AspectRatio, WebPreviewMode };
 
 export type ProjectRecord = Database["public"]["Tables"]["projects"]["Row"];
 export type ProjectInsert = Database["public"]["Tables"]["projects"]["Insert"];
@@ -25,6 +25,7 @@ export interface ResolvedVideoMeta {
  * ensuring 100% backward and visual compatibility with Patrick Jane & Aurexa components.
  */
 export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioProject {
+  const isEmbed = record.preview_mode ? record.preview_mode === "iframe" : record.can_embed;
   return {
     id: record.id,
     type: record.type,
@@ -33,13 +34,15 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
     year: record.year || "",
     description: record.description,
     thumbnail: record.preview_image_url || (record.type === "video" ? "/images/work-1-biqolpo.png" : "/images/aurexa/aurexa-project-1.png"),
+    previewImageUrl: record.preview_image_url || undefined,
     videoUrl: record.video_url || undefined,
     videoType: record.video_provider || "other",
     format: record.aspect_ratio,
     aspect: record.aspect_ratio === "9:16" ? "small" : "large",
     githubUrl: record.github_url || undefined,
     liveUrl: record.live_url || undefined,
-    canEmbed: record.can_embed,
+    canEmbed: isEmbed,
+    previewMode: (record.preview_mode as "iframe" | "fallback") || (isEmbed ? "iframe" : "fallback"),
     tags: record.tags || [],
     published: record.is_published,
     order: record.sort_order,
