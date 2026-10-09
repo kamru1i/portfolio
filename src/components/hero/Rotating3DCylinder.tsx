@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
+import { generateFallbackThumbnail } from "@/lib/video-metadata";
 
 interface Rotating3DCylinderProps {
+  initialProjects?: PortfolioProject[];
   imageWidth?: number;
   imageHeight?: number;
   tilt?: number;
@@ -13,7 +16,60 @@ interface Rotating3DCylinderProps {
   innerDim?: number;
 }
 
+interface HeroCylinderCard {
+  id: string | number;
+  src: string;
+  alt: string;
+  title?: string;
+}
+
+function getLatestVideoCards(projects: PortfolioProject[]): HeroCylinderCard[] {
+  const publishedVideos = projects
+    .filter((p) => p.type === "video" && p.published !== false)
+    .sort((a, b) => {
+      if (a.publishedAt && b.publishedAt) {
+        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      }
+      if (a.publishedAt && !b.publishedAt) return -1;
+      if (!a.publishedAt && b.publishedAt) return 1;
+      if (a.createdAt && b.createdAt) {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      return (a.order || 0) - (b.order || 0);
+    })
+    .slice(0, 5);
+
+  if (publishedVideos.length === 0) {
+    return [
+      { id: "1", src: "/images/hero-card-1.png", alt: "Architectural Editorial Portrait" },
+      { id: "2", src: "/images/hero-card-2.png", alt: "Vibrant Cobalt Blue Collage Cutout" },
+      { id: "3", src: "/images/hero-card-3.png", alt: "Cinematic Film Narrative" },
+      { id: "4", src: "/images/hero-card-4.png", alt: "Atmospheric Amber Motion" },
+      { id: "5", src: "/images/hero-card-5.png", alt: "Grain Monochrome Floral Portrait" },
+    ];
+  }
+
+  return publishedVideos.map((project, idx) => {
+    const provider =
+      project.videoType === "youtube"
+        ? "youtube"
+        : project.videoType === "vimeo"
+        ? "vimeo"
+        : project.videoType === "local"
+        ? "local"
+        : "other";
+
+    return {
+      id: project.id || `video-${idx + 1}`,
+      src: project.thumbnail || generateFallbackThumbnail(project.title, provider),
+      alt: project.title,
+      title: project.title,
+    };
+  });
+}
+
 export function Rotating3DCylinder({
+  initialProjects,
   imageWidth = 320,
   imageHeight = 390,
   tilt = -7,
@@ -38,6 +94,32 @@ export function Rotating3DCylinder({
   // Responsive spacing: 2 on desktop/tablet, 1 on mobile
   const [spacing, setSpacing] = useState<number>(2);
 
+  // Dynamic cards state: starts immediately with verified video projects, syncs with database via /api/projects
+  const [cards, setCards] = useState<HeroCylinderCard[]>(() =>
+    getLatestVideoCards(initialProjects || PORTFOLIO_DATA.showcaseProjects || [])
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/projects")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.projects && Array.isArray(data.projects)) {
+          const latestCards = getLatestVideoCards(data.projects);
+          if (latestCards.length > 0) {
+            setCards(latestCards);
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback remains active
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     const handleResize = () => {
       setSpacing(window.innerWidth < 768 ? 1 : 2);
@@ -47,39 +129,12 @@ export function Rotating3DCylinder({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const cards = [
-    {
-      id: 1,
-      src: "/images/hero-card-1.png",
-      alt: "Architectural Editorial Portrait",
-    },
-    {
-      id: 2,
-      src: "/images/hero-card-2.png", // Vibrant Cobalt Blue with collage cutout
-      alt: "Vibrant Cobalt Blue Collage Cutout",
-    },
-    {
-      id: 3,
-      src: "/images/hero-card-3.png",
-      alt: "Cinematic Film Narrative",
-    },
-    {
-      id: 4,
-      src: "/images/hero-card-4.png", // Warm orange figure
-      alt: "Atmospheric Amber Motion",
-    },
-    {
-      id: 5,
-      src: "/images/hero-card-5.png", // Grain monochrome floral portrait
-      alt: "Grain Monochrome Floral Portrait",
-    },
-  ];
-
-  const count = cards.length;
-  const angleStep = 360 / count; // 72 deg
-  // Exact radius formula from reference:
-  // k = imageWidth * (1 + spacing * 0.15) / (2 * Math.tan(Math.PI / count))
-  const radius = (imageWidth * (1 + spacing * 0.15)) / (2 * Math.tan(Math.PI / count));
+  const count = Math.max(cards.length, 1);
+  const angleStep = 360 / count;
+  const radius =
+    count > 1
+      ? (imageWidth * (1 + spacing * 0.15)) / (2 * Math.tan(Math.PI / count))
+      : 0;
   const autoRotateSpeed = speed * 6; // 12 deg/sec clockwise
 
   // Main RAF Physics & Render Loop matching exact reference implementation

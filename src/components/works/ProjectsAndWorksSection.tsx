@@ -42,9 +42,25 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
     };
   }, []);
 
-  // Filter dynamically by type and sort
-  const videoProjects = projects.filter((p) => p.type === "video");
-  const webProjects = projects.filter((p) => p.type === "web");
+function sortProjectsByRecency(items: PortfolioProject[]): PortfolioProject[] {
+  return [...items].sort((a, b) => {
+    if (a.publishedAt && b.publishedAt) {
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+    }
+    if (a.publishedAt && !b.publishedAt) return -1;
+    if (!a.publishedAt && b.publishedAt) return 1;
+    if (a.createdAt && b.createdAt) {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    if (a.createdAt && !b.createdAt) return -1;
+    if (!a.createdAt && b.createdAt) return 1;
+    return (a.order || 0) - (b.order || 0);
+  });
+}
+
+  // Filter dynamically by type and sort by newest publication/creation first
+  const videoProjects = sortProjectsByRecency(projects.filter((p) => p.type === "video"));
+  const webProjects = sortProjectsByRecency(projects.filter((p) => p.type === "web"));
 
   return (
     <section

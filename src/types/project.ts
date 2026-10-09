@@ -39,5 +39,7 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
     tags: record.tags || [],
     published: record.is_published,
     order: record.sort_order,
+    publishedAt: record.published_at || undefined,
+    createdAt: record.created_at || undefined,
   };
 }

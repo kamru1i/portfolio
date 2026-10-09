@@ -22,7 +22,7 @@ export function ProjectMedia({
   const isVideo = project.type === "video";
 
   return (
-    <div className="relative w-full aspect-square overflow-hidden bg-black rounded-none border-0 select-none">
+    <div className="relative w-full aspect-square overflow-hidden bg-black rounded-xl sm:rounded-2xl border border-white/10 select-none shadow-[0_12px_35px_rgba(0,0,0,0.5)]">
       {/* Parallax Image Frame matching Patrick Jane exact motion */}
       <motion.div
         style={parallaxY ? { y: parallaxY } : undefined}

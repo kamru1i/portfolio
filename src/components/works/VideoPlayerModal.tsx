@@ -163,76 +163,78 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
             </button>
           </div>
 
-          {/* Video Player Container */}
-          <div
-            className={`relative w-full ${
-              isPortrait ? "aspect-[9/16] max-h-[70vh]" : "aspect-video"
-            } bg-black flex items-center justify-center overflow-hidden group mx-auto`}
-          >
-            {embedUrl ? (
-              /* YouTube / Vimeo Embedded Player */
-              <iframe
-                src={embedUrl}
-                title={project.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full border-0"
-              />
-            ) : isDirectVideo && url ? (
-              /* Direct MP4 / HTML5 Video Player */
-              <>
-                <video
-                  ref={videoRef}
-                  src={url}
-                  poster={project.thumbnail}
-                  autoPlay
-                  playsInline
-                  onTimeUpdate={handleTimeUpdate}
-                  onLoadedMetadata={handleLoadedMetadata}
-                  onEnded={() => setIsPlaying(false)}
-                  className="w-full h-full object-contain cursor-pointer"
-                  onClick={togglePlay}
+          {/* Video Player Stage with Premiere Pro Rounded Screen Monitor */}
+          <div className="w-full bg-[#0d0d0f] p-2.5 sm:p-5 flex items-center justify-center">
+            <div
+              className={`relative w-full ${
+                isPortrait ? "aspect-[9/16] max-h-[68vh]" : "aspect-video max-h-[68vh]"
+              } bg-black flex items-center justify-center overflow-hidden group mx-auto rounded-xl sm:rounded-2xl border border-white/15 shadow-[0_15px_40px_rgba(0,0,0,0.8)]`}
+            >
+              {embedUrl ? (
+                /* YouTube / Vimeo Embedded Player */
+                <iframe
+                  src={embedUrl}
+                  title={project.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full border-0 rounded-xl sm:rounded-2xl"
                 />
-                {!isPlaying && (
-                  <div
+              ) : isDirectVideo && url ? (
+                /* Direct MP4 / HTML5 Video Player */
+                <>
+                  <video
+                    ref={videoRef}
+                    src={url}
+                    poster={project.thumbnail}
+                    autoPlay
+                    playsInline
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
+                    onEnded={() => setIsPlaying(false)}
+                    className="w-full h-full object-contain cursor-pointer rounded-xl sm:rounded-2xl"
                     onClick={togglePlay}
-                    className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer pointer-events-auto"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-2xl pl-1 shadow-lg hover:scale-110 transition-transform">
-                      ▶
+                  />
+                  {!isPlaying && (
+                    <div
+                      onClick={togglePlay}
+                      className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer pointer-events-auto rounded-xl sm:rounded-2xl"
+                    >
+                      <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-2xl pl-1 shadow-lg hover:scale-110 transition-transform">
+                        ▶
+                      </div>
                     </div>
+                  )}
+                </>
+              ) : isSocialExternal ? (
+                /* Social Video Fallback (TikTok / Instagram / Facebook) */
+                <div className="flex flex-col items-center justify-center text-center p-8 max-w-md mx-auto">
+                  <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl mb-4">
+                    🎬
                   </div>
-                )}
-              </>
-            ) : isSocialExternal ? (
-              /* Social Video Fallback (TikTok / Instagram / Facebook) */
-              <div className="flex flex-col items-center justify-center text-center p-8 max-w-md mx-auto">
-                <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl mb-4">
-                  🎬
+                  <h4 className="font-sans font-medium text-lg text-white mb-2">
+                    External Social Production
+                  </h4>
+                  <p className="font-mono-custom text-xs text-[#888] leading-relaxed mb-6">
+                    This {provider.toUpperCase()} video is hosted on an external social network platform.
+                  </p>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
+                  >
+                    <span>Watch on {provider.toUpperCase()}</span>
+                    <span>↗</span>
+                  </a>
                 </div>
-                <h4 className="font-sans font-medium text-lg text-white mb-2">
-                  External Social Production
-                </h4>
-                <p className="font-mono-custom text-xs text-[#888] leading-relaxed mb-6">
-                  This {provider.toUpperCase()} video is hosted on an external social network platform.
-                </p>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
-                >
-                  <span>Watch on {provider.toUpperCase()}</span>
-                  <span>↗</span>
-                </a>
-              </div>
-            ) : (
-              <div className="text-center p-8">
-                <p className="font-mono-custom text-sm text-[#888]">
-                  Video preview asset loading...
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="text-center p-8">
+                  <p className="font-mono-custom text-sm text-[#888]">
+                    Video preview asset loading...
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Bottom Player Controls for direct video */}
