@@ -17,8 +17,8 @@ export function AurexaCaseStudies({
 
   return (
     <div className="w-full select-none pb-20">
-      {/* Pure Aurexa Case Study Cards Grid Setup (3 cards per line on desktop) */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-6 lg:gap-7 items-stretch">
+      {/* Pure Aurexa Case Study Cards Grid Setup (4 cards per row on desktop) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-5 lg:gap-6 items-stretch">
         {projects.map((project, index) => (
           <motion.div
             key={project.id}
@@ -27,7 +27,7 @@ export function AurexaCaseStudies({
             viewport={{ once: true, margin: "-10% 0px" }}
             transition={{
               duration: 0.6,
-              delay: (index % 3) * 0.1,
+              delay: (index % 4) * 0.08,
               ease: [0.25, 0.1, 0.25, 1],
             }}
             className="w-full flex"
