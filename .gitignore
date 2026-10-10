@@ -10,3 +10,5 @@ scripts/qa/.temp
 scripts/qa/*.png
 scripts/qa/*.json
 public/test-screenshots
+supabase/.temp
+
