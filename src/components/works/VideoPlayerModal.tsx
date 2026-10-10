@@ -4,6 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { extractYouTubeId, extractVimeoId, detectVideoProvider } from "@/lib/video-metadata";
+import {
+  MODAL_BACKDROP_CLASSES,
+  MODAL_VIDEO_SHELL_CLASSES,
+  getTruncatedModalTitle,
+  getProjectAttribution,
+} from "./modal-tokens";
 
 interface VideoPlayerModalProps {
   project: PortfolioProject | null;
@@ -96,43 +102,25 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
 
   if (!project) return null;
 
-  const getModalPlayerDimensions = (format?: string) => {
+  const getModalPlayerStageClass = (format?: string) => {
     switch (format) {
       case "9:16":
-        return {
-          containerMaxW: "max-w-[340px] sm:max-w-[360px] md:max-w-[380px]",
-          stageAspect: "aspect-[9/16] max-h-[56vh] sm:max-h-[58vh]",
-          formatLabel: project.client || "Reel",
-        };
+        return "h-full max-h-full max-w-full aspect-[9/16]";
       case "1:1":
-        return {
-          containerMaxW: "max-w-md sm:max-w-lg",
-          stageAspect: "aspect-square max-h-[56vh] sm:max-h-[58vh]",
-          formatLabel: project.client || "Square",
-        };
+        return "h-full max-h-full max-w-full aspect-square";
       case "4:3":
-        return {
-          containerMaxW: "max-w-2xl sm:max-w-3xl",
-          stageAspect: "aspect-[4/3] max-h-[58vh] sm:max-h-[60vh]",
-          formatLabel: project.client || "Standard",
-        };
+        return "h-full max-h-full max-w-full aspect-[4/3]";
       case "5:4":
-        return {
-          containerMaxW: "max-w-2xl sm:max-w-3xl",
-          stageAspect: "aspect-[5/4] max-h-[58vh] sm:max-h-[60vh]",
-          formatLabel: project.client || "Video",
-        };
+        return "h-full max-h-full max-w-full aspect-[5/4]";
       case "16:9":
       default:
-        return {
-          containerMaxW: "max-w-4xl lg:max-w-5xl",
-          stageAspect: "aspect-video max-h-[58vh] sm:max-h-[62vh]",
-          formatLabel: project.client || "Video",
-        };
+        return "w-full max-w-4xl max-h-full aspect-video";
     }
   };
 
-  const { containerMaxW, stageAspect, formatLabel } = getModalPlayerDimensions(project.format);
+  const attribution = getProjectAttribution(project);
+  const truncatedTitle = getTruncatedModalTitle(project.title, 5);
+  const stageAspectClass = getModalPlayerStageClass(project.format);
   const url = project.videoUrl || "";
   const provider = detectVideoProvider(url);
 
@@ -161,7 +149,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 pt-20 sm:pt-22 md:pt-24 pb-4 sm:pb-6 bg-black/85 backdrop-blur-md overflow-hidden"
+        className={MODAL_BACKDROP_CLASSES}
         onClick={onClose}
       >
         <motion.div
@@ -170,23 +158,37 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className={`relative w-full ${containerMaxW} rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto`}
+          className={MODAL_VIDEO_SHELL_CLASSES}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-label={`${project.title} Video Player`}
         >
-          {/* Top Bar with Project Meta, External Watch Link and Close Button */}
-          <div className="flex items-center justify-between px-3.5 sm:px-5 py-3 border-b border-white/10 bg-[#181818]/90 gap-2">
+          {/* Top Bar with Project Meta, Format Badge, Truncated Title, Watch Link and Close Button */}
+          <div className="flex items-center justify-between px-3.5 sm:px-5 py-3 border-b border-white/10 bg-[#181818]/90 gap-2 shrink-0">
             <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
-              <span className="font-mono-custom text-[11px] uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10 whitespace-nowrap shrink-0 max-w-[120px] truncate">
-                {formatLabel}
-              </span>
-              <h3
-                className="font-sans font-medium text-xs sm:text-sm text-white truncate max-w-[140px] sm:max-w-[200px] md:max-w-[280px]"
-                title={project.title}
+              <span
+                className="font-mono-custom text-[11px] uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-white/90 border border-white/10 whitespace-nowrap shrink-0 max-w-[140px] truncate"
+                title={attribution}
               >
-                {project.title}
+                {attribution}
+              </span>
+
+              {project.format && (
+                <span
+                  className="font-mono-custom text-[10px] text-white/50 px-2 py-0.5 rounded-full bg-white/5 border border-white/5 shrink-0 hidden sm:inline-block"
+                  title={`Format: ${project.format}`}
+                >
+                  {project.format}
+                </span>
+              )}
+
+              <h3
+                className="font-sans font-medium text-xs sm:text-sm text-white truncate max-w-[160px] sm:max-w-[220px] md:max-w-[340px]"
+                title={project.title}
+                aria-label={project.title}
+              >
+                {truncatedTitle}
               </h3>
             </div>
 
@@ -196,7 +198,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
                   href={project.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-mono-custom text-[11px] border border-white/10 transition-colors flex items-center gap-1 shrink-0"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-mono-custom text-xs border border-white/10 transition-colors flex items-center gap-1 shrink-0"
                   title="Watch on original video platform"
                 >
                   <span>Watch</span>
@@ -208,7 +210,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
                 type="button"
                 onClick={onClose}
                 aria-label="Close video player"
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors shrink-0"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors shrink-0 ml-0.5"
               >
                 ✕
               </button>
@@ -216,9 +218,9 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           </div>
 
           {/* Video Player Stage with Premiere Pro Rounded Screen Monitor */}
-          <div className="w-full bg-[#0d0d0f] p-2.5 sm:p-4 flex items-center justify-center">
+          <div className="relative flex-1 min-h-0 w-full bg-[#0d0d0f] p-2.5 sm:p-4 flex items-center justify-center overflow-hidden">
             <div
-              className={`relative w-full ${stageAspect} bg-black flex items-center justify-center overflow-hidden group mx-auto rounded-xl sm:rounded-2xl border border-white/15 shadow-[0_15px_40px_rgba(0,0,0,0.8)]`}
+              className={`relative ${stageAspectClass} bg-black flex items-center justify-center overflow-hidden group mx-auto rounded-xl sm:rounded-2xl border border-white/15 shadow-[0_15px_40px_rgba(0,0,0,0.8)]`}
             >
               {embedUrl ? (
                 /* YouTube / Vimeo Embedded Player */
@@ -289,7 +291,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
 
           {/* Bottom Player Controls for direct video */}
           {isDirectVideo && (
-            <div className="p-4 sm:p-5 bg-[#161616] flex flex-col gap-3">
+            <div className="px-4 py-2.5 sm:px-5 sm:py-3 bg-[#161616] flex flex-col gap-2 shrink-0 border-t border-white/5">
               {/* Scrub Bar */}
               <div className="w-full flex items-center gap-3">
                 <input
@@ -343,8 +345,8 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           )}
 
           {/* Description & Tags */}
-          <div className="p-4 sm:p-5 bg-[#141414] border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <p className="font-mono-custom text-xs text-[#999] leading-relaxed max-w-2xl">
+          <div className="px-4 py-2.5 sm:px-5 sm:py-3 bg-[#141414] border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0">
+            <p className="font-mono-custom text-xs text-[#999] leading-relaxed max-w-2xl line-clamp-2">
               {project.description}
             </p>
             <div className="flex flex-wrap gap-1.5 flex-shrink-0">

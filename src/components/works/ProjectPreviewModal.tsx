@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PortfolioProject } from "@/lib/portfolio-data";
+import {
+  MODAL_BACKDROP_CLASSES,
+  MODAL_OUTER_SHELL_CLASSES,
+  getProjectAttribution,
+} from "./modal-tokens";
 
 interface ProjectPreviewModalProps {
   project: PortfolioProject | null;
@@ -83,7 +88,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 pt-20 sm:pt-22 md:pt-24 pb-4 sm:pb-6 bg-black/85 backdrop-blur-md overflow-hidden"
+        className={MODAL_BACKDROP_CLASSES}
         onClick={onClose}
       >
         <motion.div
@@ -92,14 +97,14 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 20 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative w-full max-w-6xl h-[78vh] sm:h-[80vh] max-h-[680px] sm:max-h-[720px] md:max-h-[740px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto"
+          className={MODAL_OUTER_SHELL_CLASSES}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-label={`${project.title} Preview`}
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10 bg-[#181818]/90 gap-2">
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10 bg-[#181818]/90 gap-2 shrink-0">
             {/* Left: Window Controls Mockup + Title */}
             <div className="flex items-center gap-3 min-w-0">
               <div className="items-center gap-1.5 hidden sm:flex shrink-0" aria-hidden="true">
@@ -109,8 +114,11 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
               </div>
 
               <div className="flex items-center gap-2 min-w-0">
-                <span className="font-mono-custom text-[11px] uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10 whitespace-nowrap shrink-0 max-w-[130px] truncate">
-                  {project.client || "Web"}
+                <span
+                  className="font-mono-custom text-[11px] uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10 whitespace-nowrap shrink-0 max-w-[130px] truncate"
+                  title={getProjectAttribution(project)}
+                >
+                  {getProjectAttribution(project)}
                 </span>
                 <h3
                   className="font-sans font-medium text-xs sm:text-sm text-white truncate max-w-[120px] sm:max-w-[180px] md:max-w-[260px]"
@@ -162,6 +170,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                   <button
                     type="button"
                     onClick={() => setViewportMode("desktop")}
+                    aria-label="Desktop View (Full Width)"
                     title="Desktop View (Full Width)"
                     className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${
                       viewportMode === "desktop"
@@ -178,6 +187,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                   <button
                     type="button"
                     onClick={() => setViewportMode("tablet")}
+                    aria-label="Tablet View (768px)"
                     title="Tablet View (768px)"
                     className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${
                       viewportMode === "tablet"
@@ -193,6 +203,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                   <button
                     type="button"
                     onClick={() => setViewportMode("mobile")}
+                    aria-label="Mobile View (375px)"
                     title="Mobile View (375px)"
                     className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${
                       viewportMode === "mobile"
