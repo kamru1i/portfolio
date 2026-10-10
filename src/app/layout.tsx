@@ -7,6 +7,16 @@ export const metadata: Metadata = {
   title: "Kamrul Islam — Video Editor | AI Creator | Web Developer | IT Professional",
   description:
     "Portfolio of Kamrul Islam: Assistant IT Manager, Video Editor, AI-assisted content creator, and full-stack web developer based in Chittagong, Bangladesh.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     title: "Kamrul Islam | Video Editor & Digital Professional",
     description:
