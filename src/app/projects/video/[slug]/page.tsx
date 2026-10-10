@@ -30,15 +30,15 @@ export async function generateMetadata({
 
   if (!project || project.type !== "video") {
     return {
-      title: "Video Project Not Found — Kamrul Islam",
+      title: "Video Project Not Found",
     };
   }
 
   return {
-    title: `${project.title} — Video Post-Production | Kamrul Islam`,
+    title: `${project.title} (Video)`,
     description: project.description,
     openGraph: {
-      title: `${project.title} | Kamrul Islam`,
+      title: `Kamrul Islam — ${project.title} (Video)`,
       description: project.description,
       type: "video.other",
       images: project.thumbnail ? [{ url: project.thumbnail }] : [],

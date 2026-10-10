@@ -171,6 +171,7 @@ export function CurtainFooter() {
 
   return (
     <footer
+      id="contact"
       aria-label="Footer"
       className="fixed bottom-0 left-0 right-0 z-[1] w-full h-[520px] sm:h-[580px] md:h-[640px] lg:h-[700px] bg-black text-white flex flex-col justify-between px-4 sm:px-8 md:px-12 pt-6 sm:pt-8 pb-6 sm:pb-8 overflow-hidden pointer-events-auto select-none"
     >

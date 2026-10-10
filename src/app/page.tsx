@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { IntroCurtain } from "@/components/common/IntroCurtain";
+import { DynamicSectionTitle } from "@/components/common/DynamicSectionTitle";
 import { Navigation } from "@/components/layout/Navigation";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { ProjectsAndWorksSection } from "@/components/works/ProjectsAndWorksSection";
@@ -18,6 +19,9 @@ export default function HomePage() {
 
   return (
     <>
+      {/* Dynamic Section Window Title Manager */}
+      <DynamicSectionTitle />
+
       {/* Intro Curtain Loader */}
       {!isCurtainComplete && (
         <IntroCurtain

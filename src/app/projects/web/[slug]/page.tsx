@@ -29,15 +29,15 @@ export async function generateMetadata({
 
   if (!project || project.type !== "web") {
     return {
-      title: "Web Project Not Found — Kamrul Islam",
+      title: "Web Project Not Found",
     };
   }
 
   return {
-    title: `${project.title} — Web Architecture | Kamrul Islam`,
+    title: `${project.title} (Web)`,
     description: project.description,
     openGraph: {
-      title: `${project.title} | Kamrul Islam`,
+      title: `Kamrul Islam — ${project.title} (Web)`,
       description: project.description,
       type: "website",
       images: project.thumbnail ? [{ url: project.thumbnail }] : [],

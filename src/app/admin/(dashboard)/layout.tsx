@@ -1,8 +1,13 @@
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { verifyAdminSession } from "@/lib/supabase/admin-auth";
 import Link from "next/link";
 import { AdminNavLogout } from "./AdminNavLogout";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
+
+export const metadata: Metadata = {
+  title: "Admin Portal",
+};
 
 export default async function AdminDashboardLayout({
   children,

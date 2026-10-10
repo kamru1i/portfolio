@@ -512,7 +512,7 @@ export const PORTFOLIO_DATA = {
       slug: "kamrul-portfolio",
       type: "web",
       aspect: "large",
-      title: "Kamrul Islam | Portfolio",
+      title: "Personal Portfolio Website",
       category: "Personal Brand • Web Architecture",
       client: "Kamrul Islam",
       year: "2026",

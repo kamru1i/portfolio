@@ -28,15 +28,15 @@ export async function generateMetadata({
 
   if (!milestone) {
     return {
-      title: "Experience Record Not Found — Kamrul Islam",
+      title: "Experience Record Not Found",
     };
   }
 
   return {
-    title: `${milestone.role} at ${milestone.organization} — Experience | Kamrul Islam`,
+    title: `${milestone.role} at ${milestone.organization}`,
     description: milestone.highlight,
     openGraph: {
-      title: `${milestone.role} at ${milestone.organization} | Kamrul Islam`,
+      title: `Kamrul Islam — ${milestone.role} at ${milestone.organization}`,
       description: milestone.highlight,
       type: "article",
     },

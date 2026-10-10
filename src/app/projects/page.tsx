@@ -6,11 +6,11 @@ import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { ProjectsPageContent } from "@/components/works/ProjectsPageContent";
 
 export const metadata: Metadata = {
-  title: "Projects & Works Archive — Kamrul Islam",
+  title: "Projects & Works Archive",
   description:
     "Explore the complete portfolio archive of video editing productions, AI-assisted content creations, responsive web applications, and digital systems by Kamrul Islam.",
   openGraph: {
-    title: "Projects & Works Archive — Kamrul Islam",
+    title: "Kamrul Islam — Projects & Works Archive",
     description:
       "Explore the complete portfolio archive of video editing productions, AI-assisted content creations, responsive web applications, and digital systems by Kamrul Islam.",
     type: "website",

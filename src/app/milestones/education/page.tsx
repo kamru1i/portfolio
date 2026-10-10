@@ -6,11 +6,11 @@ import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
 
 export const metadata: Metadata = {
-  title: "Academic & Educational Qualifications — Kamrul Islam",
+  title: "Academic Qualifications",
   description:
     "Comprehensive academic records, degrees, and educational qualifications of Kamrul Islam, including BSc in Computer Science & Engineering, Higher Secondary Certificate (HSC), and Secondary School Certificate (SSC).",
   openGraph: {
-    title: "Academic Qualifications — Kamrul Islam",
+    title: "Kamrul Islam — Academic Qualifications",
     description:
       "Comprehensive academic background, curriculum coursework, and certified degrees of Kamrul Islam.",
     type: "article",

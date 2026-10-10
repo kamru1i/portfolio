@@ -2,14 +2,14 @@ import { Metadata } from "next";
 import { ContactPageContent } from "@/components/contact/ContactPageContent";
 
 export const metadata: Metadata = {
-  title: "Contact — Kamrul Islam | Creative Technologist & Video Editor",
+  title: "Contact",
   description:
     "Get in touch with Kamrul Islam about commercial video editing, AI-assisted content production, modern web development, and digital infrastructure projects.",
   alternates: {
     canonical: "https://kamrulislam.bd/contact-us",
   },
   openGraph: {
-    title: "Contact — Kamrul Islam",
+    title: "Kamrul Islam — Contact",
     description:
       "Get in touch with Kamrul Islam about commercial video editing, AI-assisted content production, modern web development, and digital infrastructure projects.",
     url: "https://kamrulislam.bd/contact-us",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact — Kamrul Islam",
+    title: "Kamrul Islam — Contact",
     description:
       "Get in touch with Kamrul Islam about commercial video editing, AI-assisted content production, modern web development, and digital infrastructure projects.",
   },

@@ -25,15 +25,15 @@ export async function generateMetadata({
 
   if (!service) {
     return {
-      title: "Service Not Found — Kamrul Islam",
+      title: "Service Not Found",
     };
   }
 
   return {
-    title: `${service.title} — Kamrul Islam`,
+    title: service.title,
     description: service.description,
     openGraph: {
-      title: `${service.title} | Kamrul Islam`,
+      title: `Kamrul Islam — ${service.title}`,
       description: service.headline,
       type: "article",
     },
