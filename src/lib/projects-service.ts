@@ -196,6 +196,86 @@ export async function getProjectById(id: string): Promise<ProjectRecord | null> 
 }
 
 /**
+ * Retrieves a single published project by its slug, ID, or fallback title slug.
+ * Checks remote database first, then falls back to static PORTFOLIO_DATA.showcaseProjects.
+ */
+export async function getProjectBySlugOrId(slugOrId: string): Promise<PortfolioProject | null> {
+  const normalizedKey = slugOrId.trim().toLowerCase();
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(normalizedKey);
+
+  // Find in local showcase projects (matches slug, id, or generated slug)
+  const fallbackProject = PORTFOLIO_DATA.showcaseProjects.find((p) => {
+    const pSlug = (p.slug || "").toLowerCase();
+    const pId = p.id.toLowerCase();
+    const generatedSlug = generateSlug(p.title);
+    return (
+      pSlug === normalizedKey ||
+      pId === normalizedKey ||
+      generatedSlug === normalizedKey ||
+      (normalizedKey.includes("audi-q5") && (pSlug.includes("audi-q5") || pId.includes("youtube-video-5"))) ||
+      (normalizedKey.includes("kamrul") && (pSlug.includes("kamrul") || pId.includes("kamrul")))
+    );
+  });
+
+  try {
+    const supabase = await createClient();
+    if (supabase) {
+      // 1. Query remote DB by either UUID or slug
+      let query = supabase.from("projects").select("*").eq("is_published", true);
+      if (isUuid) {
+        query = query.eq("id", normalizedKey);
+      } else {
+        query = query.ilike("slug", normalizedKey);
+      }
+
+      const { data, error } = await query.maybeSingle();
+
+      if (!error && data) {
+        const mapped = mapProjectRecordToPortfolio(data as ProjectRecord);
+        // Enrich with local structured data if available
+        if (fallbackProject) {
+          return {
+            ...fallbackProject,
+            ...mapped,
+            role: mapped.role || fallbackProject.role,
+            tools: mapped.tools && mapped.tools.length > 0 ? mapped.tools : fallbackProject.tools,
+            deliverables: mapped.deliverables && mapped.deliverables.length > 0 ? mapped.deliverables : fallbackProject.deliverables,
+            overview: mapped.overview || fallbackProject.overview,
+          };
+        }
+        return mapped;
+      }
+
+      // 2. If fallbackProject has a different slug or title in DB, try matching by fallbackProject.slug
+      if (fallbackProject?.slug && fallbackProject.slug.toLowerCase() !== normalizedKey) {
+        const { data: slugMatch } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("is_published", true)
+          .ilike("slug", fallbackProject.slug.toLowerCase())
+          .maybeSingle();
+
+        if (slugMatch) {
+          const mapped = mapProjectRecordToPortfolio(slugMatch as ProjectRecord);
+          return {
+            ...fallbackProject,
+            ...mapped,
+            role: mapped.role || fallbackProject.role,
+            tools: mapped.tools && mapped.tools.length > 0 ? mapped.tools : fallbackProject.tools,
+            deliverables: mapped.deliverables && mapped.deliverables.length > 0 ? mapped.deliverables : fallbackProject.deliverables,
+            overview: mapped.overview || fallbackProject.overview,
+          };
+        }
+      }
+    }
+  } catch {
+    // Database query failed, continue to fallback
+  }
+
+  return fallbackProject || null;
+}
+
+/**
  * Creates a new project in the database and triggers cache revalidation.
  */
 export async function createProject(input: ProjectInsert): Promise<ProjectRecord> {

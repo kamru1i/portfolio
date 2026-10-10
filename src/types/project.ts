@@ -28,6 +28,7 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
   const isEmbed = record.preview_mode ? record.preview_mode === "iframe" : record.can_embed;
   return {
     id: record.id,
+    slug: record.slug || undefined,
     type: record.type,
     title: record.title,
     client: record.client_name || undefined,

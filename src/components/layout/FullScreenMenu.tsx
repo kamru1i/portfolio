@@ -12,11 +12,12 @@ interface FullScreenMenuProps {
 
 const MENU_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Projects & Works", href: "#projects" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Recognitions", href: "#recognitions" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Projects & Works", href: "/#projects" },
+  { label: "Explore Projects", href: "/projects" },
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
+  { label: "Milestones", href: "/#recognitions" },
+  { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/contact-us" },
 ];
 
@@ -46,12 +47,13 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
 
   const handleLinkClick = (href: string) => {
     onClose();
-    if (href.startsWith("#")) {
-      const element = document.querySelector(href);
+    if (href.startsWith("#") || href.startsWith("/#")) {
+      const hash = href.startsWith("/#") ? href.slice(1) : href;
+      const element = document.querySelector(hash);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
       } else {
-        window.location.href = `/${href}`;
+        window.location.href = href.startsWith("/#") ? href : `/${href}`;
       }
     }
   };

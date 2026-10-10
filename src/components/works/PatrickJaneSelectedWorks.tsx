@@ -1,5 +1,4 @@
-"use client";
-
+import Link from "next/link";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { WorkCard } from "./WorkCard";
 
@@ -14,24 +13,27 @@ export function PatrickJaneSelectedWorks({
 }: PatrickJaneSelectedWorksProps) {
   if (!projects || projects.length === 0) return null;
 
+  // Strict display limit of 5 projects for the Patrick Jane selected works overview
+  const displayedProjects = projects.slice(0, 5);
+
   return (
     <div className="w-full flex flex-col gap-24 sm:gap-32 md:gap-40 pb-16 select-none">
       {/* Row 1: Card 1 (Left 352px / 3-cols) + Card 2 (Right 704px / 6-cols col-start-7) */}
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
-        {projects[0] && (
+        {displayedProjects[0] && (
           <div className="col-span-12 md:col-span-3">
             <WorkCard
-              project={projects[0]}
+              project={displayedProjects[0]}
               isLarge={false}
               onPlayVideo={onPlayVideo}
             />
           </div>
         )}
 
-        {projects[1] && (
+        {displayedProjects[1] && (
           <div className="col-span-12 md:col-span-6 md:col-start-7">
             <WorkCard
-              project={projects[1]}
+              project={displayedProjects[1]}
               isLarge={true}
               onPlayVideo={onPlayVideo}
             />
@@ -40,11 +42,11 @@ export function PatrickJaneSelectedWorks({
       </div>
 
       {/* Row 2: Card 3 (Centered 704px / 6-cols col-start-4) */}
-      {projects[2] && (
+      {displayedProjects[2] && (
         <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
           <div className="col-span-12 md:col-span-6 md:col-start-4">
             <WorkCard
-              project={projects[2]}
+              project={displayedProjects[2]}
               isLarge={true}
               onPlayVideo={onPlayVideo}
             />
@@ -53,57 +55,52 @@ export function PatrickJaneSelectedWorks({
       )}
 
       {/* Row 3: Card 4 (Left 704px / 6-cols) + Card 5 (Right 352px / 3-cols col-start-10) with Explore More */}
-      {(projects[3] || projects[4]) && (
+      {(displayedProjects[3] || displayedProjects[4]) && (
         <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
-          {projects[3] && (
+          {displayedProjects[3] && (
             <div className="col-span-12 md:col-span-6">
               <WorkCard
-                project={projects[3]}
+                project={displayedProjects[3]}
                 isLarge={true}
                 onPlayVideo={onPlayVideo}
               />
             </div>
           )}
 
-          {projects[4] && (
+          {displayedProjects[4] && (
             <div className="col-span-12 md:col-span-3 md:col-start-10 flex flex-col justify-between">
               <WorkCard
-                project={projects[4]}
+                project={displayedProjects[4]}
                 isLarge={false}
                 onPlayVideo={onPlayVideo}
               />
 
-              {/* Explore More link matching Patrick Jane reference */}
+              {/* Dedicated Explore More Action for Video Projects */}
               <div className="mt-14 sm:mt-20 pt-1">
-                <a
-                  href="#projects"
-                  className="font-mono-custom text-[15px] sm:text-[16px] text-white hover-underline-link tracking-normal"
+                <Link
+                  href="/projects?type=video"
+                  className="group inline-flex items-center gap-2 font-mono-custom text-[15px] sm:text-[16px] text-white hover:text-white/80 hover-underline-link tracking-normal transition-colors"
+                  aria-label="Explore more video projects"
                 >
-                  Explore More
-                </a>
+                  <span>Explore More</span>
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </Link>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Subsequent video projects beyond the initial 5 rendered in editorial pairs */}
-      {projects.length > 5 && (
-        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-12 items-start">
-          {projects.slice(5).map((project, idx) => (
-            <div
-              key={project.id}
-              className={`col-span-12 ${
-                idx % 2 === 0 ? "md:col-span-6" : "md:col-span-6"
-              }`}
-            >
-              <WorkCard
-                project={project}
-                isLarge={true}
-                onPlayVideo={onPlayVideo}
-              />
-            </div>
-          ))}
+      {/* Fallback Explore More button if fewer than 5 projects are present */}
+      {!displayedProjects[4] && (
+        <div className="w-full flex items-center justify-center pt-8">
+          <Link
+            href="/projects?type=video"
+            className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-mono-custom text-xs uppercase tracking-wider transition-colors"
+          >
+            <span>Explore More Video Projects</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </Link>
         </div>
       )}
     </div>

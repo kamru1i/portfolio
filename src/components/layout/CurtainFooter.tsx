@@ -193,13 +193,19 @@ export function CurtainFooter() {
       {/* Giant Central Navigation Links (Patrick Jane Editorial Hierarchy) */}
       <div className="relative z-10 flex flex-col items-center justify-center space-y-2.5 sm:space-y-3.5 my-auto">
         <Link
-          href="#projects"
+          href="/#projects"
           className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           PROJECTS &amp; WORKS
         </Link>
         <Link
-          href="#about"
+          href="/projects"
+          className="font-gambarino text-lg sm:text-xl md:text-2xl uppercase text-emerald-400/90 tracking-widest hover-underline-link transition-opacity hover:text-white"
+        >
+          EXPLORE ALL PROJECTS
+        </Link>
+        <Link
+          href="/#about"
           className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           ABOUT

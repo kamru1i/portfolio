@@ -43,9 +43,13 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
     };
   }, []);
 
-  // Filter dynamically by type and sort by explicit manual priority, then newest publication/creation
-  const videoProjects = [...projects.filter((p) => p.type === "video")].sort(compareProjectsByPriorityAndRecency);
-  const webProjects = [...projects.filter((p) => p.type === "web")].sort(compareProjectsByPriorityAndRecency);
+  // Filter dynamically by type, sort by priority/recency, and enforce strict homepage overview limits (max 5 videos, max 8 web)
+  const videoProjects = [...projects.filter((p) => p.type === "video")]
+    .sort(compareProjectsByPriorityAndRecency)
+    .slice(0, 5);
+  const webProjects = [...projects.filter((p) => p.type === "web")]
+    .sort(compareProjectsByPriorityAndRecency)
+    .slice(0, 8);
 
   return (
     <section

@@ -19,6 +19,7 @@ export interface ProjectItem {
 
 export interface PortfolioProject {
   id: string;
+  slug?: string;
   type: "video" | "web";
   title: string;
   category?: string;
@@ -42,6 +43,11 @@ export interface PortfolioProject {
   manualPriority?: number | null;
   publishedAt?: string;
   createdAt?: string;
+  role?: string;
+  tools?: string[];
+  workflow?: string[];
+  deliverables?: string[];
+  overview?: string;
 }
 
 export interface ServiceCapability {
@@ -96,6 +102,25 @@ export interface MilestoneItem {
   organization: string;
   role: string;
   highlight: string;
+  slug: string;
+  type: "experience" | "education";
+  period?: string;
+  details?: {
+    overview?: string;
+    responsibilities?: string[];
+    achievements?: string[];
+    tools?: string[];
+    skills?: string[];
+    institution?: string;
+    board?: string;
+    group?: string;
+    gpa?: string;
+    passingYear?: string;
+    department?: string;
+    subject?: string;
+    major?: string;
+    coursework?: string[];
+  };
 }
 
 export interface StatItem {
@@ -284,12 +309,13 @@ export const PORTFOLIO_DATA = {
   showcaseProjects: [
     {
       id: "youtube-video-5",
+      slug: "audi-q5-dealership-promo",
       type: "video",
       format: "9:16",
       aspect: "small",
       title: "How I Edited a Car Dealership Promo | Audi Q5",
       category: "Social Media • Automotive Video",
-      client: "Audi Dealership",
+      client: "Syston Autos Ltd",
       year: "2026",
       description:
         "High-energy short-form vertical promo edited with speed ramps, custom sound design, cinematic color grade, and beat-matched cuts.",
@@ -300,9 +326,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 1,
       publishedAt: "2026-03-15T12:00:00Z",
+      role: "Lead Social Video Editor & Sound Designer",
+      tools: ["Adobe Premiere Pro", "After Effects", "DaVinci Resolve Fairlight"],
+      deliverables: ["9:16 Vertical Reel", "Speed Ramped Teaser", "Audio Mixed Master"],
+      overview: "Produced for Syston Autos Ltd to showcase an Audi Q5 dealership inventory piece. Built around high-energy speed ramping, custom exhaust sound design, and sharp color contrast to maximize social engagement.",
     },
     {
       id: "youtube-video-4",
+      slug: "mustard-oil-health-awareness",
       type: "video",
       format: "9:16",
       aspect: "small",
@@ -319,9 +350,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 2,
       publishedAt: "2026-03-14T12:00:00Z",
+      role: "Video Editor & Motion Graphics Specialist",
+      tools: ["CapCut Desktop", "Adobe Premiere Pro", "Adobe Podcast"],
+      deliverables: ["9:16 Vertical Documentary", "Kinetic Typography", "Voiceover Synchronization"],
+      overview: "A viral-style investigative health documentary examining cooking oil processing. Features dynamic text animation, precision voiceover pacing, and clean sound effects to sustain high retention.",
     },
     {
       id: "youtube-video-3",
+      slug: "upside-down-world-delivery",
       type: "video",
       format: "16:9",
       aspect: "large",
@@ -338,9 +374,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 3,
       publishedAt: "2026-03-13T12:00:00Z",
+      role: "Commercial Editor & VFX Compositor",
+      tools: ["DaVinci Resolve", "Adobe Premiere Pro", "Adobe After Effects"],
+      deliverables: ["16:9 Widescreen Commercial", "VFX Compositing", "Cinematic Color Grade"],
+      overview: "A narrative commercial exploring what delivery logistics look like in an inverted reality. Utilizes split-screen composites, spatial audio design, and color grading to establish two parallel dimensions.",
     },
     {
       id: "youtube-video-2",
+      slug: "plastic-pollution-awareness",
       type: "video",
       format: "16:9",
       aspect: "large",
@@ -357,9 +398,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 4,
       publishedAt: "2026-03-12T12:00:00Z",
+      role: "Documentary Editor & Colorist",
+      tools: ["DaVinci Resolve", "Adobe Podcast", "Premiere Pro"],
+      deliverables: ["16:9 Cinematic Video Essay", "Voice Cleanup & Restoration", "Color Palette Grading"],
+      overview: "A documentary raising environmental awareness about plastic pollution life cycles. Emphasizes atmospheric audio design, organic pacing, and rich film-like color curves.",
     },
     {
       id: "youtube-video-1",
+      slug: "capcut-professional-video-editing",
       type: "video",
       format: "16:9",
       aspect: "large",
@@ -376,9 +422,86 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 5,
       publishedAt: "2026-03-11T12:00:00Z",
+      role: "Producer, Editor & Technical Analyst",
+      tools: ["CapCut Desktop", "Adobe Premiere Pro", "Adobe Photoshop"],
+      deliverables: ["16:9 Full Breakdown Video", "Comparative Benchmarks", "Custom Graphic Overlays"],
+      overview: "A comprehensive deep dive comparing CapCut Desktop against industry NLEs. Explores real-world playback performance, export speed, auto-caption accuracy, and post-production bottlenecks.",
+    },
+    {
+      id: "biqolpo-ai-production",
+      slug: "biqolpo-ai-latent-stories",
+      type: "video",
+      format: "16:9",
+      aspect: "large",
+      title: "Biqolpo — Latent Stories (AI Video Production)",
+      category: "AI-Assisted Video & Content Creation",
+      client: "Biqolpo",
+      year: "2026",
+      description:
+        "AI-assisted video production, creative editing, visual storytelling, AI-generated assets integration, and final content refinement using Google Veo, Kling 3.0, and DaVinci Resolve.",
+      thumbnail: "/images/work-1-biqolpo.png",
+      videoUrl: "https://drive.google.com/file/d/1yvkmMm77WCu9J8xj8xLePf9-2rauOJ0p/preview",
+      videoType: "other",
+      tags: ["Google Veo", "Kling 3.0", "AI Compositing", "DaVinci Resolve"],
+      published: true,
+      order: 6,
+      publishedAt: "2026-03-09T12:00:00Z",
+      role: "AI-Assisted Video Editor & Prompt Architect",
+      tools: ["Google Veo", "Kling 3.0", "ChatGPT Sora", "DaVinci Resolve", "Adobe Podcast"],
+      deliverables: ["AI Scene Generation", "Prompt Engineering", "Color Grading", "Post-Production Refinement"],
+      overview: "Documented in the official Portfolio. An end-to-end generative AI production pipeline combining algorithmic camera movements with professional NLE assembly and audio enhancement.",
+    },
+    {
+      id: "syston-autos-cinema",
+      slug: "syston-autos-short-form-series",
+      type: "video",
+      format: "9:16",
+      aspect: "small",
+      title: "Syston Autos Ltd — Short-Form Cinematic Series",
+      category: "Social Media & Short-Form Video Editing",
+      client: "Syston Autos Ltd",
+      year: "2026",
+      description:
+        "Short-form promotional content, social-first editing, pacing, speed ramping, transitions, visual enhancement, and platform-ready video production.",
+      thumbnail: "/images/work-2-syston.png",
+      videoUrl: "https://www.tiktok.com/@systonautos.ltd/video/7616056007160040726",
+      videoType: "tiktok",
+      tags: ["TikTok", "Speed Ramping", "Automotive Promo", "Premiere Pro"],
+      published: true,
+      order: 7,
+      publishedAt: "2026-03-08T12:00:00Z",
+      role: "Social Media Video Editor",
+      tools: ["Adobe Premiere Pro", "After Effects", "Sound Design", "CapCut"],
+      deliverables: ["6-Part TikTok Series", "High Retention Pacing", "Audio Enhancement", "Dynamic Captions"],
+      overview: "Documented in the official Portfolio. A 6-part vertical automotive campaign designed specifically for TikTok and Instagram Reels, delivering rapid retention through engine audio mixes and seamless speed transitions.",
+    },
+    {
+      id: "bnf-cars-automotive",
+      slug: "bnf-cars-automotive-series",
+      type: "video",
+      format: "9:16",
+      aspect: "small",
+      title: "B&F Cars — Automotive Promotional Series",
+      category: "Social Media & Short-Form Video Editing",
+      client: "B&F Cars",
+      year: "2026",
+      description:
+        "Automotive promotional content, short-form editing, vehicular visual presentation, pacing, transitions, and social media optimization.",
+      thumbnail: "/images/work-5-bfcars.png",
+      videoUrl: "https://www.tiktok.com/@bnf_cars/video/7600790351141473558",
+      videoType: "tiktok",
+      tags: ["Automotive Showcase", "Social Video", "CapCut", "Premiere Pro"],
+      published: true,
+      order: 8,
+      publishedAt: "2026-03-07T12:00:00Z",
+      role: "Social Media Video Editor",
+      tools: ["CapCut", "Adobe Premiere Pro", "Color Grading", "Photoshop"],
+      deliverables: ["5-Part TikTok Showcase", "Vehicle Detail Highlight", "Sound Design", "Thumbnail Suite"],
+      overview: "Documented in the official Portfolio. Commercial automotive showcases highlighting exterior styling, interior appointments, and driving dynamics across 5 dedicated short-form video releases.",
     },
     {
       id: "kamrul-portfolio-web",
+      slug: "kamrul-portfolio",
       type: "web",
       aspect: "large",
       title: "Kamrul Islam | Portfolio",
@@ -395,9 +518,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 1,
       publishedAt: "2026-03-15T10:00:00Z",
+      role: "Full-Stack Engineer & UI Architect",
+      tools: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "Supabase"],
+      deliverables: ["Production Web Application", "Curtain Scroll Physics", "Supabase Backend Integration"],
+      overview: "Personal portfolio website crafted with precision editorial typography, dark mode aesthetic, full responsive scaling, and an interactive CMS-driven project management layer.",
     },
     {
       id: "photocard-design-web",
+      slug: "photocard-design",
       type: "web",
       aspect: "large",
       title: "Photocard Design",
@@ -410,13 +538,19 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/kamrul-islam-dev",
       liveUrl: "https://photocard-five.vercel.app/",
       canEmbed: false,
+      previewMode: "fallback",
       tags: ["React.js", "Canvas API", "Tailwind CSS", "Vercel"],
       published: true,
       order: 2,
       publishedAt: "2026-03-14T10:00:00Z",
+      role: "Front-End Developer",
+      tools: ["React.js", "HTML5 Canvas API", "Tailwind CSS", "Vercel"],
+      deliverables: ["Interactive Canvas Studio", "Image Export Pipeline", "Responsive UI"],
+      overview: "A lightweight web app allowing creators to personalize, filter, and export customized photographic cards with real-time browser preview.",
     },
     {
       id: "web-wing",
+      slug: "web-wing-agency",
       type: "web",
       aspect: "large",
       title: "Web Wing",
@@ -433,9 +567,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 3,
       publishedAt: "2026-03-13T10:00:00Z",
+      role: "Full-Stack Developer",
+      tools: ["Next.js", "TypeScript", "Tailwind CSS", "REST APIs"],
+      deliverables: ["Corporate Agency Showcase", "Lead Generation Pipeline", "Custom UI Components"],
+      overview: "Commercial agency website built with high-speed Next.js page generation, modern typography, and structured service inquiries.",
     },
     {
       id: "japanese-master-chef",
+      slug: "japanese-master-chef",
       type: "web",
       aspect: "large",
       title: "Japanese Master Chef",
@@ -451,9 +590,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 4,
       publishedAt: "2026-03-12T10:00:00Z",
+      role: "Front-End Engineer",
+      tools: ["React.js", "Firebase Auth", "Tailwind CSS", "REST API"],
+      deliverables: ["Recipe Catalog", "Chef Profiles Showcase", "Firebase Backend Integration"],
+      overview: "Interactive web app celebrating Japanese culinary culture with real-time recipe search, chef bio cards, and Firebase database synchronization.",
     },
     {
       id: "rhythmverse-dance",
+      slug: "rhythmverse-dance-school",
       type: "web",
       aspect: "large",
       title: "RythmVerse Dance School",
@@ -469,9 +613,14 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 5,
       publishedAt: "2026-03-11T10:00:00Z",
+      role: "Full-Stack Web Developer",
+      tools: ["React.js", "Firebase Auth", "Express.js", "Tailwind CSS"],
+      deliverables: ["Class Booking Portal", "Student Dashboard", "Admin Class Management"],
+      overview: "A student and instructor portal for dance academies, featuring class schedule enrollment, instructor profiles, and automated booking notifications.",
     },
     {
       id: "talent-hub",
+      slug: "talent-hub",
       type: "web",
       aspect: "large",
       title: "Talent Hub",
@@ -487,6 +636,56 @@ export const PORTFOLIO_DATA = {
       published: true,
       order: 6,
       publishedAt: "2026-03-10T10:00:00Z",
+      role: "Front-End Developer",
+      tools: ["React.js", "Tailwind CSS", "Netlify", "JSON Data Engine"],
+      deliverables: ["Job Search Filter Engine", "Application Tracker", "Responsive UI"],
+      overview: "A career portal application with instant category filtering, job requirement breakdowns, and applicant submission workflows.",
+    },
+    {
+      id: "babys-toy-out",
+      slug: "babys-toy-out",
+      type: "web",
+      aspect: "large",
+      title: "Baby's Toy Out",
+      category: "E-Commerce • Marketplace",
+      client: "Toy Out Ltd",
+      year: "2026",
+      description:
+        "Full-featured toy marketplace web application with product listings, user authentication, and shopping cart management.",
+      thumbnail: "/images/aurexa/aurexa-project-1.png",
+      liveUrl: "https://toy-marketplace-assignment-11.web.app/",
+      canEmbed: true,
+      tags: ["React.js", "Firebase", "Tailwind CSS", "MongoDB"],
+      published: true,
+      order: 7,
+      publishedAt: "2026-03-09T10:00:00Z",
+      role: "Front-End Developer",
+      tools: ["React.js", "Firebase Auth", "MongoDB", "Tailwind CSS"],
+      deliverables: ["Product Marketplace", "Seller Dashboard", "Authentication Engine"],
+      overview: "E-commerce platform for curated children's toys, featuring user authentication, toy listings management, and category search.",
+    },
+    {
+      id: "the-news-dragon",
+      slug: "the-news-dragon",
+      type: "web",
+      aspect: "large",
+      title: "The News Dragon",
+      category: "Editorial • Media Platform",
+      client: "News Dragon",
+      year: "2026",
+      description:
+        "High-density responsive news portal featuring categorization by region, real-time article feeds, and reader authentication.",
+      thumbnail: "/images/aurexa/aurexa-project-2.png",
+      liveUrl: "https://the-news-dragon-client-8ae38.web.app/",
+      canEmbed: true,
+      tags: ["React.js", "Express.js", "Bootstrap", "Firebase"],
+      published: true,
+      order: 8,
+      publishedAt: "2026-03-08T10:00:00Z",
+      role: "Front-End Developer",
+      tools: ["React.js", "Express.js", "Firebase Auth", "Bootstrap"],
+      deliverables: ["Categorized News Feed", "Article Detail View", "Authentication Flow"],
+      overview: "An online news publishing application with categorical news routing, breaking news marquees, and responsive reader layouts.",
     },
   ] as PortfolioProject[],
 
@@ -1052,38 +1251,299 @@ export const PORTFOLIO_DATA = {
     {
       year: "2026",
       organization: "B&F Corporate",
-      role: "Assistant IT Manager & Lead Video Editor",
-      highlight: "Promoted after 1 year of service · Leading digital infrastructure and video production",
+      role: "Assistant IT Manager",
+      highlight: "Promoted after 1 year of service · Leading digital infrastructure, enterprise web & IT operations",
+      slug: "bf-corporate-assistant-it-manager",
+      type: "experience",
+      period: "2 Years — Present (Joined as IT Executive, Promoted after 1 year)",
+      details: {
+        overview:
+          "Overseeing enterprise digital infrastructure, corporate web management, domain/hosting architecture, workstation security, employee IT technical operations, and creative documentation across B&F Corporate.",
+        responsibilities: [
+          "Monitor, troubleshoot, and maintain company websites to ensure proper functionality, 24/7 availability, and optimal performance.",
+          "Test website interactive forms and verify successful submission and delivery through cPanel Webmail.",
+          "Perform malware scanning, threat detection, removal, and proactive website security hardening.",
+          "Manage DNS configurations (A, MX, CNAME, TXT records) and ensure seamless domain resolution.",
+          "Monitor SSL certificates, install TLS certificates, and enforce HTTPS security protocols.",
+          "Monitor domain and hosting expiration dates and manage timely renewals across cPanel and GoDaddy.",
+          "Develop new websites according to specific business requirements and organizational needs.",
+          "Manage cPanel and cPanel Webmail access, including credential provisioning and password updates.",
+          "Troubleshoot and resolve hardware, software, operating system, and general technical issues on office PCs.",
+          "Install, configure, and activate Microsoft Office applications and troubleshoot Microsoft Outlook email, file synchronization, and access issues.",
+          "Manage employee VPN access, including account provisioning, setup, troubleshooting, and license renewal management.",
+          "Troubleshoot and resolve internet, LAN, and Wi-Fi connectivity issues affecting office users.",
+          "Manage office printers and provide day-to-day printing support for official documentation.",
+          "Create and edit visual materials using Adobe Photoshop and Illustrator, including company logos, ID cards, lanyards, posters, and banners.",
+        ],
+        tools: [
+          "cPanel",
+          "GoDaddy",
+          "DNS & SSL Management",
+          "Windows OS",
+          "Microsoft Outlook",
+          "Office 365",
+          "VPN Clients",
+          "CCTV Systems",
+          "Adobe Photoshop",
+          "Adobe Illustrator",
+        ],
+        achievements: [
+          "Promoted from IT Executive to Assistant IT Manager within 1 year in recognition of operational dependability.",
+          "Maintained 99.9% uptime across corporate web properties, email servers, and network connectivity.",
+          "Streamlined office technical onboarding with automated VPN and Outlook configuration profiles.",
+        ],
+      },
     },
     {
       year: "2025",
       organization: "B&F Corporate",
-      role: "IT Executive → Assistant IT Manager",
-      highlight: "Enterprise web management, DNS/SSL maintenance, and automotive video campaigns",
+      role: "Video Editor",
+      highlight: "Commercial video post-production, narrative pacing, audio sweetening & AI workflows",
+      slug: "bf-corporate-video-editor",
+      type: "experience",
+      period: "1 Year — Present",
+      details: {
+        overview:
+          "Executing end-to-end video editing and post-production for corporate branding, automotive showcases, and social media campaigns, combining cinematic editing instinct with cutting-edge AI-assisted generation.",
+        responsibilities: [
+          "Edit and assemble raw footage into polished, engaging, and purpose-driven video content.",
+          "Perform precision cutting, trimming, sequencing, transitions, and scene arrangement according to narrative flow.",
+          "Develop compelling edits through disciplined storytelling, rhythm, timing, and audience-tailored pacing.",
+          "Adapt visual styles and presentation according to content type, target demographics, and platform specifications.",
+          "Integrate footage, graphics, images, music tracks, voiceovers, and sound effects into cohesive productions.",
+          "Perform audio editing, noise cancellation, noise reduction, audio enhancement, voice cleanup, synchronization, volume balancing, and sound mixing.",
+          "Perform color correction and color grading to balance exposure, contrast, shot-to-shot consistency, tone, and visual mood.",
+          "Design and animate motion graphics, kinetic titles, lower thirds, callouts, overlays, and visual effects.",
+          "Develop creative concepts, scripts, scene structures, and prompt architectures for AI-assisted video production.",
+          "Generate AI-based video scenes, images, backgrounds, and voiceovers using Google Veo, ChatGPT Sora, and Kling 3.0.",
+          "Manage social media video publishing, curate high-CTR thumbnails, and optimize aspect ratios (9:16 vertical, 16:9 widescreen).",
+        ],
+        tools: [
+          "Adobe Premiere Pro",
+          "Adobe After Effects",
+          "DaVinci Resolve",
+          "CapCut",
+          "Final Cut Pro",
+          "Adobe Photoshop",
+          "Adobe Illustrator",
+          "Adobe Podcast",
+          "Audacity",
+          "Google Veo",
+          "ChatGPT Sora",
+          "Kling 3.0",
+        ],
+        achievements: [
+          "Produced high-impact commercial promotional videos for automotive clients including Syston Autos Ltd and B&F Cars.",
+          "Integrated generative AI pipelines to accelerate concept visualization and synthetic B-roll synthesis.",
+        ],
+      },
     },
     {
       year: "2024",
       organization: "Velocity Digital Inc.",
-      role: "Front-End Developer (1.5 Years)",
+      role: "Front-End Developer",
       highlight: "Component-driven React.js web interfaces, Figma conversion, Tailwind styling",
+      slug: "velocity-digital-frontend-developer",
+      type: "experience",
+      period: "1.5 Years",
+      details: {
+        overview:
+          "Developed modern, responsive, and component-driven web interfaces using React.js and modern styling ecosystems, translating high-fidelity Figma designs into production-ready web applications.",
+        responsibilities: [
+          "Develop responsive and user-friendly web interfaces based on project requirements and design specifications.",
+          "Build modern web pages and interactive interfaces using HTML5, CSS3, JavaScript (ES6+), and React.js.",
+          "Implement responsive layouts and consistent user experiences across desktop, tablet, and mobile screens.",
+          "Convert UI/UX and Figma designs into functional, reusable, and responsive front-end components.",
+          "Develop reusable component libraries and maintain structured, modular, and maintainable front-end codebases.",
+          "Implement modern UI styling using Tailwind CSS, Bootstrap, DaisyUI, and Shadcn/UI.",
+          "Integrate front-end interfaces with REST APIs and back-end services with comprehensive error handling.",
+          "Handle client-side forms, input validation, user interactions, dynamic content, and client routing.",
+          "Optimize websites and web applications for performance, usability, responsiveness, and cross-browser compatibility.",
+          "Perform testing, debugging, and code reviews using browser developer tools and Git/GitHub collaborative workflows.",
+        ],
+        tools: [
+          "React.js",
+          "JavaScript (ES6)",
+          "HTML5 & CSS3",
+          "Tailwind CSS",
+          "Bootstrap",
+          "DaisyUI",
+          "Shadcn/UI",
+          "REST APIs",
+          "Git / GitHub",
+          "Figma",
+          "VS Code",
+        ],
+        achievements: [
+          "Delivered multiple client web applications with 100% responsive fidelity across desktop, tablet, and mobile.",
+          "Accelerated development velocity by creating modular component design systems with Tailwind CSS.",
+        ],
+      },
     },
     {
       year: "2023",
       organization: "JobMatchingBD.com",
-      role: "WordPress Developer (1 Year)",
+      role: "WordPress Developer",
       highlight: "Job portal administration, Elementor development, plugins and security maintenance",
+      slug: "jobmatchingbd-wordpress-developer",
+      type: "experience",
+      period: "1 Year — Internship & Full-Time",
+      details: {
+        overview:
+          "Managed, customized, and maintained the company’s WordPress-based recruitment portal, ensuring high availability, continuous listing updates, and robust security practices.",
+        responsibilities: [
+          "Managed and maintained the company’s WordPress-based job portal website.",
+          "Published, updated, and managed job listings and other website content through WordPress.",
+          "Conducted daily website checks to identify and resolve functional, content, and technical issues.",
+          "Managed routine WordPress maintenance, plugin updates, and compatibility-related issues.",
+          "Kept the website updated with relevant WordPress technologies, features, and maintenance practices.",
+          "Performed ongoing website updates, troubleshooting, Elementor customizations, and general WordPress administration.",
+        ],
+        tools: [
+          "WordPress",
+          "Elementor",
+          "Elementor Pro",
+          "cPanel",
+          "GoDaddy",
+          "PHP",
+          "MySQL",
+        ],
+        achievements: [
+          "Maintained smooth operations for thousands of active job listings and employer postings.",
+          "Protected platform stability through proactive plugin audits, database optimizations, and regular backups.",
+        ],
+      },
     },
     {
       year: "2021",
-      organization: "Port City Int. University",
+      organization: "Port City International University",
       role: "BSc in Computer Science & Engineering",
       highlight: "Major in Web Development · Deep grounding in software architecture and algorithms",
+      slug: "bsc-cse",
+      type: "education",
+      period: "Graduated: 2021",
+      details: {
+        institution: "Port City International University",
+        department: "Natural Science",
+        subject: "Computer Science & Engineering",
+        major: "Web Development",
+        passingYear: "2021",
+        overview:
+          "Completed Bachelor of Science program in Computer Science & Engineering with a focused major in Web Development, gaining rigorous grounding in software engineering, algorithms, database systems, and web architecture.",
+        coursework: [
+          "Web Development & Distributed Systems",
+          "Data Structures & Algorithm Design",
+          "Object-Oriented Programming (OOP)",
+          "Database Management Systems (RDBMS & SQL)",
+          "Computer Networks, Protocols & Security",
+          "Software Engineering & System Analysis",
+        ],
+        achievements: [
+          "Specialized in modern web technologies, building scalable web platforms as final academic deliverables.",
+          "Gained deep theoretical and practical mastery of computational problem-solving and software architecture.",
+        ],
+      },
     },
     {
       year: "2020",
       organization: "Robi & Banglalink Helplines",
-      role: "Customer Service & Technical Support (4 Yrs)",
+      role: "Customer Service & Technical Support",
       highlight: "High-volume technical issue resolution, CRM management, customer satisfaction excellence",
+      slug: "robi-banglalink-customer-service",
+      type: "experience",
+      period: "4 Years Combined Experience",
+      details: {
+        overview:
+          "Delivered professional technical support and customer relationship management across two leading telecom networks, diagnosing service disruptions and resolving complex customer queries.",
+        responsibilities: [
+          "Handled incoming customer calls, listening attentively to user concerns, service requests, and technical issues.",
+          "Identified customer needs and provided accurate and appropriate solutions based on reported issues.",
+          "Managed customer accounts, service-related cases, and technical details through enterprise CRM interfaces.",
+          "Escalated network, internet, data package, and connectivity issues to backend technical engineering teams.",
+          "Maintained a solution-oriented, customer-focused approach when managing challenging requests.",
+          "Promoted relevant telecom products and services, performing eligible upselling based on customer usage.",
+          "Prepared daily operational and performance reports, maintaining accurate technical logs.",
+          "Maintained continuous familiarity with the latest telecom packages, network policies, and system updates.",
+        ],
+        tools: ["Telecom CRM Software", "Technical Ticketing Portals", "Network Status Dashboard", "Performance Reporting Tools"],
+        achievements: [
+          "Consistently achieved top-tier First Call Resolution (FCR) and customer satisfaction scores over 4 years.",
+          "Recognized for empathetic communication, rapid diagnostics, and dependable problem resolution.",
+        ],
+      },
+    },
+    {
+      year: "2018",
+      organization: "Pizza Hut",
+      role: "Customer Service Representative & Server",
+      highlight: "Dine-in, takeaway, POS, Foodpanda order processing, daily sales & inventory reporting",
+      slug: "pizza-hut-customer-service",
+      type: "experience",
+      period: "2 Years Combined Experience",
+      details: {
+        overview:
+          "Managed front-of-house customer relations, order processing, POS payments, online food delivery channels (Foodpanda), inventory reconciliation, and restaurant hygiene standards.",
+        responsibilities: [
+          "Warmly greeted customers and provided welcoming, professional dine-in and takeaway service.",
+          "Determined customer requirements, answered menu questions, and processed orders accurately through the POS system.",
+          "Managed Foodpanda online orders: confirmation, preparation synchronization, and courier dispatch.",
+          "Coordinated food service sequence, monitored guest satisfaction, and handled billings and payments accurately.",
+          "Prepared and submitted daily sales and cash reconciliation reports.",
+          "Conducted weekly and monthly inventory audits, reconciled stock levels, and submitted verified reports to management.",
+          "Maintained high standards of dining room hygiene, bar setup, and food safety regulations.",
+        ],
+        tools: ["POS System", "Foodpanda Merchant Portal", "Inventory Tracking Spreadsheets", "Cash Reconciliation Systems"],
+        achievements: [
+          "Maintained 100% billing and inventory accuracy across peak service shifts.",
+          "Successfully coordinated high-volume delivery operations with zero dispatch delays.",
+        ],
+      },
+    },
+    {
+      year: "2015",
+      organization: "Sitakund University College",
+      role: "Higher Secondary Certificate (HSC) — Science",
+      highlight: "Chittagong Board · Passing Year: 2015 · GPA: 3.50 (Out of 5.00)",
+      slug: "hsc",
+      type: "education",
+      period: "2015",
+      details: {
+        institution: "Sitakund University College",
+        group: "Science",
+        board: "Chittagong",
+        passingYear: "2015",
+        gpa: "3.50 (Out of 5.00)",
+        overview:
+          "Completed Higher Secondary Certificate (HSC) education in the Science stream under the Board of Intermediate and Secondary Education, Chittagong, developing foundational expertise in physics, chemistry, higher mathematics, and scientific methodology.",
+        coursework: ["Physics", "Chemistry", "Higher Mathematics", "Biology", "English", "Bangla"],
+        achievements: [
+          "Successfully earned Higher Secondary Certificate (HSC) in Science under Chittagong Education Board.",
+          "Built solid analytical and mathematical foundations preparing for higher studies in Computer Science & Engineering.",
+        ],
+      },
+    },
+    {
+      year: "2013",
+      organization: "Mahamudabad High School",
+      role: "Secondary School Certificate (SSC) — Science",
+      highlight: "Chittagong Board · Passing Year: 2013 · GPA: 4.81 (Out of 5.00) with Distinction",
+      slug: "ssc",
+      type: "education",
+      period: "2013",
+      details: {
+        institution: "Mahamudabad High School",
+        group: "Science",
+        board: "Chittagong",
+        passingYear: "2013",
+        gpa: "4.81 (Out of 5.00)",
+        overview:
+          "Completed Secondary School Certificate (SSC) with distinction in the Science stream under the Board of Intermediate and Secondary Education, Chittagong, achieving an outstanding GPA of 4.81 out of 5.00.",
+        coursework: ["General Science", "Physics", "Chemistry", "General Mathematics", "Higher Mathematics", "English", "Bangla"],
+        achievements: [
+          "Graduated with distinction with a GPA of 4.81 out of 5.00.",
+          "Consistently ranked near the top of the graduating Science cohort.",
+        ],
+      },
     },
   ] as MilestoneItem[],
 
