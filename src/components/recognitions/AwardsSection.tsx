@@ -58,7 +58,7 @@ export function AwardsSection() {
           const isAnyHovered = hoveredIdx !== null;
           const detailHref =
             item.type === "education"
-              ? `/milestones/education/${item.slug}`
+              ? `/milestones/education#${item.slug}`
               : `/milestones/experience/${item.slug}`;
 
           return (

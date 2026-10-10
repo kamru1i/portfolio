@@ -98,6 +98,7 @@ export interface ServiceItem {
 }
 
 export interface MilestoneItem {
+  id?: string;
   year: string;
   organization: string;
   role: string;
@@ -105,6 +106,7 @@ export interface MilestoneItem {
   slug: string;
   type: "experience" | "education";
   period?: string;
+  order?: number;
   details?: {
     overview?: string;
     responsibilities?: string[];
@@ -113,12 +115,18 @@ export interface MilestoneItem {
     skills?: string[];
     institution?: string;
     board?: string;
+    authority?: string;
     group?: string;
+    fieldOfStudy?: string;
     gpa?: string;
+    result?: string;
+    grade?: string;
     passingYear?: string;
     department?: string;
     subject?: string;
     major?: string;
+    degree?: string;
+    qualificationName?: string;
     coursework?: string[];
   };
 }
@@ -1415,6 +1423,7 @@ export const PORTFOLIO_DATA = {
       },
     },
     {
+      id: "edu-bsc-cse",
       year: "2021",
       organization: "Port City International University",
       role: "BSc in Computer Science & Engineering",
@@ -1424,9 +1433,13 @@ export const PORTFOLIO_DATA = {
       period: "Graduated: 2021",
       details: {
         institution: "Port City International University",
+        board: "Autonomous / University Grants Commission (UGC)",
+        authority: "Port City International University",
         department: "Natural Science",
         subject: "Computer Science & Engineering",
         major: "Web Development",
+        fieldOfStudy: "Computer Science & Engineering",
+        qualificationName: "BSc in Computer Science & Engineering",
         passingYear: "2021",
         overview:
           "Completed Bachelor of Science program in Computer Science & Engineering with a focused major in Web Development, gaining rigorous grounding in software engineering, algorithms, database systems, and web architecture.",
@@ -1445,6 +1458,7 @@ export const PORTFOLIO_DATA = {
       },
     },
     {
+      id: "exp-robi-banglalink",
       year: "2020",
       organization: "Robi & Banglalink Helplines",
       role: "Customer Service & Technical Support",
@@ -1473,6 +1487,7 @@ export const PORTFOLIO_DATA = {
       },
     },
     {
+      id: "exp-pizza-hut",
       year: "2018",
       organization: "Pizza Hut",
       role: "Customer Service Representative & Server",
@@ -1500,6 +1515,7 @@ export const PORTFOLIO_DATA = {
       },
     },
     {
+      id: "edu-hsc",
       year: "2015",
       organization: "Sitakund University College",
       role: "Higher Secondary Certificate (HSC) — Science",
@@ -1511,8 +1527,12 @@ export const PORTFOLIO_DATA = {
         institution: "Sitakund University College",
         group: "Science",
         board: "Chittagong",
+        authority: "Board of Intermediate and Secondary Education, Chittagong",
+        fieldOfStudy: "Science",
+        qualificationName: "Higher Secondary Certificate (HSC)",
         passingYear: "2015",
         gpa: "3.50 (Out of 5.00)",
+        result: "GPA 3.50 / 5.00",
         overview:
           "Completed Higher Secondary Certificate (HSC) education in the Science stream under the Board of Intermediate and Secondary Education, Chittagong, developing foundational expertise in physics, chemistry, higher mathematics, and scientific methodology.",
         coursework: ["Physics", "Chemistry", "Higher Mathematics", "Biology", "English", "Bangla"],
@@ -1523,6 +1543,7 @@ export const PORTFOLIO_DATA = {
       },
     },
     {
+      id: "edu-ssc",
       year: "2013",
       organization: "Mahamudabad High School",
       role: "Secondary School Certificate (SSC) — Science",
@@ -1534,8 +1555,12 @@ export const PORTFOLIO_DATA = {
         institution: "Mahamudabad High School",
         group: "Science",
         board: "Chittagong",
+        authority: "Board of Intermediate and Secondary Education, Chittagong",
+        fieldOfStudy: "Science",
+        qualificationName: "Secondary School Certificate (SSC)",
         passingYear: "2013",
         gpa: "4.81 (Out of 5.00)",
+        result: "GPA 4.81 / 5.00 (Distinction)",
         overview:
           "Completed Secondary School Certificate (SSC) with distinction in the Science stream under the Board of Intermediate and Secondary Education, Chittagong, achieving an outstanding GPA of 4.81 out of 5.00.",
         coursework: ["General Science", "Physics", "Chemistry", "General Mathematics", "Higher Mathematics", "English", "Bangla"],

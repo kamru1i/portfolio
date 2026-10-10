@@ -11,4 +11,4 @@ scripts/qa/*.png
 scripts/qa/*.json
 public/test-screenshots
 supabase/.temp
-
+AGENTS.md
