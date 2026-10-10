@@ -152,6 +152,23 @@ export function CurtainFooter() {
     };
   }, []);
 
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith("#") || href.startsWith("/#")) {
+      const hash = href.startsWith("/#") ? href.slice(1) : href;
+      const element = document.querySelector(hash);
+      if (element) {
+        e.preventDefault();
+        const lenis = (window as unknown as { lenis?: { scrollTo: (target: Element | string, options?: { offset?: number; duration?: number }) => void } }).lenis;
+        if (lenis && typeof lenis.scrollTo === "function") {
+          lenis.scrollTo(element, { offset: -80, duration: 1.2 });
+        } else {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+        window.history.pushState(null, "", hash);
+      }
+    }
+  };
+
   return (
     <footer
       aria-label="Footer"
@@ -194,18 +211,14 @@ export function CurtainFooter() {
       <div className="relative z-10 flex flex-col items-center justify-center space-y-2.5 sm:space-y-3.5 my-auto">
         <Link
           href="/#projects"
+          onClick={(e) => handleAnchorClick(e, "/#projects")}
           className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           PROJECTS &amp; WORKS
         </Link>
         <Link
-          href="/projects"
-          className="font-gambarino text-lg sm:text-xl md:text-2xl uppercase text-emerald-400/90 tracking-widest hover-underline-link transition-opacity hover:text-white"
-        >
-          EXPLORE ALL PROJECTS
-        </Link>
-        <Link
           href="/#about"
+          onClick={(e) => handleAnchorClick(e, "/#about")}
           className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           ABOUT

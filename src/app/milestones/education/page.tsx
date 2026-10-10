@@ -304,10 +304,10 @@ export default function EducationQualificationsPage() {
 
               <div className="flex items-center gap-3">
                 <Link
-                  href="/projects"
+                  href="/#projects"
                   className="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white text-white hover:text-black font-mono-custom text-xs uppercase tracking-wider transition-all"
                 >
-                  Explore All Projects
+                  Projects &amp; Works
                 </Link>
               </div>
             </div>

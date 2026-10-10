@@ -13,7 +13,6 @@ interface FullScreenMenuProps {
 const MENU_LINKS = [
   { label: "Home", href: "/" },
   { label: "Projects & Works", href: "/#projects" },
-  { label: "Explore Projects", href: "/projects" },
   { label: "About", href: "/#about" },
   { label: "Services", href: "/#services" },
   { label: "Milestones", href: "/#recognitions" },
@@ -45,15 +44,20 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
     }
   }, [isOpen]);
 
-  const handleLinkClick = (href: string) => {
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     onClose();
     if (href.startsWith("#") || href.startsWith("/#")) {
       const hash = href.startsWith("/#") ? href.slice(1) : href;
       const element = document.querySelector(hash);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.location.href = href.startsWith("/#") ? href : `/${href}`;
+        e.preventDefault();
+        const lenis = (window as unknown as { lenis?: { scrollTo: (target: Element | string, options?: { offset?: number; duration?: number }) => void } }).lenis;
+        if (lenis && typeof lenis.scrollTo === "function") {
+          lenis.scrollTo(element, { offset: -80, duration: 1.2 });
+        } else {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+        window.history.pushState(null, "", hash);
       }
     }
   };
@@ -127,12 +131,7 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                       ) : (
                         <Link
                           href={item.href}
-                          onClick={(e) => {
-                            if (item.href.startsWith("#")) {
-                              e.preventDefault();
-                            }
-                            handleLinkClick(item.href);
-                          }}
+                          onClick={(e) => handleLinkClick(e, item.href)}
                           className="group inline-flex items-center gap-4 text-white/80 hover:text-white transition-colors duration-200"
                         >
                           <span className="font-mono-custom text-xs sm:text-sm text-[#777] group-hover:text-emerald-400 transition-colors">
