@@ -100,34 +100,34 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
     switch (format) {
       case "9:16":
         return {
-          containerMaxW: "max-w-md",
-          stageAspect: "aspect-[9/16] max-h-[72vh]",
-          formatLabel: "9:16 Reel",
+          containerMaxW: "max-w-[340px] sm:max-w-[360px] md:max-w-[380px]",
+          stageAspect: "aspect-[9/16] max-h-[56vh] sm:max-h-[58vh]",
+          formatLabel: project.client || "Reel",
         };
       case "1:1":
         return {
-          containerMaxW: "max-w-xl",
-          stageAspect: "aspect-square max-h-[72vh]",
-          formatLabel: "1:1 Square",
+          containerMaxW: "max-w-md sm:max-w-lg",
+          stageAspect: "aspect-square max-h-[56vh] sm:max-h-[58vh]",
+          formatLabel: project.client || "Square",
         };
       case "4:3":
         return {
-          containerMaxW: "max-w-3xl",
-          stageAspect: "aspect-[4/3] max-h-[72vh]",
-          formatLabel: "4:3 Standard",
+          containerMaxW: "max-w-2xl sm:max-w-3xl",
+          stageAspect: "aspect-[4/3] max-h-[58vh] sm:max-h-[60vh]",
+          formatLabel: project.client || "Standard",
         };
       case "5:4":
         return {
-          containerMaxW: "max-w-3xl",
-          stageAspect: "aspect-[5/4] max-h-[72vh]",
-          formatLabel: "5:4 Near-Square",
+          containerMaxW: "max-w-2xl sm:max-w-3xl",
+          stageAspect: "aspect-[5/4] max-h-[58vh] sm:max-h-[60vh]",
+          formatLabel: project.client || "Video",
         };
       case "16:9":
       default:
         return {
-          containerMaxW: "max-w-5xl",
-          stageAspect: "aspect-video max-h-[72vh]",
-          formatLabel: project.client || "16:9 Video",
+          containerMaxW: "max-w-4xl lg:max-w-5xl",
+          stageAspect: "aspect-video max-h-[58vh] sm:max-h-[62vh]",
+          formatLabel: project.client || "Video",
         };
     }
   };
@@ -161,7 +161,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-10 bg-black/85 backdrop-blur-md"
+        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 pt-20 sm:pt-22 md:pt-24 pb-4 sm:pb-6 bg-black/85 backdrop-blur-md overflow-hidden"
         onClick={onClose}
       >
         <motion.div
@@ -170,35 +170,53 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className={`relative w-full ${containerMaxW} rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col`}
+          className={`relative w-full ${containerMaxW} rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto`}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-label={`${project.title} Video Player`}
         >
-          {/* Top Bar with Project Meta and Close Button */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#181818]/80">
-            <div className="flex items-center gap-3">
-              <span className="font-mono-custom text-xs uppercase px-2.5 py-1 rounded-full bg-white/10 text-white/80 border border-white/10">
+          {/* Top Bar with Project Meta, External Watch Link and Close Button */}
+          <div className="flex items-center justify-between px-3.5 sm:px-5 py-3 border-b border-white/10 bg-[#181818]/90 gap-2">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+              <span className="font-mono-custom text-[11px] uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10 whitespace-nowrap shrink-0 max-w-[120px] truncate">
                 {formatLabel}
               </span>
-              <h3 className="font-sans font-medium text-base sm:text-lg text-white truncate max-w-md">
+              <h3
+                className="font-sans font-medium text-xs sm:text-sm text-white truncate max-w-[140px] sm:max-w-[200px] md:max-w-[280px]"
+                title={project.title}
+              >
                 {project.title}
               </h3>
             </div>
 
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close video player"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              {project.videoUrl && (
+                <a
+                  href={project.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-mono-custom text-[11px] border border-white/10 transition-colors flex items-center gap-1 shrink-0"
+                  title="Watch on original video platform"
+                >
+                  <span>Watch</span>
+                  <span>↗</span>
+                </a>
+              )}
+
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close video player"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors shrink-0"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Video Player Stage with Premiere Pro Rounded Screen Monitor */}
-          <div className="w-full bg-[#0d0d0f] p-2.5 sm:p-5 flex items-center justify-center">
+          <div className="w-full bg-[#0d0d0f] p-2.5 sm:p-4 flex items-center justify-center">
             <div
               className={`relative w-full ${stageAspect} bg-black flex items-center justify-center overflow-hidden group mx-auto rounded-xl sm:rounded-2xl border border-white/15 shadow-[0_15px_40px_rgba(0,0,0,0.8)]`}
             >

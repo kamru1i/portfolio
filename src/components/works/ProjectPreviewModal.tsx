@@ -83,7 +83,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-black/85 backdrop-blur-md"
+        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 pt-20 sm:pt-22 md:pt-24 pb-4 sm:pb-6 bg-black/85 backdrop-blur-md overflow-hidden"
         onClick={onClose}
       >
         <motion.div
@@ -92,34 +92,37 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 20 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative w-full max-w-6xl h-[90vh] max-h-[900px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col"
+          className="relative w-full max-w-6xl h-[78vh] sm:h-[80vh] max-h-[680px] sm:max-h-[720px] md:max-h-[740px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-label={`${project.title} Preview`}
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#181818]/90">
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10 bg-[#181818]/90 gap-2">
             {/* Left: Window Controls Mockup + Title */}
-            <div className="flex items-center gap-4">
-              <div className="items-center gap-1.5 hidden sm:flex" aria-hidden="true">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="items-center gap-1.5 hidden sm:flex shrink-0" aria-hidden="true">
                 <span className="w-3 h-3 rounded-full bg-[#ff5f56]/80" />
                 <span className="w-3 h-3 rounded-full bg-[#ffbd2e]/80" />
                 <span className="w-3 h-3 rounded-full bg-[#27c93f]/80" />
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="font-mono-custom text-xs uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">
-                  {project.client || "Web System"}
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="font-mono-custom text-[11px] uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10 whitespace-nowrap shrink-0 max-w-[130px] truncate">
+                  {project.client || "Web"}
                 </span>
-                <h3 className="font-sans font-medium text-sm sm:text-base text-white truncate max-w-xs sm:max-w-sm">
+                <h3
+                  className="font-sans font-medium text-xs sm:text-sm text-white truncate max-w-[120px] sm:max-w-[180px] md:max-w-[260px]"
+                  title={project.title}
+                >
                   {project.title}
                 </h3>
               </div>
             </div>
 
             {/* Center Controls: Viewport or Mode Switcher */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 shrink-0">
               {/* Preview Mode Switcher (Iframe vs Fallback) */}
               <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
                 <button
@@ -153,54 +156,67 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                 </button>
               </div>
 
-              {/* Viewport switcher when in live iframe mode */}
+              {/* Viewport icon switcher when in live iframe mode */}
               {activeMode === "iframe" && !hasError && (
-                <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
+                <div className="flex items-center gap-0.5 p-1 rounded-xl bg-white/5 border border-white/10">
                   <button
                     type="button"
                     onClick={() => setViewportMode("desktop")}
-                    className={`px-2.5 py-1 rounded-lg font-mono-custom text-[11px] uppercase transition-colors ${
+                    title="Desktop View (Full Width)"
+                    className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${
                       viewportMode === "desktop"
-                        ? "bg-white/15 text-white font-medium"
-                        : "text-white/50 hover:text-white"
+                        ? "bg-white/20 text-white"
+                        : "text-white/40 hover:text-white"
                     }`}
                   >
-                    Desktop
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="3" width="20" height="14" rx="2"/>
+                      <line x1="8" y1="21" x2="16" y2="21"/>
+                      <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewportMode("tablet")}
-                    className={`px-2.5 py-1 rounded-lg font-mono-custom text-[11px] uppercase transition-colors ${
+                    title="Tablet View (768px)"
+                    className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${
                       viewportMode === "tablet"
-                        ? "bg-white/15 text-white font-medium"
-                        : "text-white/50 hover:text-white"
+                        ? "bg-white/20 text-white"
+                        : "text-white/40 hover:text-white"
                     }`}
                   >
-                    Tablet
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="4" y="2" width="16" height="20" rx="2"/>
+                      <line x1="12" y1="18" x2="12.01" y2="18"/>
+                    </svg>
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewportMode("mobile")}
-                    className={`px-2.5 py-1 rounded-lg font-mono-custom text-[11px] uppercase transition-colors ${
+                    title="Mobile View (375px)"
+                    className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${
                       viewportMode === "mobile"
-                        ? "bg-white/15 text-white font-medium"
-                        : "text-white/50 hover:text-white"
+                        ? "bg-white/20 text-white"
+                        : "text-white/40 hover:text-white"
                     }`}
                   >
-                    Mobile
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="5" y="2" width="14" height="20" rx="2"/>
+                      <line x1="12" y1="18" x2="12.01" y2="18"/>
+                    </svg>
                   </button>
                 </div>
               )}
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
               {project.githubUrl && (
                 <a
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs border border-white/10 transition-colors flex items-center gap-1.5"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs border border-white/10 transition-colors flex items-center gap-1"
                 >
                   <span>GitHub</span>
                   <span>↗</span>
@@ -212,9 +228,9 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 rounded-full bg-white text-black hover:bg-neutral-200 font-sans text-xs font-medium transition-colors flex items-center gap-1.5 shadow-sm"
+                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-white text-black hover:bg-neutral-200 font-sans text-xs font-medium transition-colors flex items-center gap-1 shadow-sm"
                 >
-                  <span>Open Live Site</span>
+                  <span>Live</span>
                   <span>↗</span>
                 </a>
               )}
@@ -223,7 +239,7 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
                 type="button"
                 onClick={onClose}
                 aria-label="Close project preview"
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors ml-1"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors ml-0.5"
               >
                 ✕
               </button>
