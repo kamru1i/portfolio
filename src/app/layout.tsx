@@ -123,11 +123,20 @@ export const metadata: Metadata = {
       "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise. View selected projects and professional experience.",
     images: [
       {
-        url: "/images/og-kamrul-islam.png",
+        url: "https://kamrulislam-bd.netlify.app/images/og-kamrul-islam.png",
+        secureUrl: "https://kamrulislam-bd.netlify.app/images/og-kamrul-islam.png",
         width: 1200,
         height: 630,
         alt: "Kamrul Islam — Video Editor, AI Content Creator & Web Developer",
         type: "image/png",
+      },
+      {
+        url: "https://kamrulislam-bd.netlify.app/images/kamrul-portrait.jpg",
+        secureUrl: "https://kamrulislam-bd.netlify.app/images/kamrul-portrait.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Kamrul Islam — Portrait",
+        type: "image/jpeg",
       },
     ],
   },
@@ -136,7 +145,7 @@ export const metadata: Metadata = {
     title: "Kamrul Islam | Video Editor, AI Content Creator & Web Developer",
     description:
       "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise. View selected projects and professional experience.",
-    images: ["/images/og-kamrul-islam.png"],
+    images: ["https://kamrulislam-bd.netlify.app/images/og-kamrul-islam.png"],
     creator: "@kamru1i",
     site: "@kamru1i",
   },
