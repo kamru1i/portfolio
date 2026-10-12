@@ -8,7 +8,7 @@ interface SectionConfig {
 }
 
 const SECTIONS: SectionConfig[] = [
-  { id: "hero", title: "Kamrul Islam — Portfolio" },
+  { id: "hero", title: "Kamrul Islam | Video Editor, AI Content Creator & Web Developer" },
   { id: "projects", title: "Kamrul Islam — Projects & Works" },
   { id: "about", title: "Kamrul Islam — About" },
   { id: "services", title: "Kamrul Islam — Services" },
@@ -24,8 +24,9 @@ export function DynamicSectionTitle() {
     const updateTitle = () => {
       // 1. If at or near the very top of the page, default immediately to Portfolio
       if (window.scrollY < 120) {
-        if (document.title !== "Kamrul Islam — Portfolio") {
-          document.title = "Kamrul Islam — Portfolio";
+        const defaultTitle = "Kamrul Islam | Video Editor, AI Content Creator & Web Developer";
+        if (document.title !== defaultTitle) {
+          document.title = defaultTitle;
         }
         return;
       }

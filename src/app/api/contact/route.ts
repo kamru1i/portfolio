@@ -200,7 +200,7 @@ inquiry.kamrul@gmail.com
 Best regards,
 Kamrul Islam
 Lead Video Editor, Web Developer & IT Specialist
-https://kamrulislam.bd
+https://kamrulislam-bd.netlify.app
 `.trim();
 
     const autoReplyHtml = `
@@ -283,7 +283,7 @@ https://kamrulislam.bd
     <div style="padding: 20px 32px; border-top: 1px solid #222; background-color: #0d0d0d; font-size: 11px; color: #666; font-family: monospace; line-height: 1.6;">
       <div>Received: ${escapeHtml(submissionTimeDhaka)} (GMT+6)</div>
       <div style="margin-top: 4px; color: #888;">Kamrul Islam · Lead Video Editor, Web Developer &amp; IT Specialist</div>
-      <div style="margin-top: 2px;"><a href="https://kamrulislam.bd" style="color: #a1a1a1; text-decoration: none;">kamrulislam.bd</a></div>
+      <div style="margin-top: 2px;"><a href="https://kamrulislam-bd.netlify.app" style="color: #a1a1a1; text-decoration: none;">kamrulislam-bd.netlify.app</a></div>
     </div>
   </div>
 </body>

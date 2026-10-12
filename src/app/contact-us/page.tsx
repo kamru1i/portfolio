@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description:
     "Get in touch with Kamrul Islam about commercial video editing, AI-assisted content production, modern web development, and digital infrastructure projects.",
   alternates: {
-    canonical: "https://kamrulislam.bd/contact-us",
+    canonical: "/contact-us",
   },
   openGraph: {
     title: "Kamrul Islam — Contact",
     description:
       "Get in touch with Kamrul Islam about commercial video editing, AI-assisted content production, modern web development, and digital infrastructure projects.",
-    url: "https://kamrulislam.bd/contact-us",
+    url: "/contact-us",
     siteName: "Kamrul Islam",
     locale: "en_US",
     type: "website",

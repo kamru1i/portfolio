@@ -11,29 +11,32 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam.bd"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam-bd.netlify.app"
+  ),
   title: {
-    default: "Kamrul Islam — Portfolio",
+    default: "Kamrul Islam | Video Editor, AI Content Creator & Web Developer",
     template: "Kamrul Islam — %s",
   },
   description:
-    "Official portfolio of Kamrul Islam: Assistant IT Manager, Commercial Video Editor, AI Content Creator, and Full-Stack Web Developer based in Chittagong, Bangladesh. Specializing in high-impact video post-production (DaVinci Resolve, Premiere Pro), generative AI media (Veo, Sora, Kling), modern web architectures (Next.js, React, TypeScript), and enterprise IT infrastructure & mail server operations.",
+    "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise. View selected projects and professional experience.",
   applicationName: "Kamrul Islam Portfolio",
   authors: [
     {
       name: "Kamrul Islam",
-      url: "https://kamrulislam.bd",
+      url: "https://kamrulislam-bd.netlify.app",
     },
   ],
   generator: "Next.js",
   keywords: [
     // Core Identity & Location
     "Kamrul Islam",
+    "Kamrul I",
     "Kamrul Islam Portfolio",
     "Chittagong",
     "Bangladesh",
 
-    // Profession 1: Commercial Video Editing & Post-Production
+    // Priority 1: Commercial Video Editing & Post-Production
     "Commercial Video Editor",
     "Professional Video Editor",
     "Post-Production Specialist",
@@ -52,8 +55,9 @@ export const metadata: Metadata = {
     "Reels & TikTok Editing",
     "Brand Films & Commercials",
 
-    // Profession 2: AI Content Creation & Generative Media
+    // Priority 2: AI Content Creation & Generative Media
     "AI Content Creator",
+    "AI-Assisted Content Creator",
     "Generative AI Specialist",
     "AI Video Production",
     "Google Veo",
@@ -65,8 +69,9 @@ export const metadata: Metadata = {
     "AI Visual Storytelling",
     "Prompt Engineering",
 
-    // Profession 3: Full-Stack Web Development & Creative Tech
+    // Priority 3: Full-Stack Web Development
     "Full-Stack Web Developer",
+    "Web Developer",
     "Frontend Architecture",
     "Creative Developer",
     "Web Developer Bangladesh",
@@ -75,12 +80,14 @@ export const metadata: Metadata = {
     "TypeScript",
     "Tailwind CSS",
     "Node.js",
+    "WordPress Developer",
     "Supabase",
     "PostgreSQL",
     "REST APIs",
     "Responsive Web Design",
 
-    // Profession 4: IT Operations & Enterprise Infrastructure
+    // Priority 4: IT Operations & Infrastructure
+    "IT Professional",
     "Assistant IT Manager",
     "IT Operations Specialist",
     "Enterprise IT Infrastructure",
@@ -94,7 +101,7 @@ export const metadata: Metadata = {
   creator: "Kamrul Islam",
   publisher: "Kamrul Islam",
   alternates: {
-    canonical: "/",
+    canonical: "https://kamrulislam-bd.netlify.app",
   },
   icons: {
     icon: [
@@ -109,26 +116,29 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://kamrulislam.bd",
-    siteName: "Kamrul Islam — Portfolio",
-    title: "Kamrul Islam — Commercial Video Editor, AI Creator, Web Developer & IT Professional",
+    url: "https://kamrulislam-bd.netlify.app",
+    siteName: "Kamrul Islam",
+    title: "Kamrul Islam | Video Editor, AI Content Creator & Web Developer",
     description:
-      "Official portfolio of Kamrul Islam: Assistant IT Manager, Commercial Video Editor, AI Content Creator, and Full-Stack Web Developer based in Chittagong, Bangladesh. Explore commercial video productions, web platforms, and digital systems.",
+      "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise. View selected projects and professional experience.",
     images: [
       {
-        url: "/images/kamrul-portrait.jpg",
+        url: "/images/og-kamrul-islam.png",
         width: 1200,
         height: 630,
-        alt: "Kamrul Islam — Portfolio",
+        alt: "Kamrul Islam — Video Editor, AI Content Creator & Web Developer",
+        type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kamrul Islam — Video Editor, AI Creator, Web Developer & IT Professional",
+    title: "Kamrul Islam | Video Editor, AI Content Creator & Web Developer",
     description:
-      "Assistant IT Manager, Commercial Video Editor, AI Content Creator, and Full-Stack Web Developer based in Chittagong, Bangladesh.",
-    images: ["/images/kamrul-portrait.jpg"],
+      "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise. View selected projects and professional experience.",
+    images: ["/images/og-kamrul-islam.png"],
+    creator: "@kamru1i",
+    site: "@kamru1i",
   },
   robots: {
     index: true,
@@ -143,47 +153,78 @@ export const metadata: Metadata = {
   },
 };
 
-const personSchema = {
+const structuredData = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Kamrul Islam",
-  alternateName: "Kamrul",
-  url: "https://kamrulislam.bd",
-  jobTitle: [
-    "Commercial Video Editor",
-    "AI Content Creator",
-    "Full-Stack Web Developer",
-    "Assistant IT Manager",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://kamrulislam-bd.netlify.app/#person",
+      name: "Kamrul Islam",
+      alternateName: ["Kamrul I", "Kamrul"],
+      url: "https://kamrulislam-bd.netlify.app",
+      image: "https://kamrulislam-bd.netlify.app/images/og-kamrul-islam.png",
+      jobTitle: [
+        "Video Editor",
+        "AI-Assisted Content Creator",
+        "Web Developer",
+        "IT Professional",
+      ],
+      description:
+        "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise.",
+      sameAs: [
+        "https://www.linkedin.com/in/kamru1i/",
+        "https://github.com/kamru1i",
+        "https://x.com/kamru1i",
+        "https://www.youtube.com/@kamru1iYT",
+        "https://www.facebook.com/kamru1i/",
+        "https://www.instagram.com/kamru1i/",
+        "https://www.tiktok.com/@kamru1i",
+      ],
+      worksFor: {
+        "@type": "Organization",
+        name: "Sterling Group of Industries / Tex Tech Co. / B&F Corporate",
+      },
+      alumniOf: {
+        "@type": "EducationalOrganization",
+        name: "Port City International University (PCIU)",
+      },
+      knowsAbout: [
+        "Commercial Video Editing",
+        "Color Grading",
+        "DaVinci Resolve Studio",
+        "Adobe Premiere Pro",
+        "Adobe After Effects",
+        "Generative AI Video",
+        "Google Veo",
+        "OpenAI Sora",
+        "Kling AI",
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Enterprise IT Infrastructure",
+        "cPanel Webmail & Mail Servers",
+        "DNS Management",
+      ],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Chittagong",
+        addressCountry: "Bangladesh",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://kamrulislam-bd.netlify.app/#website",
+      url: "https://kamrulislam-bd.netlify.app",
+      name: "Kamrul Islam | Portfolio",
+      description:
+        "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise.",
+      publisher: {
+        "@id": "https://kamrulislam-bd.netlify.app/#person",
+      },
+      inLanguage: "en-US",
+    },
   ],
-  worksFor: {
-    "@type": "Organization",
-    name: "Sterling Group of Industries / Tex Tech Co.",
-  },
-  alumniOf: {
-    "@type": "EducationalOrganization",
-    name: "Port City International University (PCIU)",
-  },
-  knowsAbout: [
-    "Commercial Video Editing",
-    "Color Grading",
-    "DaVinci Resolve",
-    "Adobe Premiere Pro",
-    "Generative AI",
-    "Google Veo",
-    "OpenAI Sora",
-    "Next.js",
-    "React",
-    "TypeScript",
-    "Tailwind CSS",
-    "Enterprise IT Infrastructure",
-    "cPanel Webmail & Mail Servers",
-    "DNS Management",
-  ],
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Chittagong",
-    addressCountry: "Bangladesh",
-  },
 };
 
 export default function RootLayout({
@@ -196,7 +237,7 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black min-h-screen">

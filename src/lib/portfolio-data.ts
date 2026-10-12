@@ -148,7 +148,7 @@ export const PORTFOLIO_DATA = {
     fullName: "Kamrul Islam",
     displayName: "KAMRUL",
     curtainName: "KAMRUL ISLAM",
-    domain: "kamrulislam.bd",
+    domain: "kamrulislam-bd.netlify.app",
     title: "Video Editor | AI Content Creator | Web Developer | IT Professional",
     location: "Chittagong, Bangladesh",
     timezone: "Asia/Dhaka", // UTC+6
