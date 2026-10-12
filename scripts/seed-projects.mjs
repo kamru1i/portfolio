@@ -136,7 +136,7 @@ const initialProjects = [
     year: "2026",
     description: "Boltshift X empowers brands with innovative design solutions to enhance their digital presence and achieve remarkable growth.",
     preview_image_url: "/images/aurexa/aurexa-project-2.png",
-    live_url: "https://kamrulislam.bd",
+    live_url: "https://kamrulislam-bd.netlify.app",
     github_url: "https://github.com/kamru1i/portfolio",
     can_embed: true,
     aspect_ratio: "16:9",
