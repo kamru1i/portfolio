@@ -148,6 +148,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  ...(process.env.NEXT_PUBLIC_FB_APP_ID
+    ? {
+        facebook: {
+          appId: process.env.NEXT_PUBLIC_FB_APP_ID,
+        },
+      }
+    : {}),
   twitter: {
     card: "summary_large_image",
     title: "Kamrul Islam | Video Editor, AI Content Creator, Web Developer & IT Specialist",
