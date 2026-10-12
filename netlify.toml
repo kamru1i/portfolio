@@ -1,0 +1,8 @@
+# Netlify Configuration
+# Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
+# Secret Scanning: https://docs.netlify.com/security/secret-scanning/
+
+[build.environment]
+  # Exclude public variables and non-sensitive emails from triggering secret scan build failures
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,NEXT_PUBLIC_SUPABASE_ANON_KEY,CONTACT_TO_EMAIL,CONTACT_FROM_EMAIL,AUTOREPLY_FROM_EMAIL"
+  SECRETS_SCAN_OMIT_PATHS = ".env.example,scripts/*"
