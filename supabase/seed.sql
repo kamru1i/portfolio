@@ -163,7 +163,7 @@ INSERT INTO public.projects (
   NULL,
   NULL,
   '16:9',
-  'https://kamrulislam.bd',
+  'https://kamrulislam-bd.netlify.app',
   'https://github.com/kamru1i/portfolio',
   true,
   ARRAY['Next.js', 'TypeScript', 'Framer Motion', 'Tailwind CSS'],
