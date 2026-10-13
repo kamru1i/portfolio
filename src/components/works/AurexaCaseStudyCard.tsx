@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Uses raw <img> with onError fallback for arbitrary external favicons and screenshots */
 
 import { useEffect, useRef, useState } from "react";
 import { PortfolioProject } from "@/lib/portfolio-data";

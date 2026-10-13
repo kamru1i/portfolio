@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
+import { extractYouTubeId, extractVimeoId } from "@/lib/video-metadata";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -48,17 +49,30 @@ export async function generateMetadata({
 
 function resolveEmbedUrl(url?: string): string | null {
   if (!url) return null;
-  const ytMatch = url.match(
-    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/i
-  );
-  if (ytMatch && ytMatch[1]) {
-    return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=0&rel=0&modestbranding=1`;
+  const ytId = extractYouTubeId(url);
+  if (ytId) {
+    return `https://www.youtube.com/embed/${ytId}?autoplay=0&rel=0&modestbranding=1`;
   }
-  const vimeoMatch = url.match(/(?:vimeo\.com\/)(\d+)/i);
-  if (vimeoMatch && vimeoMatch[1]) {
-    return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0`;
+  const vimeoId = extractVimeoId(url);
+  if (vimeoId) {
+    return `https://player.vimeo.com/video/${vimeoId}?autoplay=0`;
   }
   return null;
+}
+
+function getVideoPlayerContainerClasses(format: string): string {
+  switch (format) {
+    case "9:16":
+      return "w-full max-w-[420px] aspect-[9/16]";
+    case "1:1":
+      return "w-full max-w-[680px] aspect-square";
+    case "4:3":
+      return "w-full max-w-4xl aspect-[4/3]";
+    case "5:4":
+      return "w-full max-w-4xl aspect-[5/4]";
+    default:
+      return "w-full max-w-5xl aspect-video";
+  }
 }
 
 export default async function VideoProjectDetailPage({ params }: VideoProjectPageProps) {
@@ -84,7 +98,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
       project.videoUrl.endsWith(".webm") ||
       project.videoType === "local");
   const format = project.format || "16:9";
-  const isPortrait = format === "9:16";
+  const playerContainerClasses = getVideoPlayerContainerClasses(format);
 
   return (
     <>
@@ -143,11 +157,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
           {/* ============================================================ */}
           <section className="w-full mb-20 md:mb-28">
             <div
-              className={`relative mx-auto rounded-2xl overflow-hidden border border-white/15 bg-[#0a0a0a] shadow-[0_30px_70px_rgba(0,0,0,0.85)] ${
-                isPortrait
-                  ? "w-full max-w-[420px] aspect-[9/16]"
-                  : "w-full max-w-5xl aspect-video"
-              }`}
+              className={`relative mx-auto rounded-2xl overflow-hidden border border-white/15 bg-[#0a0a0a] shadow-[0_30px_70px_rgba(0,0,0,0.85)] ${playerContainerClasses}`}
             >
               {embedUrl ? (
                 /* YouTube / Vimeo Embedded Player */

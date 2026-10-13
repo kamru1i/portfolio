@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Uses raw <img> with onError fallback for arbitrary external favicons and screenshots */
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,25 +29,27 @@ function getDisplayDomain(url?: string): string {
 }
 
 export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalProps) {
+  if (!project) return null;
+  return <ProjectPreviewModalContent key={project.id} project={project} onClose={onClose} />;
+}
+
+function ProjectPreviewModalContent({
+  project,
+  onClose,
+}: {
+  project: PortfolioProject;
+  onClose: () => void;
+}) {
+  const isInitialFallback = project.previewMode === "fallback" || project.canEmbed === false;
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
   const [viewportMode, setViewportMode] = useState<ViewportMode>("desktop");
-  const [activeMode, setActiveMode] = useState<ModalPreviewMode>("iframe");
-
-  // Reset state whenever active project changes
-  useEffect(() => {
-    if (project) {
-      const isFallback = project.previewMode === "fallback" || project.canEmbed === false;
-      setActiveMode(isFallback ? "fallback" : "iframe");
-      setIframeLoaded(false);
-      setHasError(false);
-      setViewportMode("desktop");
-    }
-  }, [project]);
+  const [activeMode, setActiveMode] = useState<ModalPreviewMode>(
+    isInitialFallback ? "fallback" : "iframe"
+  );
 
   // Handle ESC key to dismiss
   useEffect(() => {
-    if (!project) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
@@ -54,20 +57,16 @@ export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalPro
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [project, onClose]);
+  }, [onClose]);
 
   // Lock body scroll non-destructively
   useEffect(() => {
-    if (project) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [project]);
-
-  if (!project) return null;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
 
   const displayDomain = getDisplayDomain(project.liveUrl);
   const faviconUrl = `https://www.google.com/s2/favicons?domain=${displayDomain}&sz=64`;

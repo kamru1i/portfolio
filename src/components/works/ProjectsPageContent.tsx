@@ -30,11 +30,14 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Read initial tab from query param: ?type=video or ?type=web
-  const initialType = searchParams.get("type");
-  const [activeTab, setActiveTab] = useState<"video" | "web">(
-    initialType === "web" ? "web" : "video"
-  );
+  // Read tab from query param (?type=video or ?type=web) with instant local override support
+  const urlTab: "video" | "web" = searchParams.get("type") === "web" ? "web" : "video";
+  const [tabOverride, setTabOverride] = useState<{
+    urlTab: "video" | "web";
+    active: "video" | "web";
+  } | null>(null);
+  const activeTab =
+    tabOverride && tabOverride.urlTab === urlTab ? tabOverride.active : urlTab;
 
   // Active aspect ratio subfilter for videos
   const [selectedFormat, setSelectedFormat] = useState<string>("all");
@@ -49,16 +52,6 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
       ? initialProjects
       : PORTFOLIO_DATA.showcaseProjects || []
   );
-
-  // Synchronize state with URL query parameter
-  useEffect(() => {
-    const typeParam = searchParams.get("type");
-    if (typeParam === "web" && activeTab !== "web") {
-      setActiveTab("web");
-    } else if (typeParam === "video" && activeTab !== "video") {
-      setActiveTab("video");
-    }
-  }, [searchParams, activeTab]);
 
   // Fetch complete published collection from API
   useEffect(() => {
@@ -95,7 +88,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
   }, []);
 
   const handleTabChange = (tab: "video" | "web") => {
-    setActiveTab(tab);
+    setTabOverride({ urlTab, active: tab });
     // Update URL query parameter without full reload
     const params = new URLSearchParams(window.location.search);
     params.set("type", tab);

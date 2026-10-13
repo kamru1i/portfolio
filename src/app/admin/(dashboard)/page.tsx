@@ -30,33 +30,33 @@ export default function AdminDashboardPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteProject, setConfirmDeleteProject] = useState<ProjectRecord | null>(null);
 
-  // Fetch projects from admin API
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      setErrorMsg(null);
-      const res = await fetch("/api/admin/projects");
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to load projects");
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/projects");
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Failed to load projects");
+        }
+        const data = await res.json();
+        if (isMounted) {
+          setProjects(data.projects || []);
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          setErrorMsg(err instanceof Error ? err.message : "Error fetching projects");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-      const data = await res.json();
-      setProjects(data.projects || []);
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Error fetching projects");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProjects();
+    })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  // Reset to first page when changing tabs or search query
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab, searchQuery]);
 
   // Compute stats
   const stats = useMemo(() => {
@@ -231,7 +231,10 @@ export default function AdminDashboardPage() {
             <button
               key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setCurrentPage(1);
+              }}
               className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all ${
                 activeTab === tab.id
                   ? "bg-white/15 text-white font-medium shadow-sm"
@@ -248,7 +251,10 @@ export default function AdminDashboardPage() {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Search projects..."
             className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#141416] border border-white/10 text-white placeholder-white/20 text-xs font-mono-custom focus:outline-none focus:border-white/30 transition-all"
           />
@@ -303,6 +309,7 @@ export default function AdminDashboardPage() {
                         className="object-cover"
                       />
                     ) : !isVideo && project.live_url ? (
+                      /* eslint-disable-next-line @next/next/no-img-element -- External Google S2 favicon with onError fallback */
                       <img
                         src={`https://www.google.com/s2/favicons?domain=${getDisplayDomain(project.live_url)}&sz=64`}
                         alt=""
@@ -465,7 +472,7 @@ export default function AdminDashboardPage() {
               Delete Project?
             </h3>
             <p className="font-mono-custom text-xs text-[#aaa] leading-relaxed">
-              Are you sure you want to permanently delete <strong className="text-white font-semibold">"{confirmDeleteProject.title}"</strong>?
+              Are you sure you want to permanently delete <strong className="text-white font-semibold">&ldquo;{confirmDeleteProject.title}&rdquo;</strong>?
               This action cannot be undone.
             </p>
 

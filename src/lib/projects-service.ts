@@ -83,6 +83,43 @@ export interface AdminProjectsResult {
 /**
  * Retrieves projects (published & drafts) for the Admin Dashboard with search, filter, and pagination.
  */
+const VALID_ASPECT_RATIOS = ["16:9", "9:16", "1:1", "4:3", "5:4"] as const;
+
+/**
+ * Validates and normalizes project URL fields to prevent unsafe URI schemes (e.g. javascript:, data:, vbscript:).
+ * Allows http://, https://, site-relative paths (/...), and internal SVG data URIs when explicitly permitted.
+ */
+function sanitizeProjectUrl(
+  url: string | null | undefined,
+  fieldName: string,
+  allowInternalSvgDataUri = false
+): string | null {
+  if (url === undefined || url === null) return null;
+  const trimmed = String(url).trim();
+  if (!trimmed) return null;
+
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+    return trimmed;
+  }
+
+  if (allowInternalSvgDataUri && trimmed.startsWith("data:image/svg+xml;utf8,")) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new Error(`${fieldName} must use http:// or https:// protocol.`);
+    }
+    return trimmed;
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.includes("protocol")) {
+      throw err;
+    }
+    throw new Error(`Invalid URL provided for ${fieldName}.`);
+  }
+}
+
 export async function getAllProjectsForAdmin(
   options: AdminProjectsQueryOptions = {}
 ): Promise<AdminProjectsResult> {
@@ -100,6 +137,13 @@ export async function getAllProjectsForAdmin(
     sortBy = "priority",
   } = options;
 
+  const safePage = Math.max(1, Math.floor(Number(page) || 1));
+  const safePageSize = Math.min(100, Math.max(1, Math.floor(Number(pageSize) || 25)));
+  // Strip PostgREST filter delimiters to prevent filter syntax injection in .or()
+  const cleanSearch = search
+    ? search.trim().replace(/[(),\\"%_]/g, " ").replace(/\s+/g, " ").trim().slice(0, 100)
+    : "";
+
   let query = supabase.from("projects").select("*", { count: "exact" });
 
   if (type === "video") {
@@ -114,8 +158,8 @@ export async function getAllProjectsForAdmin(
     query = query.eq("is_published", false);
   }
 
-  if (search && search.trim()) {
-    const q = `%${search.trim()}%`;
+  if (cleanSearch) {
+    const q = `%${cleanSearch}%`;
     query = query.or(`title.ilike.${q},client_name.ilike.${q},description.ilike.${q}`);
   }
 
@@ -132,8 +176,8 @@ export async function getAllProjectsForAdmin(
   }
 
   // Apply pagination range if requested
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
+  const from = (safePage - 1) * safePageSize;
+  const to = from + safePageSize - 1;
   query = query.range(from, to);
 
   let { data, error, count } = await query;
@@ -145,8 +189,8 @@ export async function getAllProjectsForAdmin(
     else if (type === "web") fallbackQuery = fallbackQuery.eq("type", "web");
     if (status === "published") fallbackQuery = fallbackQuery.eq("is_published", true);
     else if (status === "draft") fallbackQuery = fallbackQuery.eq("is_published", false);
-    if (search && search.trim()) {
-      const q = `%${search.trim()}%`;
+    if (cleanSearch) {
+      const q = `%${cleanSearch}%`;
       fallbackQuery = fallbackQuery.or(`title.ilike.${q},client_name.ilike.${q},description.ilike.${q}`);
     }
     fallbackQuery = fallbackQuery.order("created_at", { ascending: false }).range(from, to);
@@ -162,7 +206,7 @@ export async function getAllProjectsForAdmin(
 
   const rawProjects = (data as ProjectRecord[]) || [];
   const total = count || rawProjects.length;
-  const totalPages = Math.ceil(total / pageSize) || 1;
+  const totalPages = Math.ceil(total / safePageSize) || 1;
 
   // Deterministically sort in memory as safeguard when sortBy === 'priority'
   const sortedProjects = sortBy === "priority" 
@@ -172,8 +216,8 @@ export async function getAllProjectsForAdmin(
   return {
     projects: sortedProjects,
     total,
-    page,
-    pageSize,
+    page: safePage,
+    pageSize: safePageSize,
     totalPages,
   };
 }
@@ -295,17 +339,26 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
   const slug = input.slug?.trim() || generateSlug(input.title) || `project-${Date.now()}`;
   const now = new Date().toISOString();
 
-  let previewImageUrl = input.preview_image_url || null;
+  const cleanVideoUrl = sanitizeProjectUrl(input.video_url, "Video URL");
+  const cleanLiveUrl = sanitizeProjectUrl(input.live_url, "Live URL");
+  const cleanGithubUrl = sanitizeProjectUrl(input.github_url, "GitHub URL");
+  let previewImageUrl = sanitizeProjectUrl(input.preview_image_url, "Preview Image URL", true);
   let videoProvider = input.video_provider || null;
   let videoId = input.video_id || null;
-  let aspectRatio = input.aspect_ratio || "16:9";
+  let aspectRatio =
+    input.aspect_ratio && (VALID_ASPECT_RATIOS as readonly string[]).includes(input.aspect_ratio)
+      ? input.aspect_ratio
+      : "16:9";
 
   // If it's a video project, auto-resolve metadata if not already filled
-  if (input.type === "video" && input.video_url) {
-    const meta = await resolveVideoMetadata(input.video_url, input.title);
+  if (input.type === "video" && cleanVideoUrl) {
+    const meta = await resolveVideoMetadata(cleanVideoUrl, input.title);
     videoProvider = meta.provider;
     videoId = meta.videoId;
-    aspectRatio = input.aspect_ratio || meta.aspectRatio;
+    aspectRatio =
+      input.aspect_ratio && (VALID_ASPECT_RATIOS as readonly string[]).includes(input.aspect_ratio)
+        ? input.aspect_ratio
+        : meta.aspectRatio;
     if (!previewImageUrl) {
       previewImageUrl = meta.thumbnailUrl;
     }
@@ -317,12 +370,15 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
     : null;
 
   // Normalize preview mode & embeddability for web projects
-  const previewMode = input.preview_mode || (input.can_embed === false ? "fallback" : "iframe");
+  const previewMode = input.preview_mode === "fallback" || input.can_embed === false ? "fallback" : "iframe";
   const canEmbed = input.type === "web" ? previewMode === "iframe" : (input.can_embed ?? false);
 
   const insertData: ProjectInsert = {
     ...input,
     slug,
+    video_url: cleanVideoUrl,
+    live_url: cleanLiveUrl,
+    github_url: cleanGithubUrl,
     preview_image_url: previewImageUrl,
     video_provider: videoProvider,
     video_id: videoId,
@@ -379,6 +435,30 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
 
   // If publishing for the first time, set published_at
   const updatePayload: ProjectUpdate = { ...updates };
+
+  if (updates.video_url !== undefined) {
+    updatePayload.video_url = sanitizeProjectUrl(updates.video_url, "Video URL");
+  }
+  if (updates.live_url !== undefined) {
+    updatePayload.live_url = sanitizeProjectUrl(updates.live_url, "Live URL");
+  }
+  if (updates.github_url !== undefined) {
+    updatePayload.github_url = sanitizeProjectUrl(updates.github_url, "GitHub URL");
+  }
+  if (updates.preview_image_url !== undefined) {
+    updatePayload.preview_image_url = sanitizeProjectUrl(
+      updates.preview_image_url,
+      "Preview Image URL",
+      true
+    );
+  }
+  if (
+    updates.aspect_ratio !== undefined &&
+    !(VALID_ASPECT_RATIOS as readonly string[]).includes(updates.aspect_ratio)
+  ) {
+    throw new Error("Invalid aspect ratio format.");
+  }
+
   if (updates.is_published === true && !updates.published_at) {
     const existing = await getProjectById(id);
     if (existing && !existing.published_at) {
@@ -397,18 +477,19 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
 
   // Synchronize preview_mode and can_embed
   if (updates.preview_mode !== undefined) {
-    updatePayload.preview_mode = updates.preview_mode;
-    updatePayload.can_embed = updates.preview_mode === "iframe";
+    const mode = updates.preview_mode === "fallback" ? "fallback" : "iframe";
+    updatePayload.preview_mode = mode;
+    updatePayload.can_embed = mode === "iframe";
   } else if (updates.can_embed !== undefined) {
     updatePayload.preview_mode = updates.can_embed ? "iframe" : "fallback";
   }
 
   // If updating video_url, re-resolve metadata if needed
-  if (updates.type === "video" && updates.video_url) {
-    const meta = await resolveVideoMetadata(updates.video_url, updates.title || "");
+  if (updates.type === "video" && updatePayload.video_url) {
+    const meta = await resolveVideoMetadata(updatePayload.video_url, updates.title || "");
     updatePayload.video_provider = meta.provider;
     updatePayload.video_id = meta.videoId;
-    if (!updates.preview_image_url) {
+    if (!updatePayload.preview_image_url) {
       updatePayload.preview_image_url = meta.thumbnailUrl;
     }
   }

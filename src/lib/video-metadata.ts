@@ -10,18 +10,27 @@ export function isSafePublicUrl(urlString: string): boolean {
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return false;
     }
-    const hostname = parsed.hostname.toLowerCase();
-    // Block localhost, private IPs, link-local, loopbacks
+    // Strip IPv6 brackets if present
+    const hostname = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+    if (!hostname) return false;
+
+    // Block localhost, private IPs, link-local, loopbacks, IPv6 internal ranges, and integer/hex IPs
     if (
       hostname === "localhost" ||
       hostname.endsWith(".localhost") ||
-      hostname === "127.0.0.1" ||
       hostname === "0.0.0.0" ||
+      hostname === "::" ||
       hostname === "::1" ||
+      hostname.startsWith("127.") ||
       hostname.startsWith("192.168.") ||
       hostname.startsWith("10.") ||
       hostname.startsWith("169.254.") ||
-      hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
+      hostname.startsWith("::ffff:") ||
+      /^f[cd][0-9a-f]{2}:/i.test(hostname) ||
+      /^fe[89ab][0-9a-f]:/i.test(hostname) ||
+      /^\d+$/.test(hostname) ||
+      /^0x[0-9a-f]+$/i.test(hostname) ||
       hostname.endsWith(".internal") ||
       hostname.endsWith(".local")
     ) {

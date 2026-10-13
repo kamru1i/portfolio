@@ -67,18 +67,6 @@ export function ScrambleRevealText({
     onCompleteRef.current = onComplete;
   });
 
-  // Keep glyphs in sync if text or character set changes
-  useEffect(() => {
-    setActiveGlyphs(
-      Array.from({ length: text.length }, (_, i) =>
-        getDeterministicInitialGlyph(text[i], i, characters)
-      )
-    );
-    setResolvedIndex(-1);
-    setHasStarted(false);
-    startTimeRef.current = null;
-  }, [text, characters]);
-
   const getRandomGlyph = useCallback(() => {
     return characters[Math.floor(Math.random() * characters.length)];
   }, [characters]);
@@ -90,10 +78,14 @@ export function ScrambleRevealText({
 
     timerRef.current = setTimeout(() => {
       setHasStarted(true);
+      setResolvedIndex(-1);
+      startTimeRef.current = null;
 
       // Immediately randomize glyphs once the animation begins
-      setActiveGlyphs((prev) =>
-        prev.map((_, i) => (text[i] === " " ? " " : getRandomGlyph()))
+      setActiveGlyphs(
+        Array.from({ length: text.length }, (_, i) =>
+          text[i] === " " ? " " : getRandomGlyph()
+        )
       );
 
       // 1. High-frequency glyph shuffle interval for actively scrambling characters

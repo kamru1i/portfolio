@@ -13,6 +13,7 @@ interface FormDataState {
   budgetRange: string;
   timeline: string;
   details: string;
+  botCheck: string;
 }
 
 interface FormErrorsState {
@@ -58,6 +59,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
     budgetRange: BUDGET_OPTIONS[1],
     timeline: TIMELINE_OPTIONS[1],
     details: "",
+    botCheck: "",
   });
 
   const [errors, setErrors] = useState<FormErrorsState>({});
@@ -218,6 +220,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
                       budgetRange: BUDGET_OPTIONS[1],
                       timeline: TIMELINE_OPTIONS[1],
                       details: "",
+                      botCheck: "",
                     });
                   }}
                   className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white font-sans text-sm transition-all"
@@ -228,6 +231,19 @@ export function ContactFormSection({ initialService }: { initialService?: string
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} noValidate className="space-y-6 sm:space-y-7">
+              {/* Visually hidden honeypot field for automated spam bot filtering */}
+              <div className="hidden" aria-hidden="true">
+                <label htmlFor="botCheck">Leave this field blank</label>
+                <input
+                  id="botCheck"
+                  name="botCheck"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={formData.botCheck}
+                  onChange={(e) => setFormData({ ...formData, botCheck: e.target.value })}
+                />
+              </div>
               {/* Row 1: Budget Range & Timeline Selectors matching Aurexa */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>

@@ -10,16 +10,24 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const pageSize = parseInt(searchParams.get("pageSize") || "50", 10);
-    const type = (searchParams.get("type") || "all") as "all" | "video" | "web";
-    const status = (searchParams.get("status") || "all") as "all" | "published" | "draft";
-    const search = searchParams.get("q") || "";
-    const sortBy = (searchParams.get("sort") || "priority") as "priority" | "newest" | "title";
+    const rawPage = parseInt(searchParams.get("page") || "1", 10);
+    const rawPageSize = parseInt(searchParams.get("pageSize") || "50", 10);
+    const page = Number.isFinite(rawPage) ? Math.max(1, rawPage) : 1;
+    const pageSize = Number.isFinite(rawPageSize) ? Math.min(100, Math.max(1, rawPageSize)) : 50;
+    const rawType = searchParams.get("type") || "all";
+    const type: "all" | "video" | "web" =
+      rawType === "video" || rawType === "web" ? rawType : "all";
+    const rawStatus = searchParams.get("status") || "all";
+    const status: "all" | "published" | "draft" =
+      rawStatus === "published" || rawStatus === "draft" ? rawStatus : "all";
+    const search = (searchParams.get("q") || "").slice(0, 100);
+    const rawSort = searchParams.get("sort") || "priority";
+    const sortBy: "priority" | "newest" | "title" =
+      rawSort === "newest" || rawSort === "title" ? rawSort : "priority";
 
     const result = await getAllProjectsForAdmin({
-      page: isNaN(page) ? 1 : page,
-      pageSize: isNaN(pageSize) ? 50 : pageSize,
+      page,
+      pageSize,
       type,
       status,
       search,

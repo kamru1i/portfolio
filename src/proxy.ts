@@ -7,10 +7,13 @@ export async function proxy(request: NextRequest) {
     request,
   });
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    "https://uilbqehatpncchadwjza.supabase.co";
   const supabaseKey =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpbGJxZWhhdHBuY2NoYWR3anphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTU4MjgsImV4cCI6MjEwNzEzMTgyOH0.XjgR3JQ4dAhm3B693WJjWqKUDyeiC8m7md6xtFnnRVg";
 
   if (!supabaseUrl || !supabaseKey) {
     return response;
@@ -49,11 +52,20 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // If already logged in and visiting /admin/login, redirect to /admin
+  // If already logged in as a verified admin and visiting /admin/login, redirect to /admin
+  // Checking admin_users first avoids an infinite redirect loop for non-admin sessions
   if (pathname === "/admin/login" && user) {
-    const adminUrl = request.nextUrl.clone();
-    adminUrl.pathname = "/admin";
-    return NextResponse.redirect(adminUrl);
+    const { data: adminRecord } = await supabase
+      .from("admin_users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (adminRecord) {
+      const adminUrl = request.nextUrl.clone();
+      adminUrl.pathname = "/admin";
+      return NextResponse.redirect(adminUrl);
+    }
   }
 
   return response;

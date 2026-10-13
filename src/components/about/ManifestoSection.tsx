@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -105,7 +105,7 @@ function ManifestoWord({
   end,
 }: {
   word: string;
-  scrollProgress: any;
+  scrollProgress: MotionValue<number>;
   start: number;
   end: number;
 }) {

@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { getPublishedProjects } from "@/lib/projects-service";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam-bd.netlify.app";
   const now = new Date();
+  const publishedProjects = await getPublishedProjects();
 
   const staticEntries: MetadataRoute.Sitemap = [
     {
@@ -48,7 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     }));
 
-  const videoProjectEntries: MetadataRoute.Sitemap = (PORTFOLIO_DATA.showcaseProjects || [])
+  const videoProjectEntries: MetadataRoute.Sitemap = publishedProjects
     .filter((p) => p.type === "video")
     .map((p) => ({
       url: `${baseUrl}/projects/video/${p.slug || p.id}`,
@@ -57,7 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     }));
 
-  const webProjectEntries: MetadataRoute.Sitemap = (PORTFOLIO_DATA.showcaseProjects || [])
+  const webProjectEntries: MetadataRoute.Sitemap = publishedProjects
     .filter((p) => p.type === "web")
     .map((p) => ({
       url: `${baseUrl}/projects/web/${p.slug || p.id}`,

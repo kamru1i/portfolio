@@ -1,6 +1,39 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_REQUESTS_PER_WINDOW = 5;
+const rateLimitMap = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  // Prune stale entries periodically to bound memory usage
+  if (rateLimitMap.size > 500) {
+    for (const [key, timestamps] of rateLimitMap.entries()) {
+      const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+      if (recent.length === 0) {
+        rateLimitMap.delete(key);
+      } else {
+        rateLimitMap.set(key, recent);
+      }
+    }
+  }
+
+  const timestamps = rateLimitMap.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (recent.length >= MAX_REQUESTS_PER_WINDOW) {
+    rateLimitMap.set(ip, recent);
+    return true;
+  }
+  recent.push(now);
+  rateLimitMap.set(ip, recent);
+  return false;
+}
+
+function sanitizeSingleLine(text: string, maxLength: number): string {
+  return text.replace(/[\r\n\0]+/g, " ").trim().slice(0, maxLength);
+}
+
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
@@ -12,6 +45,18 @@ function escapeHtml(text: string): string {
 
 export async function POST(request: Request) {
   try {
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const clientIp =
+      request.headers.get("x-nf-client-connection-ip") ||
+      (forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown-ip");
+
+    if (isRateLimited(clientIp)) {
+      return NextResponse.json(
+        { error: "Too many inquiries submitted recently. Please wait a few minutes and try again." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, company, projectType, budgetRange, timeline, details, botCheck } = body;
 
@@ -30,7 +75,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const cleanName = name.trim().slice(0, 100);
+    const cleanName = sanitizeSingleLine(name, 100);
 
     if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return NextResponse.json(
@@ -38,7 +83,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const cleanEmail = email.trim().slice(0, 120);
+    const cleanEmail = sanitizeSingleLine(email, 120);
 
     if (!projectType || typeof projectType !== "string") {
       return NextResponse.json(
@@ -46,7 +91,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const cleanProjectType = projectType.trim().slice(0, 100);
+    const cleanProjectType = sanitizeSingleLine(projectType, 100);
 
     if (!details || typeof details !== "string" || !details.trim()) {
       return NextResponse.json(
@@ -54,10 +99,10 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const cleanDetails = details.trim().slice(0, 5000);
-    const cleanCompany = company && typeof company === "string" ? company.trim().slice(0, 100) : "N/A";
-    const cleanBudget = budgetRange && typeof budgetRange === "string" ? budgetRange.trim().slice(0, 60) : "Not specified";
-    const cleanTimeline = timeline && typeof timeline === "string" ? timeline.trim().slice(0, 60) : "Not specified";
+    const cleanDetails = details.replace(/\0/g, "").trim().slice(0, 5000);
+    const cleanCompany = company && typeof company === "string" ? sanitizeSingleLine(company, 100) || "N/A" : "N/A";
+    const cleanBudget = budgetRange && typeof budgetRange === "string" ? sanitizeSingleLine(budgetRange, 60) || "Not specified" : "Not specified";
+    const cleanTimeline = timeline && typeof timeline === "string" ? sanitizeSingleLine(timeline, 60) || "Not specified" : "Not specified";
 
     const recipient = process.env.CONTACT_TO_EMAIL || "inquiry.kamrul@gmail.com";
     const sender = process.env.CONTACT_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
@@ -338,7 +383,7 @@ https://kamrulislam-bd.netlify.app
 
     // 2. Send Automated Courtesy Confirmation Receipt to Client
     let autoReplyDeliveryId: string | null = null;
-    let autoReplyErrorDetail: any = null;
+    let autoReplyErrorMessage: string | null = null;
     try {
       const autoReplyResult = await resend.emails.send({
         from: autoReplySender,
@@ -349,7 +394,7 @@ https://kamrulislam-bd.netlify.app
       });
 
       if (autoReplyResult.error) {
-        autoReplyErrorDetail = autoReplyResult.error;
+        autoReplyErrorMessage = autoReplyResult.error.message || "Auto-reply awaiting verified domain at resend.com/domains";
         console.warn("[Auto-Reply Notice]: Client confirmation email could not be sent:", autoReplyResult.error);
       } else {
         autoReplyDeliveryId = autoReplyResult.data?.id || null;
@@ -358,9 +403,12 @@ https://kamrulislam-bd.netlify.app
           deliveryId: autoReplyDeliveryId,
         });
       }
-    } catch (autoReplyErr: any) {
-      autoReplyErrorDetail = autoReplyErr?.message || autoReplyErr;
-      console.warn("[Auto-Reply Non-Fatal Exception]:", autoReplyErr?.message || autoReplyErr);
+    } catch (autoReplyErr: unknown) {
+      autoReplyErrorMessage =
+        autoReplyErr instanceof Error
+          ? autoReplyErr.message
+          : "Auto-reply awaiting verified domain at resend.com/domains";
+      console.warn("[Auto-Reply Non-Fatal Exception]:", autoReplyErrorMessage);
     }
 
     return NextResponse.json({
@@ -368,15 +416,13 @@ https://kamrulislam-bd.netlify.app
       message: "Enquiry delivered successfully.",
       deliveryId: data?.id,
       autoReplyDeliveryId,
-      ...(autoReplyErrorDetail
+      ...(autoReplyErrorMessage
         ? {
-            autoReplyNotice:
-              autoReplyErrorDetail?.message ||
-              "Auto-reply awaiting verified domain at resend.com/domains",
+            autoReplyNotice: autoReplyErrorMessage,
           }
         : {}),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Contact API Internal Error]:", error);
     return NextResponse.json(
       { error: "Internal server error processing contact submission." },
