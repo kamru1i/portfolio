@@ -148,7 +148,7 @@ export const PORTFOLIO_DATA = {
     fullName: "Kamrul Islam",
     displayName: "KAMRUL",
     curtainName: "KAMRUL ISLAM",
-    domain: "kamrulislam-bd.netlify.app",
+    domain: "kamrulislam.me",
     title: "Video Editor | AI Content Creator | Web Developer | IT Professional",
     location: "Chittagong, Bangladesh",
     timezone: "Asia/Dhaka", // UTC+6
@@ -520,7 +520,7 @@ export const PORTFOLIO_DATA = {
         "High-performance editorial portfolio engineered with Next.js, Framer Motion, and Supabase integration.",
       thumbnail: "/images/aurexa/aurexa-project-1.png",
       githubUrl: "https://github.com/kamru1i/portfolio",
-      liveUrl: "https://kamrulislam-bd.vercel.app/",
+      liveUrl: "https://kamrulislam.me",
       canEmbed: true,
       tags: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
       published: true,

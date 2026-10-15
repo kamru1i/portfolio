@@ -12,7 +12,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam-bd.netlify.app"
+    process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam.me"
   ),
   title: {
     default: "Kamrul Islam | Video Editor, AI Content Creator & Web Developer",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "Kamrul Islam",
-      url: "https://kamrulislam-bd.netlify.app",
+      url: "https://kamrulislam.me",
     },
   ],
   generator: "Next.js",
@@ -101,7 +101,7 @@ export const metadata: Metadata = {
   creator: "Kamrul Islam",
   publisher: "Kamrul Islam",
   alternates: {
-    canonical: "https://kamrulislam-bd.netlify.app",
+    canonical: "https://kamrulislam.me",
   },
   icons: {
     icon: [
@@ -116,31 +116,31 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://kamrulislam-bd.netlify.app",
+    url: "https://kamrulislam.me",
     siteName: "Kamrul Islam",
     title: "Kamrul Islam | Video Editor, AI Content Creator, Web Developer & IT Specialist",
     description:
       "Explore Kamrul Islam’s portfolio of cinematic video storytelling, AI-assisted content creation, full-stack web engineering, and enterprise IT infrastructure.",
     images: [
       {
-        url: "https://kamrulislam-bd.netlify.app/images/og-card-studio.jpg",
-        secureUrl: "https://kamrulislam-bd.netlify.app/images/og-card-studio.jpg",
+        url: "https://kamrulislam.me/images/og-card-studio.jpg",
+        secureUrl: "https://kamrulislam.me/images/og-card-studio.jpg",
         width: 1200,
         height: 630,
         alt: "Kamrul Islam — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist",
         type: "image/jpeg",
       },
       {
-        url: "https://kamrulislam-bd.netlify.app/images/og-card-studio.png",
-        secureUrl: "https://kamrulislam-bd.netlify.app/images/og-card-studio.png",
+        url: "https://kamrulislam.me/images/og-card-studio.png",
+        secureUrl: "https://kamrulislam.me/images/og-card-studio.png",
         width: 1200,
         height: 630,
         alt: "Kamrul Islam — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist",
         type: "image/png",
       },
       {
-        url: "https://kamrulislam-bd.netlify.app/images/og-card-vibrant.jpg",
-        secureUrl: "https://kamrulislam-bd.netlify.app/images/og-card-vibrant.jpg",
+        url: "https://kamrulislam.me/images/og-card-vibrant.jpg",
+        secureUrl: "https://kamrulislam.me/images/og-card-vibrant.jpg",
         width: 1200,
         height: 630,
         alt: "Kamrul Islam — Creative Studio",
@@ -160,7 +160,7 @@ export const metadata: Metadata = {
     title: "Kamrul Islam | Video Editor, AI Content Creator, Web Developer & IT Specialist",
     description:
       "Explore Kamrul Islam’s portfolio of cinematic video storytelling, AI-assisted content creation, full-stack web engineering, and enterprise IT infrastructure.",
-    images: ["https://kamrulislam-bd.netlify.app/images/og-card-studio.jpg"],
+    images: ["https://kamrulislam.me/images/og-card-studio.jpg"],
     creator: "@kamru1i",
     site: "@kamru1i",
   },
@@ -182,11 +182,11 @@ const structuredData = {
   "@graph": [
     {
       "@type": "Person",
-      "@id": "https://kamrulislam-bd.netlify.app/#person",
+      "@id": "https://kamrulislam.me/#person",
       name: "Kamrul Islam",
       alternateName: ["Kamrul I", "Kamrul"],
-      url: "https://kamrulislam-bd.netlify.app",
-      image: "https://kamrulislam-bd.netlify.app/images/Kamrul%20I.png",
+      url: "https://kamrulislam.me",
+      image: "https://kamrulislam.me/images/Kamrul%20I.png",
       jobTitle: [
         "Video Editor",
         "AI-Assisted Content Creator",
@@ -238,13 +238,13 @@ const structuredData = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://kamrulislam-bd.netlify.app/#website",
-      url: "https://kamrulislam-bd.netlify.app",
+      "@id": "https://kamrulislam.me/#website",
+      url: "https://kamrulislam.me",
       name: "Kamrul Islam | Portfolio",
       description:
         "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise.",
       publisher: {
-        "@id": "https://kamrulislam-bd.netlify.app/#person",
+        "@id": "https://kamrulislam.me/#person",
       },
       inLanguage: "en-US",
     },

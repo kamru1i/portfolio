@@ -13,8 +13,8 @@ async function verify() {
 
   console.log("\n=== 2. VERIFYING CODEBASE METADATA IN layout.tsx ===");
   const layout = fs.readFileSync("src/app/layout.tsx", "utf8");
-  console.log("Contains metadataBase pointing to https://kamrulislam-bd.netlify.app:", layout.includes("https://kamrulislam-bd.netlify.app"));
-  console.log("Contains canonical pointing to https://kamrulislam-bd.netlify.app:", layout.includes("canonical: \"https://kamrulislam-bd.netlify.app\""));
+  console.log("Contains metadataBase pointing to https://kamrulislam.me:", layout.includes("https://kamrulislam.me"));
+  console.log("Contains canonical pointing to https://kamrulislam.me:", layout.includes("canonical: \"https://kamrulislam.me\""));
   console.log("Contains og:image pointing to /images/og-kamrul-islam.png:", layout.includes("/images/og-kamrul-islam.png"));
   console.log("Contains twitter:card summary_large_image:", layout.includes("summary_large_image"));
   console.log("Contains twitter:creator @kamru1i:", layout.includes("@kamru1i"));
@@ -24,9 +24,9 @@ async function verify() {
   console.log("src/app/robots.ts exists:", fs.existsSync("src/app/robots.ts"));
   console.log("src/app/sitemap.ts exists:", fs.existsSync("src/app/sitemap.ts"));
 
-  console.log("\n=== 4. TESTING LIVE PRODUCTION DOMAIN https://kamrulislam-bd.netlify.app ===");
+  console.log("\n=== 4. TESTING LIVE PRODUCTION DOMAIN https://kamrulislam.me ===");
   try {
-    const res = await fetch("https://kamrulislam-bd.netlify.app", {
+    const res = await fetch("https://kamrulislam.me", {
       headers: { "User-Agent": "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)" }
     });
     console.log("HTTP Status:", res.status);

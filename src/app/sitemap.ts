@@ -3,7 +3,7 @@ import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { getPublishedProjects } from "@/lib/projects-service";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam-bd.netlify.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam.me";
   const now = new Date();
   const publishedProjects = await getPublishedProjects();
 

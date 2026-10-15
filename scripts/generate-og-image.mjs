@@ -166,7 +166,7 @@ async function generateOgImage() {
         <path d="M10 2a13 13 0 0 1 0 16 13 13 0 0 1 0-16z" />
       </g>
       <text x="48" y="26" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-size="14.5" font-weight="600" letter-spacing="0.6" fill="#ffffff">
-        kamrulislam-bd.netlify.app
+        kamrulislam.me
       </text>
     </g>
 
