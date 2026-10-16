@@ -77,11 +77,11 @@ async function main() {
       hasErrors = true;
     }
 
-    const newEmailLocator = testPage.locator("text=inquiry.kamrul@gmail.com").first();
+    const newEmailLocator = testPage.locator("text=hello@kamrulislam.me").first();
     const isNewEmailVisible = await newEmailLocator.isVisible();
-    console.log(`Contact page new email (inquiry.kamrul@gmail.com) displayed: ${isNewEmailVisible}`);
+    console.log(`Contact page new email (hello@kamrulislam.me) displayed: ${isNewEmailVisible}`);
     if (!isNewEmailVisible) {
-      console.error("FAILED: New email inquiry.kamrul@gmail.com not visible on Contact page!");
+      console.error("FAILED: New email hello@kamrulislam.me not visible on Contact page!");
       hasErrors = true;
     }
 

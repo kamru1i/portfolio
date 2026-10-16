@@ -194,7 +194,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
                   Enquiry Delivered Successfully
                 </h3>
                 <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed max-w-lg">
-                  Thank you, <strong className="text-white">{formData.name}</strong>. Your enquiry has been delivered directly to <strong className="text-white">inquiry.kamrul@gmail.com</strong>. I review client submissions daily and will respond to{" "}
+                  Thank you, <strong className="text-white">{formData.name}</strong>. Your enquiry has been delivered directly to <strong className="text-white">hello@kamrulislam.me</strong>. I review client submissions daily and will respond to{" "}
                   <strong className="text-white">{formData.email}</strong> within 24–48 hours.
                 </p>
               </div>

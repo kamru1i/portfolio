@@ -152,7 +152,7 @@ export const PORTFOLIO_DATA = {
     title: "Video Editor | AI Content Creator | Web Developer | IT Professional",
     location: "Chittagong, Bangladesh",
     timezone: "Asia/Dhaka", // UTC+6
-    email: "inquiry.kamrul@gmail.com",
+    email: "hello@kamrulislam.me",
     phone: "(+880) 1839 00 6867",
     socials: [
       { label: "LI", name: "LinkedIn", url: "https://www.linkedin.com/in/kamru1i/" },
@@ -1588,7 +1588,7 @@ export const PORTFOLIO_DATA = {
       role: "Lead Video Editor, Web Developer & IT Specialist",
       ctaText: "Get in touch",
       ctaHref: "/contact-us",
-      email: "inquiry.kamrul@gmail.com",
+      email: "hello@kamrulislam.me",
       status: "Available for select freelance & full-time roles",
       avatarSrc: "/images/Kamrul I.png",
     },

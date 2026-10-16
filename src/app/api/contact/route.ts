@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     const cleanBudget = budgetRange && typeof budgetRange === "string" ? sanitizeSingleLine(budgetRange, 60) || "Not specified" : "Not specified";
     const cleanTimeline = timeline && typeof timeline === "string" ? sanitizeSingleLine(timeline, 60) || "Not specified" : "Not specified";
 
-    const recipient = process.env.CONTACT_TO_EMAIL || "inquiry.kamrul@gmail.com";
+    const recipient = process.env.CONTACT_TO_EMAIL || "hello@kamrulislam.me";
     const sender = process.env.CONTACT_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
     const apiKey = process.env.RESEND_API_KEY;
 
@@ -200,7 +200,7 @@ Recipient:         ${recipient}
       process.env.AUTOREPLY_FROM_EMAIL ||
       (sender.includes("onboarding@resend.dev")
         ? "Kamrul Islam (No-Reply) <onboarding@resend.dev>"
-        : sender.replace(/<[^>]+>/, "<noreply@inquiry.kamrul>"));
+        : sender.replace(/<[^>]+>/, "<noreply@kamrulislam.me>"));
 
     // -------------------------------------------------------------------------
     // CLIENT COURTESY CONFIRMATION (AUTO-REPLY RECEIPT)
@@ -234,12 +234,12 @@ ${cleanDetails}
 IMPORTANT — PLEASE DO NOT REPLY DIRECTLY TO THIS EMAIL
 ============================================================
 This notification was sent automatically from a no-reply address 
-(noreply@inquiry.kamrul). Incoming replies to this address 
+(noreply@kamrulislam.me). Incoming replies to this address 
 are not monitored and will not be received.
 
 If you have additional assets, references, or urgent updates 
 to share before I reply, please send them directly to:
-inquiry.kamrul@gmail.com
+hello@kamrulislam.me
 ============================================================
 
 Best regards,
@@ -315,11 +315,11 @@ https://kamrulislam.me
       <div style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 14px 16px;">
         <div style="font-size: 12px; font-weight: 600; color: #fbbf24; margin-bottom: 4px; font-family: monospace;">⚠️ AUTOMATED NO-REPLY NOTIFICATION</div>
         <div style="font-size: 12px; color: #d1d5db; line-height: 1.5;">
-          This message was generated automatically from an unmonitored address (<strong style="color: #fff;">noreply@inquiry.kamrul</strong>). 
+          This message was generated automatically from an unmonitored address (<strong style="color: #fff;">noreply@kamrulislam.me</strong>). 
           <strong>Please do not reply directly to this email</strong>, as incoming replies cannot be received or monitored.
           <br><br>
           If you need to send additional project attachments or have urgent questions before I respond, please email directly to: 
-          <a href="mailto:inquiry.kamrul@gmail.com" style="color: #38bdf8; text-decoration: underline;">inquiry.kamrul@gmail.com</a>.
+          <a href="mailto:hello@kamrulislam.me" style="color: #38bdf8; text-decoration: underline;">hello@kamrulislam.me</a>.
         </div>
       </div>
     </div>
