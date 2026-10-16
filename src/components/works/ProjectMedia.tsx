@@ -56,10 +56,10 @@ export function ProjectMedia({
         />
       </motion.div>
 
-      {/* Video Hover Overlay with Sleek Play Button */}
+      {/* Video Hover Overlay with Sleek Play Button (always visible on mobile/touch, hover-revealed on desktop) */}
       {isVideo && (
-        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white text-black flex items-center justify-center text-xl sm:text-2xl pl-1 shadow-2xl transition-transform duration-300 group-hover:scale-110">
+        <div className="absolute inset-0 bg-black/20 md:bg-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/95 md:bg-white text-black flex items-center justify-center text-lg sm:text-2xl pl-1 shadow-2xl transition-transform duration-300 group-hover:scale-110">
             ▶
           </div>
         </div>

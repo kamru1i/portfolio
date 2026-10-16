@@ -31,7 +31,7 @@ export function CurtainFooter() {
     return () => clearInterval(interval);
   }, []);
 
-  // Iridescent Liquid Chrome Wordmark Shader Canvas
+  // Iridescent Liquid Chrome Wordmark Shader Canvas (cross-browser & iOS Safari WebKit safe)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -39,26 +39,55 @@ export function CurtainFooter() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    let width = (canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1));
-    let height = (canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1));
+    const getDpr = () => Math.min(window.devicePixelRatio || 1, 2);
+    let width = (canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * getDpr())));
+    let height = (canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * getDpr())));
 
     const handleResize = () => {
       if (!canvas) return;
-      const dpr = window.devicePixelRatio || 1;
-      width = canvas.width = canvas.offsetWidth * dpr;
-      height = canvas.height = canvas.offsetHeight * dpr;
+      const dpr = getDpr();
+      width = canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * dpr));
+      height = canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * dpr));
     };
     window.addEventListener("resize", handleResize);
+
+    if (typeof document !== "undefined" && "fonts" in document) {
+      document.fonts.ready.then(() => {
+        handleResize();
+      }).catch(() => {});
+    }
 
     let t = 0;
     const render = () => {
       t += 0.02;
-      ctx.clearRect(0, 0, width, height);
-
       const w = width;
       const h = height;
 
-      // Base silver / chrome metallic gradient
+      ctx.clearRect(0, 0, w, h);
+
+      // Measure "KAMRUL ISLAM" safely at a 100px reference size (always < WebKit 256px glyph limit)
+      const refSize = 100;
+      ctx.font = `400 ${refSize}px Gambarino, serif`;
+      const measuredRefWidth = ctx.measureText("KAMRUL ISLAM").width;
+      const safeRefWidth = measuredRefWidth > 10 ? measuredRefWidth : refSize * 6.5;
+      const fontSize = Math.max(
+        16,
+        Math.floor(Math.min(h * 0.82, refSize * ((w * 0.96) / safeRefWidth)))
+      );
+
+      // Step 1: Draw the "KAMRUL ISLAM" glyph mask FIRST onto the cleared canvas (alpha = 1 inside letters, 0 outside)
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `400 ${fontSize}px Gambarino, serif`;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("KAMRUL ISLAM", w * 0.5, h * 0.52);
+      ctx.restore();
+
+      // Step 2: Paint base silver / chrome metallic gradient ONLY where glyph alpha > 0 (source-atop)
+      ctx.save();
+      ctx.globalCompositeOperation = "source-atop";
       const grad = ctx.createLinearGradient(0, 0, w, h);
       grad.addColorStop(0, "#f0f0f4");
       grad.addColorStop(0.2, "#8c8c96");
@@ -69,14 +98,11 @@ export function CurtainFooter() {
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
 
-      // Chromatic dispersion ripples
+      // Chromatic dispersion ripples locked strictly inside the glyph alpha mask
       for (let i = 0; i < 4; i++) {
-        ctx.save();
-        ctx.globalCompositeOperation = "color-dodge";
         ctx.beginPath();
-
         const hue = (t * 22 + i * 85) % 360;
-        ctx.fillStyle = `hsla(${hue}, 85%, 65%, 0.38)`;
+        ctx.fillStyle = `hsla(${hue}, 85%, 68%, 0.34)`;
 
         for (let x = 0; x <= w; x += 16) {
           const y =
@@ -90,44 +116,23 @@ export function CurtainFooter() {
         ctx.lineTo(0, h);
         ctx.closePath();
         ctx.fill();
-        ctx.restore();
       }
 
-      // Specular shine sweep across letters
-      ctx.save();
-      ctx.globalCompositeOperation = "screen";
+      // Specular shine sweep across letters locked strictly inside the glyph alpha mask
       const sweepX = ((Math.sin(t * 0.7) + 1) * 0.5) * w;
       const sweepGrad = ctx.createRadialGradient(
         sweepX,
         h * 0.5,
-        15,
+        10,
         sweepX,
         h * 0.5,
         w * 0.45
       );
-      sweepGrad.addColorStop(0, "rgba(255, 255, 255, 0.85)");
-      sweepGrad.addColorStop(0.5, "rgba(210, 230, 255, 0.25)");
-      sweepGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      sweepGrad.addColorStop(0, "rgba(255, 255, 255, 0.78)");
+      sweepGrad.addColorStop(0.5, "rgba(210, 230, 255, 0.22)");
+      sweepGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
       ctx.fillStyle = sweepGrad;
       ctx.fillRect(0, 0, w, h);
-      ctx.restore();
-
-      // Step 2: Mask with the giant wordmark "KAMRUL ISLAM" spanning ~96% width
-      ctx.save();
-      ctx.globalCompositeOperation = "destination-in";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      // Dynamically calculate font size so wordmark spans edge-to-edge
-      let fontSize = h * 0.88;
-      ctx.font = `400 ${fontSize}px Gambarino, serif`;
-      let textWidth = ctx.measureText("KAMRUL ISLAM").width;
-      if (textWidth > w * 0.96) {
-        fontSize = fontSize * ((w * 0.96) / textWidth);
-        ctx.font = `400 ${fontSize}px Gambarino, serif`;
-      }
-
-      ctx.fillText("KAMRUL ISLAM", w * 0.5, h * 0.52);
       ctx.restore();
 
       // Step 3: Beveled metallic edge stroke
@@ -181,22 +186,22 @@ export function CurtainFooter() {
       </div>
 
       {/* Patrick Jane Top Metadata Row */}
-      <div className="w-full flex items-center justify-between text-[#888] font-mono-custom text-xs pt-3 pb-2 border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <KamrulBrandWordmark className="h-4 w-auto inline-block text-white" />
+      <div className="w-full flex items-center justify-between gap-2 text-[#888] font-mono-custom text-[11px] sm:text-xs pt-3 pb-2 border-b border-white/5">
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <KamrulBrandWordmark className="h-3.5 sm:h-4 w-auto inline-block text-white" />
           <span className="text-[#555] hidden sm:inline">|</span>
           <span className="hidden sm:inline">Creative Technologist</span>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <span className="text-white/80">{timeStr}</span>
           </div>
 
           <a
             href={`mailto:${PORTFOLIO_DATA.brand.email}`}
-            className="hover-underline-link text-white/90 hover:text-white transition-colors hidden md:inline"
+            className="hover-underline-link text-white/90 hover:text-white transition-colors hidden md:inline whitespace-nowrap"
           >
             {PORTFOLIO_DATA.brand.email}
           </a>
@@ -204,7 +209,7 @@ export function CurtainFooter() {
       </div>
 
       {/* Giant Iridescent Chromatic Wordmark: Full Width Scale */}
-      <div className="relative w-full h-[140px] sm:h-[190px] md:h-[260px] lg:h-[300px] flex items-center justify-center my-auto">
+      <div className="relative w-full h-[80px] sm:h-[140px] md:h-[240px] lg:h-[290px] flex items-center justify-center my-auto">
         <canvas ref={canvasRef} className="w-full h-full block" />
       </div>
 

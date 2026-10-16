@@ -38,26 +38,42 @@ export function Rotating3DCylinder({
   const dragStateRef = useRef<{ active: boolean; x: number }>({ active: false, x: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  // Responsive spacing: 2 on desktop/tablet, 1 on mobile
+  // Responsive spacing & card dimensions across mobile, tablet, and desktop
   const [spacing, setSpacing] = useState<number>(2);
+  const [viewportWidth, setViewportWidth] = useState<number>(1280);
 
   // Use curated stock photography cards (easy to replace via hero-gallery-config.ts)
   const cards = items && items.length > 0 ? items : HERO_GALLERY_IMAGES;
 
   useEffect(() => {
     const handleResize = () => {
-      setSpacing(window.innerWidth < 768 ? 1 : 2);
+      const vw = window.innerWidth;
+      setViewportWidth(vw);
+      setSpacing(vw < 768 ? 1 : 2);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const activeWidth =
+    viewportWidth < 400
+      ? Math.round(imageWidth * 0.75) // 240px on 320–390px phones
+      : viewportWidth < 640
+      ? Math.round(imageWidth * 0.85) // 272px on 400–639px phones
+      : imageWidth;
+  const activeHeight =
+    viewportWidth < 400
+      ? Math.round(imageHeight * 0.77) // 300px on 320–390px phones
+      : viewportWidth < 640
+      ? Math.round(imageHeight * 0.86) // 335px on 400–639px phones
+      : imageHeight;
+
   const count = Math.max(cards.length, 1);
   const angleStep = 360 / count;
   const radius =
     count > 1
-      ? (imageWidth * (1 + spacing * 0.15)) / (2 * Math.tan(Math.PI / count))
+      ? (activeWidth * (1 + spacing * 0.15)) / (2 * Math.tan(Math.PI / count))
       : 0;
   const autoRotateSpeed = speed * 6; // 12 deg/sec clockwise
 
@@ -101,9 +117,8 @@ export function Rotating3DCylinder({
     };
   }, [radius, autoRotateSpeed]);
 
-  // Pointer Event Handlers matching exact reference implementation
+  // Pointer Event Handlers allowing vertical page scroll (pan-y) while supporting horizontal spin
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    e.preventDefault();
     try {
       e.currentTarget.setPointerCapture?.(e.pointerId);
     } catch {}
@@ -115,7 +130,6 @@ export function Rotating3DCylinder({
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!dragStateRef.current.active) return;
-      e.preventDefault();
 
       const deltaX = e.clientX - dragStateRef.current.x;
       dragStateRef.current.x = e.clientX;
@@ -140,13 +154,12 @@ export function Rotating3DCylinder({
       ref={containerRef}
       id="hero-3d-cylinder"
       data-testid="hero-3d-cylinder"
-      data-lenis-prevent
-      className={`relative w-full h-[390px] flex items-center justify-center overflow-hidden select-none ${
+      className={`relative w-full h-[310px] sm:h-[360px] md:h-[390px] flex items-center justify-center overflow-hidden select-none ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       }`}
       style={{
         perspective: `${perspective}px`,
-        touchAction: "none",
+        touchAction: "pan-y",
         background: "rgba(0, 0, 0, 0)",
       }}
       onPointerDown={handlePointerDown}
@@ -160,7 +173,7 @@ export function Rotating3DCylinder({
         aria-hidden="true"
       >
         <div
-          className="w-[440px] h-[440px] rounded-full blur-[100px] opacity-20"
+          className="w-[300px] sm:w-[440px] h-[300px] sm:h-[440px] rounded-full blur-[100px] opacity-20"
           style={{
             background:
               "radial-gradient(circle, rgba(30, 80, 200, 0.4) 0%, rgba(200, 90, 20, 0.15) 50%, transparent 75%)",
@@ -180,8 +193,8 @@ export function Rotating3DCylinder({
           ref={cylinderRef}
           style={{
             position: "relative",
-            width: `${imageWidth}px`,
-            height: `${imageHeight}px`,
+            width: `${activeWidth}px`,
+            height: `${activeHeight}px`,
             transformStyle: "preserve-3d",
             willChange: "transform",
           }}

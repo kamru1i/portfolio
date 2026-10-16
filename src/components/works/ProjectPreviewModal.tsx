@@ -350,10 +350,10 @@ function ProjectPreviewModalContent({
                   </div>
 
                   {/* Browser Window Body */}
-                  <div className="relative min-h-[260px] sm:min-h-[360px] max-h-[500px] overflow-hidden bg-[#0c0d12] flex items-center justify-center">
+                  <div className="relative min-h-[220px] sm:min-h-[360px] sm:max-h-[500px] overflow-hidden bg-[#0c0d12] flex flex-col sm:flex-row items-center justify-center">
                     {previewImage ? (
                       /* Display valid project artwork / screenshot */
-                      <div className="relative w-full h-[260px] sm:h-[360px] lg:h-[420px] overflow-hidden group">
+                      <div className="relative w-full h-[200px] sm:h-[360px] lg:h-[420px] overflow-hidden group">
                         <img
                           src={previewImage}
                           alt={`${project.title} homepage preview`}
@@ -363,18 +363,18 @@ function ProjectPreviewModalContent({
                       </div>
                     ) : (
                       /* Branded Layout when no screenshot image is uploaded */
-                      <div className="p-8 sm:p-12 text-center flex flex-col items-center justify-center max-w-lg">
-                        <div className="w-16 h-16 rounded-2xl bg-white/[0.06] border border-white/15 flex items-center justify-center mb-4 shadow-xl">
+                      <div className="p-6 sm:p-12 text-center flex flex-col items-center justify-center max-w-lg">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/[0.06] border border-white/15 flex items-center justify-center mb-3 sm:mb-4 shadow-xl">
                           <img
                             src={faviconUrl}
                             alt=""
-                            className="w-8 h-8 rounded-lg object-contain"
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-contain"
                             onError={(e) => {
                               e.currentTarget.style.display = "none";
                             }}
                           />
                         </div>
-                        <h4 className="font-sans font-medium text-xl sm:text-2xl text-white mb-2">
+                        <h4 className="font-sans font-medium text-lg sm:text-2xl text-white mb-1.5 sm:mb-2">
                           {project.title}
                         </h4>
                         <p className="font-mono-custom text-xs text-[#999] leading-relaxed">
@@ -384,13 +384,13 @@ function ProjectPreviewModalContent({
                     )}
 
                     {/* Informative Security Overlay / Banner at bottom of preview */}
-                    <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-black/80 backdrop-blur-md border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xl">
+                    <div className="relative sm:absolute sm:bottom-4 sm:left-4 sm:right-4 w-full sm:w-auto p-3.5 sm:p-4 sm:rounded-xl bg-black/90 sm:bg-black/80 backdrop-blur-md border-t sm:border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xl">
                       <div className="flex items-center gap-3 min-w-0 text-center sm:text-left">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0 hidden xs:flex sm:flex">
                           🛡️
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center justify-center sm:justify-start gap-2">
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                             <span className="font-sans font-medium text-xs sm:text-sm text-white">
                               Cloudflare & Browser Security Protected
                             </span>
@@ -398,7 +398,7 @@ function ProjectPreviewModalContent({
                               Active
                             </span>
                           </div>
-                          <p className="font-mono-custom text-[11px] text-[#999] truncate max-w-md mt-0.5">
+                          <p className="font-mono-custom text-[11px] text-[#999] sm:truncate max-w-md mt-0.5">
                             Cross-origin nesting protected. Inspect the live application in a standalone tab.
                           </p>
                         </div>

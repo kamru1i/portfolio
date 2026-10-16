@@ -12,7 +12,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ isRevealed = true }: HeroSectionProps) {
   return (
-    <section id="hero" className="relative w-full min-h-[100svh] flex flex-col items-center justify-center pt-28 sm:pt-32 md:pt-36 lg:pt-36 2xl:pt-0 pb-12 sm:pb-16 lg:pb-16 2xl:pb-0 px-4 overflow-hidden">
+    <section id="hero" className="relative w-full min-h-[100svh] flex flex-col items-center justify-center pt-24 sm:pt-32 md:pt-36 lg:pt-36 2xl:pt-0 pb-10 sm:pb-16 lg:pb-16 2xl:pb-0 overflow-hidden">
       {/* Coordinated Editorial Hero Composition: Title -> Subtitle -> 3D Cylinder */}
       <div className="w-full flex flex-col items-center my-auto">
         {/* Massive Editorial Display Wordmark with Typographic Scramble-Resolution Reveal */}
@@ -21,7 +21,7 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
         </div>
 
       {/* Subtitle Statement: Coordinated Scramble-Resolution Sequence */}
-      <div className="mt-7 md:mt-8 max-w-[680px] px-4 text-center select-none">
+      <div className="mt-6 sm:mt-7 md:mt-8 max-w-[680px] px-1 sm:px-4 text-center select-none">
         <ScrambleRevealText
           text={PORTFOLIO_DATA.hero.subtitle}
           isRevealed={isRevealed}
@@ -32,7 +32,7 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
           tickSpeed={35}
           resolvedColor="#a1a1a1"
           scrambleColor="#ffffff"
-          className="font-mono-custom text-[14px] sm:text-[16px] leading-[1.4] text-center select-none"
+          className="font-mono-custom text-[13px] sm:text-[16px] leading-[1.45] text-center select-none"
         />
       </div>
 

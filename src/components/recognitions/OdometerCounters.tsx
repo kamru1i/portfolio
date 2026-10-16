@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { StatItem } from "@/lib/portfolio-data";
 
 export function OdometerCounters({ stats }: { stats: StatItem[] }) {
@@ -11,7 +11,7 @@ export function OdometerCounters({ stats }: { stats: StatItem[] }) {
   return (
     <div
       ref={containerRef}
-      className="w-full grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-start select-none"
+      className="w-full grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-12 md:gap-8 items-center md:items-start select-none"
     >
       {stats.map((stat, i) => (
         <CounterColumn key={i} stat={stat} index={i} triggered={isInView} />
@@ -32,9 +32,9 @@ function CounterColumn({
   const digits = String(stat.target).split("");
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-center text-center md:items-start md:text-left">
       {/* Rolling Digits Display in Gambarino 120px */}
-      <div className="font-gambarino text-7xl sm:text-8xl md:text-[100px] lg:text-[120px] text-white leading-none tracking-[-0.02em] flex items-center select-none overflow-hidden h-[1em]">
+      <div className="font-gambarino text-7xl sm:text-8xl md:text-[100px] lg:text-[120px] text-white leading-none tracking-[-0.02em] flex items-center justify-center md:justify-start select-none overflow-hidden h-[1em]">
         <div className="inline-flex items-center">
           {digits.map((digit, dIdx) => (
             <DigitReel
@@ -51,7 +51,7 @@ function CounterColumn({
       </div>
 
       {/* Label in Roboto Mono 16px */}
-      <span className="font-mono-custom text-[15px] sm:text-[16px] text-[#a1a1a1] mt-4 tracking-wide">
+      <span className="font-mono-custom text-[15px] sm:text-[16px] text-[#a1a1a1] mt-3 sm:mt-4 tracking-wide">
         {stat.label}
       </span>
     </div>
@@ -67,19 +67,24 @@ function DigitReel({
   triggered: boolean;
   delay?: number;
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   return (
     <div className="relative inline-block overflow-hidden h-[1em] leading-[1em]">
       <motion.div
         className="flex flex-col will-change-transform"
-        initial={{ y: "0em" }}
-        animate={{ y: triggered ? `-${targetDigit}em` : "0em" }}
-        transition={{
-          duration: 1.8,
-          delay,
-          ease: [0.16, 1, 0.3, 1], // Expo-out rolling curve
-        }}
+        initial={{ y: shouldReduceMotion ? `-${targetDigit}em` : "0em" }}
+        animate={{ y: triggered || shouldReduceMotion ? `-${targetDigit}em` : "0em" }}
+        transition={
+          shouldReduceMotion
+            ? { duration: 0 }
+            : {
+                duration: 1.8,
+                delay,
+                ease: [0.16, 1, 0.3, 1], // Expo-out rolling curve
+              }
+        }
       >
         {numbers.map((n) => (
           <span

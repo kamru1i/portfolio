@@ -71,31 +71,40 @@ export function AwardsSection() {
               <EditorialListCard
                 isHovered={isHovered}
                 isDimmed={isAnyHovered && !isHovered}
-                onMouseEnter={() => setHoveredIdx(idx)}
-                className="py-6 sm:py-7 md:py-8 px-5 sm:px-8 cursor-pointer"
+                onMouseEnter={() => {
+                  if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+                    setHoveredIdx(idx);
+                  }
+                }}
+                className="py-5 sm:py-7 md:py-8 px-5 sm:px-8 cursor-pointer"
               >
-                <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8">
-                  {/* Left Column: Year & Period */}
-                  <div className="w-[120px] sm:w-[150px] md:w-[180px] flex-shrink-0 flex items-center gap-3">
-                    <span className="font-mono-custom text-sm sm:text-base text-white/90 font-medium tracking-wider">
-                      {item.year}
+                <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 md:gap-8">
+                  {/* Top Row on Mobile / Left Column on Desktop: Year & Period + Mobile Index */}
+                  <div className="w-full md:w-[180px] md:flex-shrink-0 flex items-center justify-between md:justify-start gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono-custom text-sm sm:text-base text-white/90 font-medium tracking-wider">
+                        {item.year}
+                      </span>
+                      <span className="h-px w-6 bg-white/20 hidden sm:inline-block" />
+                    </div>
+                    <span className="md:hidden font-mono-custom text-xs sm:text-sm text-[#666] group-hover:text-white transition-colors">
+                      {String(idx + 1).padStart(2, "0")}
                     </span>
-                    <span className="h-px w-6 bg-white/20 hidden sm:inline-block" />
                   </div>
 
                   {/* Center / Main Column: Organization & Role Hierarchy */}
-                  <div className="flex-1 flex flex-col justify-center">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       <span className="font-mono-custom text-xs uppercase tracking-widest text-[#888] group-hover:text-emerald-400/90 transition-colors">
                         {item.organization}
                       </span>
-                      <span className="font-mono-custom text-[10px] px-2 py-0.2 rounded-full bg-white/5 border border-white/10 text-white/50 group-hover:text-white/80 transition-colors">
+                      <span className="font-mono-custom text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/50 group-hover:text-white/80 transition-colors shrink-0">
                         {item.type === "education" ? "Education" : "Career Role"}
                       </span>
                     </div>
                     <h3 className="font-sans text-xl sm:text-2xl md:text-3xl text-white font-normal tracking-tight transition-colors group-hover:text-white flex items-center gap-2">
                       <span>{item.role}</span>
-                      <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-emerald-400 text-lg">
+                      <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-emerald-400 text-lg hidden sm:inline">
                         →
                       </span>
                     </h3>
@@ -104,8 +113,8 @@ export function AwardsSection() {
                     </p>
                   </div>
 
-                  {/* Right Column: Index Numbering */}
-                  <div className="w-[40px] sm:w-[60px] text-right flex-shrink-0 font-mono-custom text-sm sm:text-base text-[#666] group-hover:text-white transition-colors">
+                  {/* Right Column: Index Numbering (Desktop) */}
+                  <div className="hidden md:block w-[60px] text-right flex-shrink-0 font-mono-custom text-base text-[#666] group-hover:text-white transition-colors">
                     {String(idx + 1).padStart(2, "0")}
                   </div>
                 </div>

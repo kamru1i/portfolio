@@ -19,9 +19,9 @@ export function PatrickJaneSelectedWorks({
   return (
     <div className="w-full flex flex-col gap-24 sm:gap-32 md:gap-40 pb-16 select-none">
       {/* Row 1: Card 1 (Left 352px / 3-cols) + Card 2 (Right 704px / 6-cols col-start-7) */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-12 sm:gap-16 md:gap-0 items-start">
         {displayedProjects[0] && (
-          <div className="col-span-12 md:col-span-3">
+          <div className="col-span-1 md:col-span-3 min-w-0">
             <WorkCard
               project={displayedProjects[0]}
               isLarge={false}
@@ -31,7 +31,7 @@ export function PatrickJaneSelectedWorks({
         )}
 
         {displayedProjects[1] && (
-          <div className="col-span-12 md:col-span-6 md:col-start-7">
+          <div className="col-span-1 md:col-span-6 md:col-start-7 min-w-0">
             <WorkCard
               project={displayedProjects[1]}
               isLarge={true}
@@ -43,8 +43,8 @@ export function PatrickJaneSelectedWorks({
 
       {/* Row 2: Card 3 (Centered 704px / 6-cols col-start-4) */}
       {displayedProjects[2] && (
-        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
-          <div className="col-span-12 md:col-span-6 md:col-start-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-12 sm:gap-16 md:gap-0 items-start">
+          <div className="col-span-1 md:col-span-6 md:col-start-4 min-w-0">
             <WorkCard
               project={displayedProjects[2]}
               isLarge={true}
@@ -56,9 +56,9 @@ export function PatrickJaneSelectedWorks({
 
       {/* Row 3: Card 4 (Left 704px / 6-cols) + Card 5 (Right 352px / 3-cols col-start-10) with Explore More */}
       {(displayedProjects[3] || displayedProjects[4]) && (
-        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-0 items-start">
+        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-12 sm:gap-16 md:gap-0 items-start">
           {displayedProjects[3] && (
-            <div className="col-span-12 md:col-span-6">
+            <div className="col-span-1 md:col-span-6 min-w-0">
               <WorkCard
                 project={displayedProjects[3]}
                 isLarge={true}
@@ -68,7 +68,7 @@ export function PatrickJaneSelectedWorks({
           )}
 
           {displayedProjects[4] && (
-            <div className="col-span-12 md:col-span-3 md:col-start-10 flex flex-col justify-between">
+            <div className="col-span-1 md:col-span-3 md:col-start-10 min-w-0 flex flex-col justify-between">
               <WorkCard
                 project={displayedProjects[4]}
                 isLarge={false}
@@ -76,7 +76,7 @@ export function PatrickJaneSelectedWorks({
               />
 
               {/* Dedicated Explore More Action for Video Projects */}
-              <div className="mt-14 sm:mt-20 pt-1">
+              <div className="mt-10 sm:mt-16 md:mt-20 pt-1">
                 <Link
                   href="/projects?type=video"
                   className="group inline-flex items-center gap-2 font-mono-custom text-[15px] sm:text-[16px] text-white hover:text-white/80 hover-underline-link tracking-normal transition-colors"

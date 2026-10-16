@@ -63,7 +63,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
       <Navigation isRevealed={true} />
 
       {/* Main Detail Canvas */}
-      <main className="relative z-10 w-full bg-black min-h-screen text-white pt-32 sm:pt-36 md:pt-40 pb-24 mb-[450px] md:mb-[510px] lg:mb-[634px] shadow-[0_40px_80px_rgba(0,0,0,0.95)]">
+      <main className="relative z-10 w-full bg-black min-h-screen text-white pt-32 sm:pt-36 md:pt-40 pb-24 mb-[520px] sm:mb-[580px] md:mb-[640px] lg:mb-[700px] shadow-[0_40px_80px_rgba(0,0,0,0.95)] overflow-x-clip">
         <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 md:px-12 lg:px-16">
           {/* Breadcrumb / Back Navigation */}
           <div className="mb-8 sm:mb-12">

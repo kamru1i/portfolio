@@ -5,13 +5,13 @@
  */
 
 export const MODAL_BACKDROP_CLASSES =
-  "fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 pt-24 sm:pt-24 md:pt-24 pb-4 sm:pb-6 bg-black/85 backdrop-blur-md overflow-hidden";
+  "fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 pt-16 sm:pt-20 md:pt-24 pb-3 sm:pb-6 bg-black/85 backdrop-blur-md overflow-hidden";
 
 export const MODAL_OUTER_SHELL_CLASSES =
-  "relative w-full max-w-5xl xl:max-w-6xl h-[76vh] h-[76dvh] max-h-[720px] min-h-[380px] sm:min-h-[460px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto";
+  "relative w-full max-w-5xl xl:max-w-6xl h-[80vh] h-[80dvh] sm:h-[76vh] sm:h-[76dvh] max-h-[calc(100dvh-5rem)] sm:max-h-[720px] min-h-[280px] sm:min-h-[420px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto";
 
 export const MODAL_VIDEO_SHELL_CLASSES =
-  "relative w-full max-w-5xl h-[76vh] h-[76dvh] max-h-[720px] min-h-[380px] sm:min-h-[460px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto";
+  "relative w-full max-w-5xl h-[80vh] h-[80dvh] sm:h-[76vh] sm:h-[76dvh] max-h-[calc(100dvh-5rem)] sm:max-h-[720px] min-h-[280px] sm:min-h-[420px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto";
 
 /**
  * Truncates title to approximately maxWords (default: 5) words with an ellipsis.
@@ -72,12 +72,12 @@ export function computeAspectModalDimensions(
   viewportHeight: number = 1080
 ): ModalDimensions {
   const headerHeight = 52;
-  const paddingX = viewportWidth < 640 ? 24 : 32;
-  const maxViewportW = Math.max(320, viewportWidth - paddingX);
+  const paddingX = viewportWidth < 640 ? 20 : 32;
+  const maxViewportW = Math.max(260, viewportWidth - paddingX);
 
   // Outer modal height matches the shared strategy: min(720px, 76dvh)
-  const targetMaxModalH = Math.min(720, Math.round(viewportHeight * 0.76));
-  const maxAvailableMediaH = Math.max(200, targetMaxModalH - headerHeight);
+  const targetMaxModalH = Math.min(720, Math.round(viewportHeight * 0.78));
+  const maxAvailableMediaH = Math.max(180, targetMaxModalH - headerHeight);
 
   const ratio = getAspectRatioMultiplier(format);
 
@@ -86,8 +86,8 @@ export function computeAspectModalDimensions(
   const mediaHeight = Math.round(Math.min(maxAvailableMediaH, maxMediaHFromWidth));
   const mediaWidth = Math.round(mediaHeight * ratio);
 
-  // Minimum header width so controls fit gracefully
-  const minHeaderW = Math.min(maxViewportW, format === "9:16" ? 360 : 420);
+  // Minimum header width so controls fit gracefully without exceeding narrow 320px viewports
+  const minHeaderW = Math.min(maxViewportW, format === "9:16" ? 320 : 380);
   const modalWidth = Math.max(minHeaderW, mediaWidth);
   const modalHeight = mediaHeight + headerHeight;
 

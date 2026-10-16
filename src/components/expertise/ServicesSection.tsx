@@ -80,27 +80,36 @@ export function ServicesSection() {
               href={service.href}
               isHovered={isHovered}
               isDimmed={isAnyHovered && !isHovered}
-              onMouseEnter={() => setHoveredId(service.id)}
+              onMouseEnter={() => {
+                if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+                  setHoveredId(service.id);
+                }
+              }}
               onMouseMove={handleMouseMove}
               ariaLabel={`${service.title} - View details`}
-              className="min-h-[100px] sm:min-h-[120px] md:min-h-[130px] flex items-center"
+              className="min-h-[96px] sm:min-h-[116px] md:min-h-[130px] flex items-center"
             >
-              {/* Idle State: Clean Minimal Editorial Row inside Card */}
-              <div className="w-full py-6 sm:py-8 md:py-9 px-5 sm:px-8 flex items-center justify-between text-white group cursor-pointer">
-                {/* Left Category Label */}
-                <div className="w-[120px] sm:w-[180px] md:w-[220px] flex-shrink-0 text-[#777] font-mono-custom text-xs sm:text-sm tracking-widest uppercase transition-colors group-hover:text-white/80">
-                  {service.category}
+              {/* Idle State: Mobile Stacked Header + Full-Width Title / Desktop 3-Column Editorial Row */}
+              <div className="w-full py-5 sm:py-7 md:py-9 px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3 md:gap-4 text-white group cursor-pointer">
+                {/* Top Row on Mobile / Left Column on Desktop: Category Label + Mobile Index */}
+                <div className="w-full md:w-[200px] lg:w-[220px] md:flex-shrink-0 flex items-center justify-between">
+                  <span className="text-[#777] font-mono-custom text-[11px] sm:text-xs md:text-sm tracking-widest uppercase transition-colors group-hover:text-white/80">
+                    {service.category}
+                  </span>
+                  <span className="md:hidden text-[#777] font-mono-custom text-xs sm:text-sm transition-colors group-hover:text-white">
+                    {service.index}
+                  </span>
                 </div>
 
-                {/* Center Title */}
-                <div className="flex-1 text-center md:text-center px-4">
-                  <h3 className="font-sans text-2xl sm:text-4xl md:text-5xl lg:text-5xl text-white font-normal tracking-tight transition-transform duration-200 group-hover:scale-[1.01]">
+                {/* Main Service Title: Full width on mobile, centered on desktop */}
+                <div className="w-full md:flex-1 text-left md:text-center md:px-4">
+                  <h3 className="font-sans text-xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-normal tracking-tight leading-snug md:leading-tight transition-transform duration-200 group-hover:scale-[1.01]">
                     {service.title}
                   </h3>
                 </div>
 
-                {/* Right Index */}
-                <div className="w-[40px] sm:w-[60px] text-right flex-shrink-0 text-[#777] font-mono-custom text-sm sm:text-base transition-colors group-hover:text-white">
+                {/* Right Index (Desktop) */}
+                <div className="hidden md:block w-[60px] text-right flex-shrink-0 text-[#777] font-mono-custom text-base transition-colors group-hover:text-white">
                   {service.index}
                 </div>
               </div>

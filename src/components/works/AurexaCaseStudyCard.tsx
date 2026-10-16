@@ -61,9 +61,7 @@ export function AurexaCaseStudyCard({
       ref={containerRef}
       data-project-id={project.id}
       onClick={() => {
-        if (project.liveUrl) {
-          onPreviewWeb(project);
-        }
+        onPreviewWeb(project);
       }}
       className="relative group w-full h-[450px] sm:h-[460px] lg:h-[470px] xl:h-[485px] rounded-2xl sm:rounded-3xl border border-white/10 hover:border-white/25 bg-[#0e0e0e] overflow-hidden select-none cursor-pointer transition-all duration-500 shadow-[0_12px_40px_rgba(0,0,0,0.5)] flex flex-col justify-between"
     >

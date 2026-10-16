@@ -55,7 +55,7 @@ export function ManifestoSection() {
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
           transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
-          className="col-span-12 md:col-span-5 relative w-full aspect-square max-w-[420px] select-none mx-auto md:mx-0 flex items-center justify-center"
+          className="col-span-1 md:col-span-5 min-w-0 relative w-full aspect-square max-w-[300px] sm:max-w-[360px] md:max-w-[420px] select-none mx-auto md:mx-0 flex items-center justify-center"
         >
           <Image
             src={PORTFOLIO_DATA.manifesto.portraitSrc}
@@ -63,13 +63,13 @@ export function ManifestoSection() {
             width={420}
             height={420}
             className="w-full h-auto max-h-[440px] object-contain"
-            sizes="(max-width: 768px) 340px, 420px"
+            sizes="(max-width: 640px) 300px, (max-width: 768px) 360px, 420px"
             priority
           />
         </motion.div>
 
         {/* Bio Paragraphs & Contact CTA (Right, col-start-7 for exact 563px width) */}
-        <div className="col-span-12 md:col-span-6 md:col-start-7 flex flex-col justify-start space-y-8 font-mono-custom text-[15px] sm:text-[16px] leading-[1.65] text-[#a1a1a1]">
+        <div className="col-span-1 md:col-span-6 md:col-start-7 min-w-0 w-full flex flex-col justify-start space-y-6 sm:space-y-8 font-mono-custom text-[15px] sm:text-[16px] leading-[1.65] text-[#a1a1a1] break-words">
           <p
             className="[&_strong]:text-white [&_strong]:font-medium"
             dangerouslySetInnerHTML={{
