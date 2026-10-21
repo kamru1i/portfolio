@@ -41,6 +41,7 @@ export async function generateMetadata({
       canonical: canonicalUrl,
     },
     openGraph: {
+      siteName: "Kamrul Islam",
       title: `Kamrul Islam — ${milestone.role} at ${milestone.organization}`,
       description: milestone.highlight,
       url: canonicalUrl,

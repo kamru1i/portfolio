@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   description:
     "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise. View selected projects and professional experience.",
-  applicationName: "Kamrul Islam Portfolio",
+  applicationName: "Kamrul Islam",
   authors: [
     {
       name: "Kamrul Islam",
@@ -237,8 +237,9 @@ const structuredData = {
     {
       "@type": "WebSite",
       "@id": "https://kamrulislam.me/#website",
-      url: "https://kamrulislam.me",
-      name: "Kamrul Islam | Portfolio",
+      url: "https://kamrulislam.me/",
+      name: "Kamrul Islam",
+      alternateName: ["Kamrul I", "Kamrul Islam Portfolio", "kamrulislam.me"],
       description:
         "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise.",
       publisher: {

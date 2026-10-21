@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     canonical: "https://kamrulislam.me/milestones/education",
   },
   openGraph: {
+    siteName: "Kamrul Islam",
     title: "Kamrul Islam — Academic Qualifications",
     description:
       "Comprehensive academic background, curriculum coursework, and certified degrees of Kamrul Islam.",

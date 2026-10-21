@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     canonical: "https://kamrulislam.me/cv",
   },
   openGraph: {
+    siteName: "Kamrul Islam",
     title: "Curriculum Vitae — Kamrul Islam (Kamrul I)",
     description:
       "View or download the official Curriculum Vitae of Kamrul Islam across Video Editing, AI-Assisted Content Creation, Web Development, and IT Support.",

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
   },
   openGraph: {
     url: "https://kamrulislam.me",
+    siteName: "Kamrul Islam",
+    title: "Kamrul Islam | Video Editor, AI Content Creator, Web Developer & IT Specialist",
+    description:
+      "Explore Kamrul Islam’s portfolio of cinematic video storytelling, AI-assisted content creation, full-stack web engineering, and enterprise IT infrastructure.",
+    type: "website",
+    locale: "en_US",
   },
 };
 
