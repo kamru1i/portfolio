@@ -17,8 +17,33 @@ export const metadata: Metadata = {
   },
 };
 
+const homeProfileJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": "https://kamrulislam.me/#profilepage",
+  url: "https://kamrulislam.me",
+  name: "Kamrul Islam (Kamrul I) — Official Portfolio",
+  description:
+    "Official portfolio of Kamrul Islam (Kamrul I) — Video Editor & Post-Production Specialist, AI-Assisted Content Creator, Web Developer, and IT Specialist.",
+  inLanguage: "en-US",
+  mainEntity: {
+    "@id": "https://kamrulislam.me/#person",
+  },
+  primaryImageOfPage: {
+    "@id": "https://kamrulislam.me/#portrait",
+  },
+};
+
 export default async function HomePage() {
   const initialProjects = await getPublishedProjects();
 
-  return <HomePageClient initialProjects={initialProjects} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeProfileJsonLd) }}
+      />
+      <HomePageClient initialProjects={initialProjects} />
+    </>
+  );
 }

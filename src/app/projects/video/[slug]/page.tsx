@@ -114,27 +114,55 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
   const format = project.format || "16:9";
   const playerContainerClasses = getVideoPlayerContainerClasses(format);
   const canonicalSlug = project.slug || project.id;
-  const breadcrumbJsonLd = {
+  const canonicalUrl = `https://kamrulislam.me/projects/video/${canonicalSlug}`;
+  const rawThumb = project.previewImageUrl || project.thumbnail || "/opengraph-image.jpg";
+  const absoluteThumbnailUrl = rawThumb.startsWith("http")
+    ? rawThumb
+    : `https://kamrulislam.me${rawThumb.startsWith("/") ? "" : "/"}${rawThumb}`;
+
+  const videoPageJsonLd = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://kamrulislam.me",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Projects & Works",
-        item: "https://kamrulislam.me/projects",
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
+        "@type": "VideoObject",
+        "@id": `${canonicalUrl}#video`,
         name: project.title,
-        item: `https://kamrulislam.me/projects/video/${canonicalSlug}`,
+        description: project.description || project.overview || `${project.title} — Video editing and post-production by Kamrul Islam.`,
+        thumbnailUrl: [absoluteThumbnailUrl],
+        uploadDate: project.publishedAt || "2025-01-01T00:00:00Z",
+        ...(embedUrl ? { embedUrl } : {}),
+        contentUrl: project.videoUrl || canonicalUrl,
+        creator: {
+          "@id": "https://kamrulislam.me/#person",
+        },
+        author: {
+          "@id": "https://kamrulislam.me/#person",
+        },
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://kamrulislam.me",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Projects & Works",
+            item: "https://kamrulislam.me/projects",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: project.title,
+            item: canonicalUrl,
+          },
+        ],
       },
     ],
   };
@@ -143,7 +171,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoPageJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />

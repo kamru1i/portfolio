@@ -79,27 +79,58 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
     (project.previewMode ? project.previewMode === "iframe" : project.canEmbed !== false) &&
     Boolean(project.liveUrl);
   const canonicalSlug = project.slug || project.id;
-  const breadcrumbJsonLd = {
+  const canonicalUrl = `https://kamrulislam.me/projects/web/${canonicalSlug}`;
+  const rawThumb = project.previewImageUrl || project.thumbnail || "/opengraph-image.jpg";
+  const absoluteThumbnailUrl = rawThumb.startsWith("http")
+    ? rawThumb
+    : `https://kamrulislam.me${rawThumb.startsWith("/") ? "" : "/"}${rawThumb}`;
+
+  const webProjectJsonLd = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://kamrulislam.me",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Projects & Works",
-        item: "https://kamrulislam.me/projects",
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
+        "@type": "CreativeWork",
+        "@id": `${canonicalUrl}#work`,
         name: project.title,
-        item: `https://kamrulislam.me/projects/web/${canonicalSlug}`,
+        headline: `${project.title} — Web Development Case Study by Kamrul Islam`,
+        description: project.description || project.overview,
+        url: canonicalUrl,
+        mainEntityOfPage: canonicalUrl,
+        image: absoluteThumbnailUrl,
+        author: {
+          "@id": "https://kamrulislam.me/#person",
+        },
+        creator: {
+          "@id": "https://kamrulislam.me/#person",
+        },
+        ...(project.tags && project.tags.length > 0
+          ? { keywords: project.tags.join(", ") }
+          : {}),
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://kamrulislam.me",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Projects & Works",
+            item: "https://kamrulislam.me/projects",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: project.title,
+            item: canonicalUrl,
+          },
+        ],
       },
     ],
   };
@@ -108,7 +139,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webProjectJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />

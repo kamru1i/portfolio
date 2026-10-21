@@ -178,12 +178,29 @@ const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "ImageObject",
+      "@id": "https://kamrulislam.me/#portrait",
+      url: "https://kamrulislam.me/images/Kamrul%20I.png",
+      contentUrl: "https://kamrulislam.me/images/Kamrul%20I.png",
+      name: "Kamrul Islam (Kamrul I) — Official Portrait",
+      caption:
+        "Kamrul Islam (Kamrul I) — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist",
+      creator: {
+        "@id": "https://kamrulislam.me/#person",
+      },
+      creditText: "Kamrul Islam",
+      copyrightNotice: "© Kamrul Islam",
+      representativeOfPage: true,
+    },
+    {
       "@type": "Person",
       "@id": "https://kamrulislam.me/#person",
       name: "Kamrul Islam",
       alternateName: ["Kamrul I", "Kamrul"],
       url: "https://kamrulislam.me",
-      image: "https://kamrulislam.me/images/Kamrul%20I.png",
+      image: {
+        "@id": "https://kamrulislam.me/#portrait",
+      },
       jobTitle: [
         "Video Editor",
         "AI-Assisted Content Creator",
@@ -246,6 +263,62 @@ const structuredData = {
         "@id": "https://kamrulislam.me/#person",
       },
       inLanguage: "en-US",
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://kamrulislam.me/#sitelinks",
+      name: "Main Navigation",
+      itemListElement: [
+        {
+          "@type": "SiteNavigationElement",
+          position: 1,
+          name: "Projects & Works",
+          description: "Video Editing, AI Content Creation & Web Development Case Studies",
+          url: "https://kamrulislam.me/projects",
+        },
+        {
+          "@type": "SiteNavigationElement",
+          position: 2,
+          name: "Curriculum Vitae (CV)",
+          description: "Official CV & Professional Resume of Kamrul Islam",
+          url: "https://kamrulislam.me/cv",
+        },
+        {
+          "@type": "SiteNavigationElement",
+          position: 3,
+          name: "Video Editing & Post-Production",
+          description: "Commercial video editing, color grading, and motion graphics services",
+          url: "https://kamrulislam.me/services/video-editing",
+        },
+        {
+          "@type": "SiteNavigationElement",
+          position: 4,
+          name: "AI-Assisted Content Creation",
+          description: "Generative AI video workflows and modern digital storytelling",
+          url: "https://kamrulislam.me/services/ai-assisted-content",
+        },
+        {
+          "@type": "SiteNavigationElement",
+          position: 5,
+          name: "Web Development",
+          description: "Full-stack Next.js, React, TypeScript & WordPress web engineering",
+          url: "https://kamrulislam.me/services/web-development",
+        },
+        {
+          "@type": "SiteNavigationElement",
+          position: 6,
+          name: "Academic Qualifications",
+          description: "BSc in Computer Science & Engineering and academic credentials",
+          url: "https://kamrulislam.me/milestones/education",
+        },
+        {
+          "@type": "SiteNavigationElement",
+          position: 7,
+          name: "Contact",
+          description: "Get in touch with Kamrul Islam via hello@kamrulislam.me",
+          url: "https://kamrulislam.me/contact-us",
+        },
+      ],
     },
   ],
 };

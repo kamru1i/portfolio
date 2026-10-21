@@ -59,7 +59,7 @@ export function ManifestoSection() {
         >
           <Image
             src={PORTFOLIO_DATA.manifesto.portraitSrc}
-            alt="Kamrul Islam"
+            alt="Kamrul Islam (Kamrul I) — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist"
             width={420}
             height={420}
             className="w-full h-auto max-h-[440px] object-contain"

@@ -69,21 +69,60 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
       (currentIndex + 1) % PORTFOLIO_DATA.services.length
     ];
 
-  const breadcrumbJsonLd = {
+  const canonicalUrl = `https://kamrulislam.me/services/${service.slug}`;
+  const servicePageJsonLd = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://kamrulislam.me",
+        "@type": "Service",
+        "@id": `${canonicalUrl}#service`,
+        name: service.title,
+        serviceType: service.category,
+        description: service.description,
+        url: canonicalUrl,
+        provider: {
+          "@id": "https://kamrulislam.me/#person",
+        },
+        areaServed: [
+          {
+            "@type": "Country",
+            name: "Bangladesh",
+          },
+          {
+            "@type": "Place",
+            name: "Worldwide",
+          },
+        ],
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: `${service.title} Capabilities`,
+          itemListElement: (service.bulletHighlights || []).map((hl, idx) => ({
+            "@type": "Offer",
+            position: idx + 1,
+            itemOffered: {
+              "@type": "Service",
+              name: hl,
+            },
+          })),
+        },
       },
       {
-        "@type": "ListItem",
-        position: 2,
-        name: service.title,
-        item: `https://kamrulislam.me/services/${service.slug}`,
+        "@type": "BreadcrumbList",
+        "@id": `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://kamrulislam.me",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: service.title,
+            item: canonicalUrl,
+          },
+        ],
       },
     ],
   };
@@ -92,7 +131,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicePageJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
