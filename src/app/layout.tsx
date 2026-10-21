@@ -196,19 +196,60 @@ const structuredData = {
       "@type": "Person",
       "@id": "https://kamrulislam.me/#person",
       name: "Kamrul Islam",
-      alternateName: ["Kamrul I", "Kamrul"],
+      givenName: "Kamrul",
+      familyName: "Islam",
+      alternateName: [
+        "Kamrul I",
+        "Kamrul",
+        "Kam",
+        "Kamrul Islam Video Editor",
+        "Kamrul Islam Web Developer",
+        "Kamrul Islam IT Specialist",
+      ],
       url: "https://kamrulislam.me",
+      mainEntityOfPage: {
+        "@id": "https://kamrulislam.me/#profilepage",
+      },
       image: {
         "@id": "https://kamrulislam.me/#portrait",
       },
       jobTitle: [
-        "Video Editor",
+        "Video Editor & Post-Production Specialist",
         "AI-Assisted Content Creator",
-        "Web Developer",
-        "IT Professional",
+        "Full-Stack Web Developer",
+        "IT Specialist",
+      ],
+      hasOccupation: [
+        {
+          "@type": "Occupation",
+          name: "Video Editor",
+          occupationalCategory: "27-4032.00",
+          description:
+            "Commercial video editing, post-production, color grading, and motion graphics.",
+        },
+        {
+          "@type": "Occupation",
+          name: "AI-Assisted Content Creator",
+          description:
+            "AI-augmented video generation, script-to-screen storytelling, and multi-platform digital content creation.",
+        },
+        {
+          "@type": "Occupation",
+          name: "Web Developer",
+          occupationalCategory: "15-1254.00",
+          description:
+            "Full-stack web application development using Next.js, React, TypeScript, Tailwind CSS, and WordPress.",
+        },
+        {
+          "@type": "Occupation",
+          name: "IT Specialist",
+          occupationalCategory: "15-1232.00",
+          description:
+            "Enterprise IT infrastructure, network administration, system troubleshooting, and webmail/DNS management.",
+        },
       ],
       description:
-        "Explore Kamrul Islam’s portfolio of video editing, AI-assisted content creation, web development, WordPress projects, and IT expertise.",
+        "Kamrul Islam (Kamrul I) is a Video Editor, AI-Assisted Content Creator, Web Developer, and IT Specialist based in Chittagong, Bangladesh.",
       sameAs: [
         "https://www.linkedin.com/in/kamru1i/",
         "https://github.com/kamru1i",
@@ -226,6 +267,10 @@ const structuredData = {
       alumniOf: {
         "@type": "EducationalOrganization",
         name: "Port City International University (PCIU)",
+      },
+      nationality: {
+        "@type": "Country",
+        name: "Bangladesh",
       },
       knowsAbout: [
         "Commercial Video Editing",
