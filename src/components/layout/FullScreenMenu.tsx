@@ -16,7 +16,7 @@ const MENU_LINKS = [
   { label: "About", href: "/#about" },
   { label: "Services", href: "/#services" },
   { label: "Milestones", href: "/#recognitions" },
-  { label: "View CV", href: "/cv" },
+  { label: "Curriculum Vitae", href: "/cv" },
   { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/contact-us" },
 ];
