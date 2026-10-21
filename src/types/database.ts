@@ -113,6 +113,54 @@ export interface Database {
         };
         Relationships: [];
       };
+      cv_documents: {
+        Row: {
+          id: string;
+          title: string;
+          file_name: string;
+          storage_path: string;
+          file_url: string;
+          file_size: number;
+          mime_type: string;
+          version_label: string | null;
+          is_published: boolean;
+          published_at: string | null;
+          uploaded_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title?: string;
+          file_name: string;
+          storage_path: string;
+          file_url?: string;
+          file_size: number;
+          mime_type?: string;
+          version_label?: string | null;
+          is_published?: boolean;
+          published_at?: string | null;
+          uploaded_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          file_name?: string;
+          storage_path?: string;
+          file_url?: string;
+          file_size?: number;
+          mime_type?: string;
+          version_label?: string | null;
+          is_published?: boolean;
+          published_at?: string | null;
+          uploaded_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

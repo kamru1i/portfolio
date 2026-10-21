@@ -100,9 +100,6 @@ export const metadata: Metadata = {
   ],
   creator: "Kamrul Islam",
   publisher: "Kamrul Islam",
-  alternates: {
-    canonical: "https://kamrulislam.me",
-  },
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -206,8 +203,9 @@ const structuredData = {
       ],
       worksFor: {
         "@type": "Organization",
-        name: "Sterling Group of Industries / Tex Tech Co. / B&F Corporate",
+        name: "B&F Corporate",
       },
+      email: "mailto:hello@kamrulislam.me",
       alumniOf: {
         "@type": "EducationalOrganization",
         name: "Port City International University (PCIU)",

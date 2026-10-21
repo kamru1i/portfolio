@@ -35,14 +35,27 @@ export async function generateMetadata({
     };
   }
 
+  const canonicalSlug = project.slug || project.id;
+  const canonicalUrl = `https://kamrulislam.me/projects/video/${canonicalSlug}`;
+
   return {
-    title: `${project.title} (Video)`,
+    title: `${project.title} — Video Editing & Post-Production Case Study`,
     description: project.description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `Kamrul Islam — ${project.title} (Video)`,
       description: project.description,
+      url: canonicalUrl,
       type: "video.other",
       images: project.thumbnail ? [{ url: project.thumbnail }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Kamrul Islam — ${project.title} (Video)`,
+      description: project.description,
+      images: project.thumbnail ? [project.thumbnail] : undefined,
     },
   };
 }
@@ -99,9 +112,38 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
       project.videoType === "local");
   const format = project.format || "16:9";
   const playerContainerClasses = getVideoPlayerContainerClasses(format);
+  const canonicalSlug = project.slug || project.id;
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://kamrulislam.me",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Projects & Works",
+        item: "https://kamrulislam.me/projects",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: project.title,
+        item: `https://kamrulislam.me/projects/video/${canonicalSlug}`,
+      },
+    ],
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
 

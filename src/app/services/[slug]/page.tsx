@@ -29,13 +29,24 @@ export async function generateMetadata({
     };
   }
 
+  const canonicalUrl = `https://kamrulislam.me/services/${service.slug}`;
+
   return {
     title: service.title,
     description: service.description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `Kamrul Islam — ${service.title}`,
       description: service.headline,
+      url: canonicalUrl,
       type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Kamrul Islam — ${service.title}`,
+      description: service.headline,
     },
   };
 }
@@ -57,8 +68,31 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
       (currentIndex + 1) % PORTFOLIO_DATA.services.length
     ];
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://kamrulislam.me",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: service.title,
+        item: `https://kamrulislam.me/services/${service.slug}`,
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
 

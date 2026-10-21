@@ -7,6 +7,10 @@ import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 
 export const metadata: Metadata = {
   title: "Admin Portal",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function AdminDashboardLayout({
@@ -51,6 +55,12 @@ export default async function AdminDashboardLayout({
                 className="px-3 py-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
               >
                 + New Project
+              </Link>
+              <Link
+                href="/admin/cv"
+                className="px-3 py-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                CV / Resume
               </Link>
             </nav>
           </div>

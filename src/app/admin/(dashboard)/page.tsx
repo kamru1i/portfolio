@@ -158,13 +158,23 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <Link
-          href="/admin/projects/new"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 active:scale-95 transition-all shadow-sm flex-shrink-0"
-        >
-          <span className="text-base leading-none font-bold">+</span>
-          <span>Add New Project</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2.5 flex-shrink-0">
+          <Link
+            href="/admin/cv"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-all"
+          >
+            <span>📄</span>
+            <span>Manage CV / PDF</span>
+          </Link>
+
+          <Link
+            href="/admin/projects/new"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 active:scale-95 transition-all shadow-sm"
+          >
+            <span className="text-base leading-none font-bold">+</span>
+            <span>Add New Project</span>
+          </Link>
+        </div>
       </div>
 
       {/* Metrics Row */}

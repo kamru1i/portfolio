@@ -177,6 +177,7 @@ export function ScrambleRevealText({
         transition: "opacity 0.2s ease-out",
       }}
     >
+      <span className="sr-only">{text}</span>
       <span aria-hidden="true" className="contents">
         {words.map((word, wordIndex) => {
           const wordChars = word.split("");
@@ -202,13 +203,15 @@ export function ScrambleRevealText({
                     }}
                   >
                     {/* Invisible ghost character locking cell dimensions with zero layout shift */}
-                    <span className="invisible select-none pointer-events-none">
-                      {targetChar}
-                    </span>
+                    <span
+                      data-char={targetChar}
+                      className="invisible select-none pointer-events-none after:content-[attr(data-char)]"
+                    />
 
                     {/* Visible animated glyph strictly locked to cell bounds */}
                     <span
-                      className="absolute inset-0 flex items-center justify-center select-none"
+                      data-glyph={displayChar}
+                      className="absolute inset-0 flex items-center justify-center select-none after:content-[attr(data-glyph)]"
                       style={{
                         color: isResolved ? resolvedColor : scrambleColor,
                         transition: isResolved
@@ -216,9 +219,7 @@ export function ScrambleRevealText({
                           : "none",
                         filter: isResolved ? "none" : "brightness(0.95)",
                       }}
-                    >
-                      {displayChar}
-                    </span>
+                    />
                   </span>
                 );
               })}

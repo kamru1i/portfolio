@@ -6,14 +6,24 @@ import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
 
 export const metadata: Metadata = {
-  title: "Academic Qualifications",
+  title: "Academic Qualifications — BSc in Computer Science & Engineering",
   description:
     "Comprehensive academic records, degrees, and educational qualifications of Kamrul Islam, including BSc in Computer Science & Engineering, Higher Secondary Certificate (HSC), and Secondary School Certificate (SSC).",
+  alternates: {
+    canonical: "https://kamrulislam.me/milestones/education",
+  },
   openGraph: {
     title: "Kamrul Islam — Academic Qualifications",
     description:
       "Comprehensive academic background, curriculum coursework, and certified degrees of Kamrul Islam.",
+    url: "https://kamrulislam.me/milestones/education",
     type: "article",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kamrul Islam — Academic Qualifications",
+    description:
+      "Comprehensive academic background, curriculum coursework, and certified degrees of Kamrul Islam.",
   },
 };
 
@@ -24,8 +34,31 @@ export default function EducationQualificationsPage() {
     (m) => m.type === "education"
   );
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://kamrulislam.me",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Academic Qualifications",
+        item: "https://kamrulislam.me/milestones/education",
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
 

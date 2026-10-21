@@ -69,8 +69,8 @@ export function IntroCurtain({
           : { y: 0 }
       }
     >
-      <div className="flex flex-wrap items-center justify-center px-4 max-w-full">
-        <h1 className="font-gambarino text-4xl sm:text-6xl md:text-8xl lg:text-[100px] tracking-[-0.01em] uppercase text-white flex flex-wrap justify-center leading-[0.95em]">
+      <div className="flex flex-wrap items-center justify-center px-4 max-w-full" aria-hidden="true">
+        <div className="font-gambarino text-4xl sm:text-6xl md:text-8xl lg:text-[100px] tracking-[-0.01em] uppercase text-white flex flex-wrap justify-center leading-[0.95em]">
           {characters.map((char, index) => (
             <motion.span
               key={index}
@@ -97,7 +97,7 @@ export function IntroCurtain({
               {char === " " ? "\u00A0" : char}
             </motion.span>
           ))}
-        </h1>
+        </div>
       </div>
     </motion.div>
   );

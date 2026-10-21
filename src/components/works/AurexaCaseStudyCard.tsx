@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- Uses raw <img> with onError fallback for arbitrary external favicons and screenshots */
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { PortfolioProject } from "@/lib/portfolio-data";
 
 interface AurexaCaseStudyCardProps {
@@ -245,8 +246,16 @@ export function AurexaCaseStudyCard({
             </span>
           </div>
 
-          {/* Right: Rounded Square Arrow Action Button + Optional GitHub */}
+          {/* Right: Case Study Link + Optional GitHub + Preview Arrow Button */}
           <div className="flex items-center gap-2">
+            <Link
+              href={`/projects/web/${project.slug || project.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="px-2.5 h-8 sm:h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono-custom text-[11px] uppercase tracking-wider border border-white/10 transition-all flex items-center justify-center shadow-sm"
+            >
+              Details
+            </Link>
+
             {project.githubUrl && (
               <a
                 href={project.githubUrl}

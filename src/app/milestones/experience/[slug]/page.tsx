@@ -32,13 +32,24 @@ export async function generateMetadata({
     };
   }
 
+  const canonicalUrl = `https://kamrulislam.me/milestones/experience/${milestone.slug}`;
+
   return {
     title: `${milestone.role} at ${milestone.organization}`,
     description: milestone.highlight,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `Kamrul Islam — ${milestone.role} at ${milestone.organization}`,
       description: milestone.highlight,
+      url: canonicalUrl,
       type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Kamrul Islam — ${milestone.role} at ${milestone.organization}`,
+      description: milestone.highlight,
     },
   };
 }
@@ -59,8 +70,31 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
     experienceItems[(currentIndex + 1) % experienceItems.length] || experienceItems[0];
   const d = milestone.details || {};
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://kamrulislam.me",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: `${milestone.role} — ${milestone.organization}`,
+        item: `https://kamrulislam.me/milestones/experience/${milestone.slug}`,
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
 

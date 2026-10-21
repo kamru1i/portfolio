@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { PortfolioProject, ProjectItem } from "@/lib/portfolio-data";
 import { ProjectMedia } from "./ProjectMedia";
@@ -50,6 +51,10 @@ export function WorkCard({
 
   const isVideo = normalizedProject.type === "video";
   const isPortraitLarge = normalizedProject.format === "9:16" && isLarge;
+  const projectSlug = normalizedProject.slug || normalizedProject.id;
+  const detailHref = isVideo
+    ? `/projects/video/${projectSlug}`
+    : `/projects/web/${projectSlug}`;
 
   return (
     <div
@@ -71,9 +76,15 @@ export function WorkCard({
       />
 
       {/* Card Title - Pure Gambarino 22px matching Patrick Jane reference */}
-      <div className="mt-4 sm:mt-5 flex items-baseline justify-between">
+      <div className="mt-4 sm:mt-5 flex items-baseline justify-between gap-3">
         <h3 className="font-gambarino text-[20px] sm:text-[22px] font-normal leading-[1.2] text-white">
-          <span className="hover-underline-link">{normalizedProject.title}</span>
+          <Link
+            href={detailHref}
+            onClick={(e) => e.stopPropagation()}
+            className="hover-underline-link"
+          >
+            {normalizedProject.title}
+          </Link>
         </h3>
       </div>
     </div>

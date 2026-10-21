@@ -6,22 +6,55 @@ import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { ProjectsPageContent } from "@/components/works/ProjectsPageContent";
 
 export const metadata: Metadata = {
-  title: "Projects & Works Archive",
+  title: "Projects & Works Archive — Video Editing, AI Content & Web Development",
   description:
     "Explore the complete portfolio archive of video editing productions, AI-assisted content creations, responsive web applications, and digital systems by Kamrul Islam.",
+  alternates: {
+    canonical: "https://kamrulislam.me/projects",
+  },
   openGraph: {
     title: "Kamrul Islam — Projects & Works Archive",
     description:
       "Explore the complete portfolio archive of video editing productions, AI-assisted content creations, responsive web applications, and digital systems by Kamrul Islam.",
+    url: "https://kamrulislam.me/projects",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kamrul Islam — Projects & Works Archive",
+    description:
+      "Explore the complete portfolio archive of video editing productions, AI-assisted content creations, responsive web applications, and digital systems by Kamrul Islam.",
   },
 };
 
 export default async function ProjectsArchivePage() {
   const publishedProjects = await getPublishedProjects();
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://kamrulislam.me",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Projects & Works",
+        item: "https://kamrulislam.me/projects",
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
 

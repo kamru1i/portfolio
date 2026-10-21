@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { SectionBadge } from "@/components/common/SectionBadge";
@@ -106,42 +106,31 @@ export function FaqSection() {
                   </div>
                 </button>
 
-                {/* Smooth Animated Height & Opacity Collapsible Answer */}
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      id={`faq-panel-${item.id}`}
-                      role="region"
-                      aria-labelledby={`faq-btn-${item.id}`}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{
-                        height: "auto",
-                        opacity: 1,
-                        transition: {
-                          height: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] },
-                          opacity: { duration: 0.25, delay: 0.05 },
-                        },
-                      }}
-                      exit={{
-                        height: 0,
-                        opacity: 0,
-                        transition: {
-                          height: { duration: 0.25, ease: [0.25, 0.1, 0.25, 1] },
-                          opacity: { duration: 0.15 },
-                        },
-                      }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
-                        <div className="pt-3.5 border-t border-white/[0.06]">
-                          <p className="font-mono-custom text-[14px] sm:text-[15px] text-[#a1a1a1] leading-relaxed">
-                            {item.answer}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Smooth Animated Height & Opacity Collapsible Answer (always in DOM for SEO crawlability) */}
+                <motion.div
+                  id={`faq-panel-${item.id}`}
+                  role="region"
+                  aria-labelledby={`faq-btn-${item.id}`}
+                  aria-hidden={!isOpen}
+                  initial={false}
+                  animate={{
+                    height: isOpen ? "auto" : 0,
+                    opacity: isOpen ? 1 : 0,
+                  }}
+                  transition={{
+                    height: { duration: isOpen ? 0.35 : 0.25, ease: [0.25, 0.1, 0.25, 1] },
+                    opacity: { duration: isOpen ? 0.25 : 0.15, delay: isOpen ? 0.05 : 0 },
+                  }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
+                    <div className="pt-3.5 border-t border-white/[0.06]">
+                      <p className="font-mono-custom text-[14px] sm:text-[15px] text-[#a1a1a1] leading-relaxed">
+                        {item.answer}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
               </motion.div>
             );
           })}

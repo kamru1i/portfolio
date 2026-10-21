@@ -214,24 +214,30 @@ export function CurtainFooter() {
       </div>
 
       {/* Giant Central Navigation Links (Patrick Jane Editorial Hierarchy) */}
-      <div className="relative z-10 flex flex-col items-center justify-center space-y-2.5 sm:space-y-3.5 my-auto">
+      <div className="relative z-10 flex flex-col items-center justify-center space-y-1.5 sm:space-y-2.5 my-auto">
         <Link
           href="/#projects"
           onClick={(e) => handleAnchorClick(e, "/#projects")}
-          className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
+          className="font-gambarino text-xl sm:text-2xl md:text-[34px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           PROJECTS &amp; WORKS
         </Link>
         <Link
           href="/#about"
           onClick={(e) => handleAnchorClick(e, "/#about")}
-          className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
+          className="font-gambarino text-xl sm:text-2xl md:text-[34px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           ABOUT
         </Link>
         <Link
+          href="/cv"
+          className="font-gambarino text-xl sm:text-2xl md:text-[34px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
+        >
+          CURRICULUM VITAE
+        </Link>
+        <Link
           href="/contact-us"
-          className="font-gambarino text-2xl sm:text-3xl md:text-[38px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
+          className="font-gambarino text-xl sm:text-2xl md:text-[34px] uppercase text-white tracking-widest hover-underline-link transition-opacity hover:opacity-80"
         >
           CONTACT US
         </Link>

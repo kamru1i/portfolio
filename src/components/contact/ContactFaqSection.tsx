@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { SectionBadge } from "@/components/common/SectionBadge";
 
 interface ContactFaqItem {
@@ -116,24 +116,23 @@ export function ContactFaqSection() {
                 </div>
               </div>
 
-              {/* Answer Content Animated */}
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div className="pt-4 mt-4 border-t border-white/10">
-                      <p className="font-mono-custom text-sm sm:text-[15px] text-[#a1a1a1] leading-relaxed">
-                        {item.answer}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Answer Content Animated (always in DOM for SEO crawlability) */}
+              <motion.div
+                aria-hidden={!isOpen}
+                initial={false}
+                animate={{
+                  opacity: isOpen ? 1 : 0,
+                  height: isOpen ? "auto" : 0,
+                }}
+                transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 mt-4 border-t border-white/10">
+                  <p className="font-mono-custom text-sm sm:text-[15px] text-[#a1a1a1] leading-relaxed">
+                    {item.answer}
+                  </p>
+                </div>
+              </motion.div>
             </motion.div>
           );
         })}

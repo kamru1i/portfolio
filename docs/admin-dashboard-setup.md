@@ -56,7 +56,7 @@ Once configured, you will be able to add, edit, publish, and manage **Video** an
 1. In the Supabase sidebar, click **Authentication** → **Users**.
 2. Click **Add user** → **Create user**.
 3. Enter your admin email and a strong password:
-   * **Email**: e.g. `admin@kamrulislam.bd` or your personal email.
+   * **Email**: e.g. `hello@kamrulislam.me` or your personal email.
    * **Password**: Create a secure password.
    * Toggle **Auto Confirm User?** to **ON** (so you don't need to verify via email link).
 4. Click **Create user**.
