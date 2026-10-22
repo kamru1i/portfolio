@@ -186,10 +186,14 @@ const structuredData = {
       caption:
         "Kamrul Islam (Kamrul I) — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist",
       creator: {
+        "@type": "Person",
         "@id": "https://kamrulislam.me/#person",
+        name: "Kamrul Islam",
       },
       creditText: "Kamrul Islam",
       copyrightNotice: "© Kamrul Islam",
+      license: "https://kamrulislam.me/contact-us",
+      acquireLicensePage: "https://kamrulislam.me/contact-us",
       representativeOfPage: true,
     },
     {
