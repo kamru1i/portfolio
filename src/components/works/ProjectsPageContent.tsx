@@ -168,7 +168,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
         <div
           role="tablist"
           aria-label="Filter archive projects by discipline"
-          className="inline-flex items-center p-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)] w-fit"
+          className="inline-flex items-center p-1.5 rounded-full bg-white/4 border border-white/10 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)] w-fit"
         >
           <button
             type="button"
@@ -248,7 +248,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                   className={`px-3.5 sm:px-4 py-1.5 rounded-full font-mono-custom text-xs tracking-wide transition-all border flex items-center gap-2 ${
                     isSelected
                       ? "bg-white text-black border-white font-medium shadow-md"
-                      : "bg-white/[0.03] text-white/70 border-white/10 hover:border-white/25 hover:text-white"
+                      : "bg-white/3 text-white/70 border-white/10 hover:border-white/25 hover:text-white"
                   }`}
                 >
                   <span>{opt.label}</span>
@@ -294,7 +294,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
                       {/* Top Badges: Format & Attribution */}
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
@@ -338,7 +338,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                           {(project.tags || []).slice(0, 3).map((tag) => (
                             <span
                               key={tag}
-                              className="font-mono-custom text-[10px] text-[#888] bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]"
+                              className="font-mono-custom text-[10px] text-[#888] bg-white/4 px-2 py-0.5 rounded border border-white/6"
                             >
                               {tag}
                             </span>
@@ -360,7 +360,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
 
                         <Link
                           href={`/projects/video/${projectSlug}`}
-                          className="px-4 py-1.5 rounded-full bg-white/[0.05] hover:bg-white hover:text-black text-white/90 font-mono-custom text-xs border border-white/10 transition-all flex items-center gap-1.5"
+                          className="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white hover:text-black text-white/90 font-mono-custom text-xs border border-white/10 transition-all flex items-center gap-1.5"
                           aria-label={`View full details for ${project.title}`}
                         >
                           <span>Details</span>
@@ -374,8 +374,8 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
             </div>
           ) : (
             /* Polished Empty State for aspect ratio filters with no items */
-            <div className="w-full py-20 px-6 rounded-2xl bg-white/[0.02] border border-white/10 text-center flex flex-col items-center justify-center">
-              <div className="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-2xl mb-4">
+            <div className="w-full py-20 px-6 rounded-2xl bg-white/2 border border-white/10 text-center flex flex-col items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl mb-4">
                 🎬
               </div>
               <h3 className="font-gambarino text-2xl text-white mb-2">
@@ -439,7 +439,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
               })}
             </div>
           ) : (
-            <div className="w-full py-20 px-6 rounded-2xl bg-white/[0.02] border border-white/10 text-center">
+            <div className="w-full py-20 px-6 rounded-2xl bg-white/2 border border-white/10 text-center">
               <p className="font-mono-custom text-sm text-[#888]">
                 No web projects found in the archive.
               </p>

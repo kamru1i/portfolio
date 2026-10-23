@@ -51,7 +51,7 @@ export function AurexaCaseStudyCard({
           />
 
           {/* Ambient Dark Gradients for Crisp Text Contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/25 to-black/90 pointer-events-none transition-opacity duration-300 group-hover:opacity-40" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/85 via-black/25 to-black/90 pointer-events-none transition-opacity duration-300 group-hover:opacity-40" />
         </div>
       ) : (
         /* Static Fallback Canvas when no screenshot image is available */
@@ -79,7 +79,7 @@ export function AurexaCaseStudyCard({
                 <img
                   src={faviconUrl}
                   alt=""
-                  className="w-3 h-3 rounded-xs object-contain flex-shrink-0"
+                  className="w-3 h-3 rounded-xs object-contain shrink-0"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
                   }}
@@ -91,7 +91,7 @@ export function AurexaCaseStudyCard({
             </div>
 
             {/* Favicon / Emblem centerpiece */}
-            <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/15 flex items-center justify-center mb-3 shadow-inner p-2.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/6 border border-white/15 flex items-center justify-center mb-3 shadow-inner p-2.5">
               <img
                 src={faviconUrl}
                 alt=""
@@ -108,7 +108,7 @@ export function AurexaCaseStudyCard({
           </div>
 
           {/* Ambient Bottom Fade */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/85 pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/70 via-transparent to-black/85 pointer-events-none" />
         </div>
       )}
 

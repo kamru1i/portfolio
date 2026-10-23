@@ -223,7 +223,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
                       botCheck: "",
                     });
                   }}
-                  className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white font-sans text-sm transition-all"
+                  className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-white/8 hover:bg-white/[0.14] border border-white/10 text-white font-sans text-sm transition-all"
                 >
                   Send another message
                 </button>

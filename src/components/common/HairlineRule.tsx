@@ -20,7 +20,7 @@ export function HairlineRule({ className = "", delay = 0 }: HairlineRuleProps) {
           ease: [0.25, 1, 0.5, 1],
         }}
         style={{ originX: 0 }}
-        className="h-[1px] w-full bg-white/15"
+        className="h-px w-full bg-white/15"
       />
     </div>
   );

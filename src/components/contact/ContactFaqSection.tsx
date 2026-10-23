@@ -111,7 +111,7 @@ export function ContactFaqSection() {
                   {item.question}
                 </h3>
 
-                <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center flex-shrink-0 text-white font-mono-custom text-sm group-hover:bg-white/[0.12] transition-colors">
+                <div className="w-8 h-8 rounded-full bg-white/6 border border-white/10 flex items-center justify-center shrink-0 text-white font-mono-custom text-sm group-hover:bg-white/12 transition-colors">
                   {isOpen ? "−" : "+"}
                 </div>
               </div>

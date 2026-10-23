@@ -69,7 +69,7 @@ export function ManifestoSection() {
         </motion.div>
 
         {/* Bio Paragraphs & Contact CTA (Right, col-start-7 for exact 563px width) */}
-        <div className="col-span-1 md:col-span-6 md:col-start-7 min-w-0 w-full flex flex-col justify-start space-y-6 sm:space-y-8 font-mono-custom text-[15px] sm:text-[16px] leading-[1.65] text-[#a1a1a1] break-words">
+        <div className="col-span-1 md:col-span-6 md:col-start-7 min-w-0 w-full flex flex-col justify-start space-y-6 sm:space-y-8 font-mono-custom text-[15px] sm:text-[16px] leading-[1.65] text-[#a1a1a1] wrap-break-word">
           <p
             className="[&_strong]:text-white [&_strong]:font-medium"
             dangerouslySetInnerHTML={{

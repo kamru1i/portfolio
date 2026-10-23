@@ -72,7 +72,7 @@ export function FaqSection() {
                 className={`rounded-[14px] bg-[#1a1a1a] transition-all duration-300 border ${
                   isOpen
                     ? "border-white/20 bg-[#1e1e1e]/90 shadow-[0_8px_24px_rgba(0,0,0,0.4)]"
-                    : "border-white/[0.08] hover:border-white/15 hover:bg-[#1c1c1c]"
+                    : "border-white/8 hover:border-white/15 hover:bg-[#1c1c1c]"
                 }`}
               >
                 {/* Accordion Trigger Button */}
@@ -90,10 +90,10 @@ export function FaqSection() {
 
                   {/* Smooth 45° Rotating Plus/Minus Icon */}
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 flex-shrink-0 ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 shrink-0 ${
                       isOpen
                         ? "bg-white text-black border-white"
-                        : "bg-white/[0.04] text-white/70 border-white/10 group-hover:border-white/30 group-hover:text-white"
+                        : "bg-white/4 text-white/70 border-white/10 group-hover:border-white/30 group-hover:text-white"
                     }`}
                   >
                     <motion.span
@@ -124,7 +124,7 @@ export function FaqSection() {
                   className="overflow-hidden"
                 >
                   <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
-                    <div className="pt-3.5 border-t border-white/[0.06]">
+                    <div className="pt-3.5 border-t border-white/6">
                       <p className="font-mono-custom text-[14px] sm:text-[15px] text-[#a1a1a1] leading-relaxed">
                         {item.answer}
                       </p>

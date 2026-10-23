@@ -92,7 +92,7 @@ export function ServicesSection() {
               {/* Idle State: Mobile Stacked Header + Full-Width Title / Desktop 3-Column Editorial Row */}
               <div className="w-full py-5 sm:py-7 md:py-9 px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3 md:gap-4 text-white group cursor-pointer">
                 {/* Top Row on Mobile / Left Column on Desktop: Category Label + Mobile Index */}
-                <div className="w-full md:w-[200px] lg:w-[220px] md:flex-shrink-0 flex items-center justify-between">
+                <div className="w-full md:w-[200px] lg:w-[220px] md:shrink-0 flex items-center justify-between">
                   <span className="text-[#777] font-mono-custom text-[11px] sm:text-xs md:text-sm tracking-widest uppercase transition-colors group-hover:text-white/80">
                     {service.category}
                   </span>
@@ -109,7 +109,7 @@ export function ServicesSection() {
                 </div>
 
                 {/* Right Index (Desktop) */}
-                <div className="hidden md:block w-[60px] text-right flex-shrink-0 text-[#777] font-mono-custom text-base transition-colors group-hover:text-white">
+                <div className="hidden md:block w-[60px] text-right shrink-0 text-[#777] font-mono-custom text-base transition-colors group-hover:text-white">
                   {service.index}
                 </div>
               </div>
@@ -144,9 +144,9 @@ export function ServicesSection() {
                     >
                       {/* Repeat Ribbon Units: [Image] Title [Image] Title [Image] Title */}
                       {[0, 1, 2, 3].map((rep) => (
-                        <div key={rep} className="flex items-center gap-6 sm:gap-10 flex-shrink-0">
+                        <div key={rep} className="flex items-center gap-6 sm:gap-10 shrink-0">
                           {/* Pill / Stadium Shaped Service-Specific Image */}
-                          <div className="relative w-[180px] sm:w-[240px] md:w-[280px] h-[64px] sm:h-[80px] md:h-[94px] rounded-full overflow-hidden flex-shrink-0 border border-white/20 bg-black/60 shadow-inner">
+                          <div className="relative w-[180px] sm:w-[240px] md:w-[280px] h-[64px] sm:h-[80px] md:h-[94px] rounded-full overflow-hidden shrink-0 border border-white/20 bg-black/60 shadow-inner">
                             <Image
                               src={service.images[rep % service.images.length] || service.image}
                               alt={`${service.title} visual preview`}
@@ -158,7 +158,7 @@ export function ServicesSection() {
                           </div>
 
                           {/* Service Title in Ribbon */}
-                          <span className="font-sans text-2xl sm:text-3xl md:text-5xl text-white font-normal tracking-tight flex-shrink-0">
+                          <span className="font-sans text-2xl sm:text-3xl md:text-5xl text-white font-normal tracking-tight shrink-0">
                             {service.title}
                           </span>
                         </div>

@@ -15,17 +15,17 @@ interface ProjectMediaProps {
 export function getProjectAspectClass(format?: string, isLarge = false): string {
   switch (format) {
     case "16:9":
-      return "aspect-[16/9]";
+      return "aspect-video";
     case "9:16":
-      return isLarge ? "aspect-[9/16] max-w-[380px] sm:max-w-[420px] mx-auto" : "aspect-[9/16]";
+      return isLarge ? "aspect-9/16 max-w-[380px] sm:max-w-[420px] mx-auto" : "aspect-9/16";
     case "1:1":
       return "aspect-square";
     case "4:3":
-      return "aspect-[4/3]";
+      return "aspect-4/3";
     case "5:4":
-      return "aspect-[5/4]";
+      return "aspect-5/4";
     default:
-      return "aspect-[16/9]";
+      return "aspect-video";
   }
 }
 
@@ -44,7 +44,7 @@ export function ProjectMedia({
       {/* Parallax Image Frame matching Patrick Jane exact motion */}
       <motion.div
         style={parallaxY ? { y: parallaxY } : undefined}
-        className="absolute inset-x-0 -top-[15%] h-[130%] w-full will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
+        className="absolute inset-x-0 top-[-15%] h-[130%] w-full will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
       >
         <Image
           src={project.thumbnail}

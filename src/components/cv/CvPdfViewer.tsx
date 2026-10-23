@@ -34,7 +34,7 @@ export function CvPdfViewer({
     return (
       <div className="w-full rounded-2xl bg-[#0e0e10] border border-white/10 p-6 sm:p-10 md:p-12 shadow-2xl">
         <div className="max-w-3xl space-y-5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-[#bbb] font-mono-custom text-xs uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/6 border border-white/10 text-[#bbb] font-mono-custom text-xs uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
             <span>Interactive HTML Dossier Active • PDF Edition Ready for Request</span>
           </div>
@@ -58,7 +58,7 @@ export function CvPdfViewer({
 
             <Link
               href="/contact-us"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/[0.06] hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
             >
               <span>Contact &amp; Inquiries</span>
             </Link>
@@ -102,12 +102,12 @@ export function CvPdfViewer({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <a
             href="/api/cv/pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
           >
             <span>Open PDF in New Tab</span>
             <span>↗</span>

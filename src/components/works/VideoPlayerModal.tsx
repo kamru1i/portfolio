@@ -198,7 +198,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
             ) : isSocialExternal ? (
               /* Social Video Fallback (TikTok / Instagram / Facebook) */
               <div className="flex flex-col items-center justify-center text-center p-6 max-w-sm mx-auto">
-                <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl mb-3">
+                <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/10 flex items-center justify-center text-2xl mb-3">
                   🎬
                 </div>
                 <h4 className="font-sans font-medium text-base text-white mb-1.5">

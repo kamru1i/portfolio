@@ -58,13 +58,13 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen w-full bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-4 sm:p-6 select-none relative overflow-hidden">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-white/[0.02] rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-white/2 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main card */}
       <div className="w-full max-w-md relative z-10 bg-[#121214] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-white/60 font-mono-custom text-xs uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/4 border border-white/10 text-white/60 font-mono-custom text-xs uppercase tracking-wider mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             Restricted Access
           </div>

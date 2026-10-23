@@ -20,7 +20,7 @@ export function SectionBadge({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10% 0px" }}
       transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-white/85 font-mono-custom text-xs uppercase tracking-widest mb-6 w-fit backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)] ${className}`}
+      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/85 font-mono-custom text-xs uppercase tracking-widest mb-6 w-fit backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)] ${className}`}
     >
       {showIndicator && (
         <span

@@ -53,7 +53,7 @@ export function IntroCurtain({
   return (
     <motion.div
       key="intro-curtain"
-      className={`fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black overflow-hidden select-none ${
+      className={`fixed inset-0 z-999 flex flex-col items-center justify-center bg-black overflow-hidden select-none ${
         stage === "exit" ? "pointer-events-none" : "pointer-events-auto"
       }`}
       initial={{ y: 0 }}

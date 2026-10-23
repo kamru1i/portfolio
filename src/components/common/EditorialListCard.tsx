@@ -37,7 +37,7 @@ export function EditorialListCard({
   const baseClasses = `relative w-full rounded-[14px] bg-[#1a1a1a] transition-all duration-300 border ${
     isHovered
       ? "border-white/20 bg-[#1e1e1e]/90 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
-      : "border-white/[0.08] hover:border-white/15 hover:bg-[#1c1c1c]"
+      : "border-white/8 hover:border-white/15 hover:bg-[#1c1c1c]"
   } ${isDimmed ? "opacity-35" : "opacity-100"} ${className}`;
 
   if (href) {

@@ -132,7 +132,7 @@ export function ContactHeroOptions() {
         >
           {/* Top Row: Icon */}
           <div className="mb-6 flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/5 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-white/4 border border-white/5 flex items-center justify-center group-hover:scale-105 transition-transform">
               {opt.icon}
             </div>
           </div>

@@ -36,7 +36,7 @@ export default async function AdminDashboardLayout({
               className="flex items-center gap-3 text-white hover:opacity-90 transition-opacity"
               aria-label="Kamrul Islam CMS"
             >
-              <KamrulBrandWordmark className="h-[22px] sm:h-[24px] w-auto text-white flex-shrink-0" />
+              <KamrulBrandWordmark className="h-[22px] sm:h-[24px] w-auto text-white shrink-0" />
               <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/10 tracking-wider">
                 CMS
               </span>
@@ -77,7 +77,7 @@ export default async function AdminDashboardLayout({
               <span>↗</span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 font-mono-custom text-xs text-[#888]">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/3 border border-white/5 font-mono-custom text-xs text-[#888]">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span className="truncate max-w-[180px]">{user.email}</span>
             </div>

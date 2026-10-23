@@ -540,7 +540,7 @@ export default function AdminCvManagementPage() {
             {documents.map((doc) => (
               <div
                 key={doc.id}
-                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
+                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/2 transition-colors"
               >
                 <div className="space-y-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -570,7 +570,7 @@ export default function AdminCvManagementPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 self-end sm:self-center flex-shrink-0">
+                <div className="flex flex-wrap items-center gap-2 self-end sm:self-center shrink-0">
                   <button
                     type="button"
                     onClick={() => setPreviewDoc(doc)}

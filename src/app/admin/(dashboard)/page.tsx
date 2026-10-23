@@ -158,7 +158,7 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <Link
             href="/admin/cv"
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-all"
@@ -304,12 +304,12 @@ export default function AdminDashboardPage() {
             return (
               <div
                 key={project.id}
-                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
+                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/2 transition-colors"
               >
                 {/* Project Media Thumbnail + Details */}
                 <div className="flex items-start sm:items-center gap-4 min-w-0">
                   {/* Thumbnail Container */}
-                  <div className={`relative flex-shrink-0 ${is916 ? "w-12 h-20" : "w-20 h-14"} rounded-lg bg-black/60 border border-white/10 overflow-hidden flex items-center justify-center`}>
+                  <div className={`relative shrink-0 ${is916 ? "w-12 h-20" : "w-20 h-14"} rounded-lg bg-black/60 border border-white/10 overflow-hidden flex items-center justify-center`}>
                     {project.preview_image_url ? (
                       <Image
                         src={project.preview_image_url}
@@ -349,7 +349,7 @@ export default function AdminDashboardPage() {
                           Priority #{project.manual_priority}
                         </span>
                       ) : (
-                        <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/[0.04] text-[#888] border border-white/5">
+                        <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/4 text-[#888] border border-white/5">
                           Priority: Date
                         </span>
                       )}
@@ -396,7 +396,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Right Actions: Status & Controls */}
-                <div className="flex items-center gap-3 self-end sm:self-center flex-shrink-0">
+                <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
                   {/* Publish Toggle Button */}
                   <button
                     type="button"

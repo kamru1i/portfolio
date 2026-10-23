@@ -12,7 +12,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ isRevealed = true }: HeroSectionProps) {
   return (
-    <section id="hero" className="relative w-full min-h-[100svh] flex flex-col items-center justify-center pt-28 sm:pt-32 md:pt-36 lg:pt-36 xl:pt-28 2xl:pt-24 pb-8 sm:pb-12 lg:pb-12 xl:pb-6 2xl:pb-4 overflow-hidden">
+    <section id="hero" className="relative w-full min-h-svh flex flex-col items-center justify-center pt-28 sm:pt-32 md:pt-36 lg:pt-36 xl:pt-28 2xl:pt-24 pb-8 sm:pb-12 lg:pb-12 xl:pb-6 2xl:pb-4 overflow-hidden">
       {/* Coordinated Editorial Hero Composition: Title -> Subtitle -> 3D Cylinder */}
       <div className="w-full flex flex-col items-center my-auto">
         {/* Massive Editorial Display Wordmark with Typographic Scramble-Resolution Reveal */}

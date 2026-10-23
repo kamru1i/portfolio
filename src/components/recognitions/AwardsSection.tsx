@@ -80,7 +80,7 @@ export function AwardsSection() {
               >
                 <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 md:gap-8">
                   {/* Top Row on Mobile / Left Column on Desktop: Year & Period + Mobile Index */}
-                  <div className="w-full md:w-[180px] md:flex-shrink-0 flex items-center justify-between md:justify-start gap-3">
+                  <div className="w-full md:w-[180px] md:shrink-0 flex items-center justify-between md:justify-start gap-3">
                     <div className="flex items-center gap-3">
                       <span className="font-mono-custom text-sm sm:text-base text-white/90 font-medium tracking-wider">
                         {item.year}
@@ -114,7 +114,7 @@ export function AwardsSection() {
                   </div>
 
                   {/* Right Column: Index Numbering (Desktop) */}
-                  <div className="hidden md:block w-[60px] text-right flex-shrink-0 font-mono-custom text-base text-[#666] group-hover:text-white transition-colors">
+                  <div className="hidden md:block w-[60px] text-right shrink-0 font-mono-custom text-base text-[#666] group-hover:text-white transition-colors">
                     {String(idx + 1).padStart(2, "0")}
                   </div>
                 </div>

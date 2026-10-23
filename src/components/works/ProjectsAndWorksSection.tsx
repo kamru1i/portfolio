@@ -100,7 +100,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
         <div
           role="tablist"
           aria-label="Filter projects by category"
-          className="inline-flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)]"
+          className="inline-flex items-center p-1 rounded-full bg-white/4 border border-white/10 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)]"
         >
           <button
             type="button"

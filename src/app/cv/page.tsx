@@ -196,7 +196,7 @@ export default async function CurriculumVitaePage() {
           {/* Editorial Header */}
           <header className="w-full mb-12 md:mb-16">
             <div className="flex flex-wrap items-center gap-3 mb-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono-custom uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono-custom uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span>OFFICIAL DOSSIER // CURRICULUM VITAE</span>
               </div>
@@ -227,7 +227,7 @@ export default async function CurriculumVitaePage() {
               </div>
 
               {/* Primary Header Actions */}
-              <div className="flex flex-wrap items-center gap-3 flex-shrink-0">
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
                 {publishedCv ? (
                   <>
                     <a
@@ -242,7 +242,7 @@ export default async function CurriculumVitaePage() {
                       href="/api/cv/pdf"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/[0.06] hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
                     >
                       <span>Open PDF</span>
                       <span>↗</span>
@@ -260,7 +260,7 @@ export default async function CurriculumVitaePage() {
 
                 <Link
                   href="/contact-us"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/10 text-white/90 font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/4 hover:bg-white/10 text-white/90 font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
                 >
                   <span>Inquire / Hire</span>
                 </Link>
@@ -307,7 +307,7 @@ export default async function CurriculumVitaePage() {
                   {CORE_PILLARS.map((pillar) => (
                     <article
                       key={pillar.index}
-                      className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between space-y-5 hover:border-white/20 transition-colors"
+                      className="p-6 rounded-2xl bg-white/3 border border-white/10 flex flex-col justify-between space-y-5 hover:border-white/20 transition-colors"
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -335,7 +335,7 @@ export default async function CurriculumVitaePage() {
                         {pillar.skills.map((skill) => (
                           <span
                             key={skill}
-                            className="px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/10 font-mono-custom text-[11px] text-white/85"
+                            className="px-2.5 py-1 rounded-md bg-white/4 border border-white/10 font-mono-custom text-[11px] text-white/85"
                           >
                             {skill}
                           </span>
@@ -372,7 +372,7 @@ export default async function CurriculumVitaePage() {
                     return (
                       <article
                         key={job.slug}
-                        className="p-6 sm:p-7 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4 hover:border-white/20 transition-colors"
+                        className="p-6 sm:p-7 rounded-2xl bg-white/3 border border-white/10 space-y-4 hover:border-white/20 transition-colors"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                           <div>
@@ -390,7 +390,7 @@ export default async function CurriculumVitaePage() {
 
                           <Link
                             href={`/milestones/experience/${job.slug}`}
-                            className="self-start sm:self-center inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white text-white hover:text-black font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all shrink-0"
+                            className="self-start sm:self-center inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/6 hover:bg-white text-white hover:text-black font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all shrink-0"
                           >
                             <span>Full Role Dossier</span>
                             <span>→</span>
@@ -457,7 +457,7 @@ export default async function CurriculumVitaePage() {
                     return (
                       <article
                         key={edu.slug}
-                        className="p-5 sm:p-6 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between space-y-4"
+                        className="p-5 sm:p-6 rounded-2xl bg-white/3 border border-white/10 flex flex-col justify-between space-y-4"
                       >
                         <div className="space-y-2">
                           <span className="font-mono-custom text-xs text-emerald-400 block">
@@ -486,7 +486,7 @@ export default async function CurriculumVitaePage() {
             {/* SECTION 04: LANGUAGES & PROFESSIONAL CONTACT */}
             <section aria-labelledby="cv-contact-heading">
               <HairlineRule className="mb-10 md:mb-14" />
-              <div className="p-6 sm:p-10 md:p-12 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              <div className="p-6 sm:p-10 md:p-12 rounded-2xl bg-white/3 border border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                 <div className="space-y-3 max-w-2xl">
                   <span className="font-mono-custom text-xs uppercase tracking-wider text-emerald-400 block">
                     04 // Direct Inquiries &amp; Collaboration
@@ -547,7 +547,7 @@ export default async function CurriculumVitaePage() {
                   </a>
                   <Link
                     href="/projects"
-                    className="px-6 py-3.5 rounded-full bg-white/[0.06] hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
+                    className="px-6 py-3.5 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
                   >
                     Explore Portfolio Works →
                   </Link>

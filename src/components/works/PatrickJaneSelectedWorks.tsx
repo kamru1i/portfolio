@@ -96,7 +96,7 @@ export function PatrickJaneSelectedWorks({
         <div className="w-full flex items-center justify-center pt-8">
           <Link
             href="/projects?type=video"
-            className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-mono-custom text-xs uppercase tracking-wider transition-colors"
+            className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/4 hover:bg-white/8 border border-white/10 text-white font-mono-custom text-xs uppercase tracking-wider transition-colors"
           >
             <span>Explore More Video Projects</span>
             <span className="group-hover:translate-x-1 transition-transform">→</span>

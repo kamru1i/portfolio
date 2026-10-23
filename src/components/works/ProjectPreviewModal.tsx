@@ -321,7 +321,7 @@ function ProjectPreviewModalContent({
                       <img
                         src={faviconUrl}
                         alt=""
-                        className="w-3.5 h-3.5 rounded-sm object-contain flex-shrink-0"
+                        className="w-3.5 h-3.5 rounded-sm object-contain shrink-0"
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                         }}
@@ -340,7 +340,7 @@ function ProjectPreviewModalContent({
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-mono-custom text-[11px] text-white/70 hover:text-white px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1 flex-shrink-0"
+                        className="font-mono-custom text-[11px] text-white/70 hover:text-white px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1 shrink-0"
                       >
                         <span>Open</span>
                         <span>↗</span>
@@ -358,12 +358,12 @@ function ProjectPreviewModalContent({
                           alt={`${project.title} homepage preview`}
                           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
                       </div>
                     ) : (
                       /* Branded Layout when no screenshot image is uploaded */
                       <div className="p-6 sm:p-12 text-center flex flex-col items-center justify-center max-w-lg">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/[0.06] border border-white/15 flex items-center justify-center mb-3 sm:mb-4 shadow-xl">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/6 border border-white/15 flex items-center justify-center mb-3 sm:mb-4 shadow-xl">
                           <img
                             src={faviconUrl}
                             alt=""
@@ -385,7 +385,7 @@ function ProjectPreviewModalContent({
                     {/* Informative Security Overlay / Banner at bottom of preview */}
                     <div className="relative sm:absolute sm:bottom-4 sm:left-4 sm:right-4 w-full sm:w-auto p-3.5 sm:p-4 sm:rounded-xl bg-black/90 sm:bg-black/80 backdrop-blur-md border-t sm:border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xl">
                       <div className="flex items-center gap-3 min-w-0 text-center sm:text-left">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0 hidden xs:flex sm:flex">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 hidden xs:flex sm:flex">
                           🛡️
                         </div>
                         <div className="min-w-0">
@@ -403,7 +403,7 @@ function ProjectPreviewModalContent({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-center">
+                      <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-center">
                         <button
                           type="button"
                           onClick={() => {
@@ -439,11 +439,11 @@ function ProjectPreviewModalContent({
             <p className="font-mono-custom text-xs text-[#888] truncate max-w-xl">
               {project.description}
             </p>
-            <div className="flex flex-wrap gap-1.5 flex-shrink-0">
+            <div className="flex flex-wrap gap-1.5 shrink-0">
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="font-mono-custom text-[11px] text-[#777] bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]"
+                  className="font-mono-custom text-[11px] text-[#777] bg-white/4 px-2 py-0.5 rounded border border-white/6"
                 >
                   {tag}
                 </span>

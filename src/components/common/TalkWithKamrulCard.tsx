@@ -31,11 +31,11 @@ export function TalkWithKamrulCard({
 
   return (
     <div
-      className={`w-full max-w-md rounded-2xl bg-[#161616] border border-white/[0.08] p-5 sm:p-6 flex flex-col gap-4 shadow-[0_12px_36px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-white/15 ${className}`}
+      className={`w-full max-w-md rounded-2xl bg-[#161616] border border-white/8 p-5 sm:p-6 flex flex-col gap-4 shadow-[0_12px_36px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-white/15 ${className}`}
     >
       {/* Profile Avatar & Info Row */}
       <div className="flex items-center gap-4">
-        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-white/20 flex-shrink-0 shadow-inner">
+        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-white/20 shrink-0 shadow-inner">
           <Image
             src={cardData.avatarSrc}
             alt="Kamrul Islam"
@@ -57,7 +57,7 @@ export function TalkWithKamrulCard({
 
       {/* Availability Status Indicator */}
       <div className="flex items-center gap-2 pt-1">
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
         <span className="font-mono-custom text-[11px] sm:text-xs text-[#aaa]">
           {cardData.status}
         </span>

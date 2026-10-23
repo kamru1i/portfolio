@@ -181,7 +181,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
               onClick={() => setIsMenuOpen((prev) => !prev)}
               aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={isMenuOpen}
-              className="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 hover:border-white/25 text-white text-[12px] sm:text-[13px] font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/25 text-white text-[12px] sm:text-[13px] font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
               {isMenuOpen ? (
                 <>

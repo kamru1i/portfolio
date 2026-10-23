@@ -48,7 +48,7 @@ export function AurexaCaseStudies({
       <div className="w-full mt-12 sm:mt-16 flex items-center justify-center">
         <Link
           href="/projects?type=web"
-          className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-white font-mono-custom text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-sm"
+          className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-white/4 hover:bg-white/8 border border-white/10 hover:border-white/20 text-white font-mono-custom text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-sm"
           aria-label="Explore more web development projects"
         >
           <span>Explore More Web Projects</span>

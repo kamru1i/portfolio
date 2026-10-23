@@ -119,7 +119,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
           <section className="w-full mb-16 md:mb-24">
             <div className="flex flex-wrap items-center gap-3 mb-6">
               {/* Category Pill Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span>CAREER ROLE // {milestone.year}</span>
               </div>
@@ -156,7 +156,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
               <div className="md:col-span-4">
-                <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                   OVERVIEW
                 </span>
                 <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -181,7 +181,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
                 <div className="md:col-span-4">
-                  <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                  <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                     DUTIES &amp; SCOPE
                   </span>
                   <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -196,7 +196,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
                   {d.responsibilities.map((resp, idx) => (
                     <div
                       key={idx}
-                      className="p-5 sm:p-6 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-4 hover:border-white/20 transition-colors"
+                      className="p-5 sm:p-6 rounded-xl bg-white/2 border border-white/10 flex items-start gap-4 hover:border-white/20 transition-colors"
                     >
                       <span className="font-mono-custom text-xs text-emerald-400 font-bold shrink-0 mt-0.5">
                         {String(idx + 1).padStart(2, "0")}
@@ -220,7 +220,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
                 <div className="md:col-span-4">
-                  <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                  <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                     TOOLCHAIN
                   </span>
                   <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -232,7 +232,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
                   {d.tools.map((tool) => (
                     <span
                       key={tool}
-                      className="px-4 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs sm:text-sm font-mono-custom tracking-wide transition-colors"
+                      className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs sm:text-sm font-mono-custom tracking-wide transition-colors"
                     >
                       {tool}
                     </span>
@@ -251,7 +251,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
                 <div className="md:col-span-4">
-                  <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                  <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                     ACHIEVEMENTS
                   </span>
                   <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -263,7 +263,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
                   {d.achievements.map((ach) => (
                     <div
                       key={ach}
-                      className="p-5 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3"
+                      className="p-5 rounded-xl bg-white/2 border border-white/10 flex items-start gap-3"
                     >
                       <span className="text-emerald-400 mt-0.5">✦</span>
                       <p className="font-mono-custom text-xs sm:text-sm text-[#aaa] leading-relaxed">

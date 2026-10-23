@@ -83,7 +83,7 @@ export default function EducationQualificationsPage() {
           <header className="w-full mb-12 md:mb-16">
             <div className="flex flex-wrap items-center gap-3 mb-6">
               {/* Category Pill */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span>ACADEMIC DOSSIER // QUALIFICATIONS</span>
               </div>
@@ -139,7 +139,7 @@ export default function EducationQualificationsPage() {
                   <a
                     key={item.slug}
                     href={`#${item.slug}`}
-                    className="px-3 sm:px-4 py-1.5 rounded-full bg-white/[0.04] hover:bg-white text-white/70 hover:text-black font-mono-custom text-xs uppercase tracking-wider border border-white/10 hover:border-white transition-all flex items-center gap-1.5"
+                    className="px-3 sm:px-4 py-1.5 rounded-full bg-white/4 hover:bg-white text-white/70 hover:text-black font-mono-custom text-xs uppercase tracking-wider border border-white/10 hover:border-white transition-all flex items-center gap-1.5"
                   >
                     <span>{navLabel}</span>
                     <span className="text-[#555] group-hover:text-black/60 font-mono text-[10px]">
@@ -177,7 +177,7 @@ export default function EducationQualificationsPage() {
                     {/* Left Meta & Index Column */}
                     <div className="lg:col-span-4 flex flex-col space-y-4">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono-custom text-xs px-3 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/90 uppercase tracking-wider">
+                        <span className="font-mono-custom text-xs px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/90 uppercase tracking-wider">
                           INDEX 0{index + 1}
                         </span>
                         <span className="font-mono-custom text-xs px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
@@ -206,7 +206,7 @@ export default function EducationQualificationsPage() {
                       {/* Structured Parameters Specification Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {/* Parameter 1: Institution */}
-                        <div className="p-4 sm:p-5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col">
+                        <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
                           <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
                             Institution
                           </span>
@@ -216,7 +216,7 @@ export default function EducationQualificationsPage() {
                         </div>
 
                         {/* Parameter 2: Board / Authority / University */}
-                        <div className="p-4 sm:p-5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col">
+                        <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
                           <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
                             Board / Authority
                           </span>
@@ -226,7 +226,7 @@ export default function EducationQualificationsPage() {
                         </div>
 
                         {/* Parameter 3: Academic Group / Major */}
-                        <div className="p-4 sm:p-5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col">
+                        <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
                           <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
                             Group / Major
                           </span>
@@ -236,7 +236,7 @@ export default function EducationQualificationsPage() {
                         </div>
 
                         {/* Parameter 4: Passing Year */}
-                        <div className="p-4 sm:p-5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col">
+                        <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
                           <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
                             Passing Year
                           </span>
@@ -247,7 +247,7 @@ export default function EducationQualificationsPage() {
 
                         {/* Parameter 5: Result / GPA (rendered when documented) */}
                         {resultGrade && (
-                          <div className="p-4 sm:p-5 rounded-xl bg-white/[0.03] border border-emerald-500/20 sm:col-span-2 flex flex-col">
+                          <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-emerald-500/20 sm:col-span-2 flex flex-col">
                             <span className="font-mono-custom text-[11px] text-emerald-400 uppercase tracking-wider mb-1">
                               Result / Academic Performance
                             </span>
@@ -272,7 +272,7 @@ export default function EducationQualificationsPage() {
                           {d.coursework.map((course) => (
                             <span
                               key={course}
-                              className="px-3.5 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-white/90 font-mono-custom text-xs tracking-wide"
+                              className="px-3.5 py-1.5 rounded-lg bg-white/4 border border-white/10 text-white/90 font-mono-custom text-xs tracking-wide"
                             >
                               {course}
                             </span>
@@ -295,7 +295,7 @@ export default function EducationQualificationsPage() {
                           {d.achievements.map((ach, aIdx) => (
                             <div
                               key={aIdx}
-                              className="p-4 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3"
+                              className="p-4 rounded-xl bg-white/2 border border-white/10 flex items-start gap-3"
                             >
                               <span className="font-mono-custom text-xs text-emerald-400 font-bold shrink-0 mt-0.5">
                                 ✓

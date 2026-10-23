@@ -271,7 +271,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
                 <div
                   className={`relative ${
                     aspectRatio === "9:16" ? "w-20 h-36" : aspectRatio === "1:1" ? "w-24 h-24" : "w-40 h-24"
-                  } rounded-lg overflow-hidden bg-black flex-shrink-0 border border-white/15`}
+                  } rounded-lg overflow-hidden bg-black shrink-0 border border-white/15`}
                 >
                   <Image
                     src={resolvedThumbnail}
@@ -343,7 +343,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
                       className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${
                         isSelected
                           ? "bg-white/15 border-white text-white shadow-sm ring-1 ring-white/20"
-                          : "bg-white/[0.02] border-white/10 text-[#888] hover:border-white/20 hover:text-white"
+                          : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
                       }`}
                     >
                       <div

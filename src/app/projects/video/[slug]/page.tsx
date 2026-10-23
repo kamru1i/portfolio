@@ -77,13 +77,13 @@ function resolveEmbedUrl(url?: string): string | null {
 function getVideoPlayerContainerClasses(format: string): string {
   switch (format) {
     case "9:16":
-      return "w-full max-w-[420px] aspect-[9/16]";
+      return "w-full max-w-[420px] aspect-9/16";
     case "1:1":
       return "w-full max-w-[680px] aspect-square";
     case "4:3":
-      return "w-full max-w-4xl aspect-[4/3]";
+      return "w-full max-w-4xl aspect-4/3";
     case "5:4":
-      return "w-full max-w-4xl aspect-[5/4]";
+      return "w-full max-w-4xl aspect-5/4";
     default:
       return "w-full max-w-5xl aspect-video";
   }
@@ -196,7 +196,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
           <section className="w-full mb-14 md:mb-20">
             <div className="flex flex-wrap items-center gap-3 mb-6">
               {/* Category Pill Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span>VIDEO POST-PRODUCTION // {format}</span>
               </div>
@@ -259,7 +259,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                     className="object-cover opacity-30 blur-sm"
                   />
                   <div className="relative z-10 max-w-md p-6 rounded-2xl bg-black/80 backdrop-blur-md border border-white/15 flex flex-col items-center">
-                    <div className="w-14 h-14 rounded-2xl bg-white/[0.08] border border-white/15 flex items-center justify-center text-2xl mb-3">
+                    <div className="w-14 h-14 rounded-2xl bg-white/8 border border-white/15 flex items-center justify-center text-2xl mb-3">
                       🎬
                     </div>
                     <h3 className="font-gambarino text-xl text-white mb-2">
@@ -300,7 +300,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
               <div className="md:col-span-4">
-                <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                   OVERVIEW
                 </span>
                 <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -329,7 +329,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
               <div className="md:col-span-4">
-                <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                   RESPONSIBILITIES
                 </span>
                 <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -351,7 +351,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                 ].map((duty, idx) => (
                   <div
                     key={idx}
-                    className="p-5 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3"
+                    className="p-5 rounded-xl bg-white/2 border border-white/10 flex items-start gap-3"
                   >
                     <span className="font-mono-custom text-xs text-emerald-400 font-bold shrink-0 mt-0.5">
                       0{idx + 1}
@@ -373,7 +373,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
               <div className="md:col-span-4">
-                <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                   TOOLS &amp; TECH
                 </span>
                 <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -388,7 +388,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                 ).map((tool) => (
                   <span
                     key={tool}
-                    className="px-4 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs sm:text-sm font-mono-custom tracking-wide transition-colors"
+                    className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs sm:text-sm font-mono-custom tracking-wide transition-colors"
                   >
                     {tool}
                   </span>
@@ -405,7 +405,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
               <div className="md:col-span-4">
-                <span className="inline-block px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
+                <span className="inline-block px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider mb-4">
                   DELIVERABLES
                 </span>
                 <h2 className="font-gambarino text-3xl sm:text-4xl text-white tracking-tight">
@@ -421,7 +421,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                   ).map((deliv) => (
                     <span
                       key={deliv}
-                      className="px-4 py-2 rounded-xl bg-white/[0.03] border border-white/10 font-mono-custom text-xs text-white/90"
+                      className="px-4 py-2 rounded-xl bg-white/3 border border-white/10 font-mono-custom text-xs text-white/90"
                     >
                       ✓ {deliv}
                     </span>
@@ -432,7 +432,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                   {(project.tags || []).map((tag) => (
                     <span
                       key={tag}
-                      className="font-mono-custom text-[11px] text-[#777] bg-white/[0.04] px-2.5 py-1 rounded border border-white/[0.06]"
+                      className="font-mono-custom text-[11px] text-[#777] bg-white/4 px-2.5 py-1 rounded border border-white/6"
                     >
                       #{tag}
                     </span>
