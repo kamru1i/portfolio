@@ -9,9 +9,7 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "eslint .",
-    "qa:inspect": "node scripts/qa/inspect-reference.mjs",
-    "qa:compare": "node scripts/qa/compare.mjs"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

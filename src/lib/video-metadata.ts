@@ -6,13 +6,22 @@ import { ResolvedVideoMeta, VideoMetaStatus } from "@/types/project";
  */
 export function isSafePublicUrl(urlString: string): boolean {
   try {
+    // Reject NUL bytes or non-ASCII control characters (CVE-2026-105482 / CVE-2026-105483 hardening)
+    if (
+      urlString.includes("\0") ||
+      /%00/i.test(urlString) ||
+      /[^\x20-\x7E]/.test(urlString)
+    ) {
+      return false;
+    }
+
     const parsed = new URL(urlString);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return false;
     }
     // Strip IPv6 brackets if present
     const hostname = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, "");
-    if (!hostname) return false;
+    if (!hostname || /[^\x21-\x7E]/.test(hostname)) return false;
 
     // Block localhost, private IPs, link-local, loopbacks, IPv6 internal ranges, and integer/hex IPs
     if (
@@ -134,6 +143,7 @@ async function resolveYouTubeThumbnailUrl(videoId: string): Promise<string> {
 
     const res = await fetch(maxResUrl, {
       method: "HEAD",
+      headers: { "Accept-Encoding": "gzip, deflate" },
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -259,6 +269,7 @@ export async function resolveVideoMetadata(urlStr: string, projectTitle: string 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3500);
       const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(cleanUrl)}`, {
+        headers: { "Accept-Encoding": "gzip, deflate" },
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -300,6 +311,7 @@ export async function resolveVideoMetadata(urlStr: string, projectTitle: string 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3500);
       const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(cleanUrl)}`, {
+        headers: { "Accept-Encoding": "gzip, deflate" },
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
