@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verifyAdminSession } from "@/lib/supabase/admin-auth";
+import { Hono } from "hono";
 import { createClient } from "@/lib/supabase/server";
 
 export const SCREENSHOT_BUCKET_NAME = "project-screenshots";
@@ -34,7 +33,6 @@ function sanitizeImageFilename(rawName: string, ext: string): string {
 function hasValidImageSignature(buffer: Buffer, mimeType: string): boolean {
   if (buffer.byteLength < 12) return false;
 
-  // PNG: 89 50 4E 47 0D 0A 1A 0A
   if (mimeType === "image/png") {
     return (
       buffer[0] === 0x89 &&
@@ -44,19 +42,16 @@ function hasValidImageSignature(buffer: Buffer, mimeType: string): boolean {
     );
   }
 
-  // JPEG: FF D8 FF
   if (mimeType === "image/jpeg" || mimeType === "image/jpg") {
     return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
   }
 
-  // WebP: "RIFF" .... "WEBP"
   if (mimeType === "image/webp") {
     const riff = buffer.subarray(0, 4).toString("ascii");
     const webp = buffer.subarray(8, 12).toString("ascii");
     return riff === "RIFF" && webp === "WEBP";
   }
 
-  // AVIF: .... "ftyp"
   if (mimeType === "image/avif") {
     const ftyp = buffer.subarray(4, 8).toString("ascii");
     return ftyp === "ftyp";
@@ -65,64 +60,46 @@ function hasValidImageSignature(buffer: Buffer, mimeType: string): boolean {
   return false;
 }
 
-export async function POST(req: NextRequest) {
-  const { user, isAdmin, error } = await verifyAdminSession();
-  if (!user || !isAdmin) {
-    return NextResponse.json(
-      { error: error || "Unauthorized: Admin privileges required" },
-      { status: 401 }
-    );
-  }
+export const uploadScreenshotRoute = new Hono();
 
+uploadScreenshotRoute.post("/", async (c) => {
   try {
     const supabase = await createClient();
     if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase client is not configured." },
-        { status: 500 }
-      );
+      return c.json({ error: "Supabase client is not configured." }, 500);
     }
 
-    const formData = await req.formData();
+    const formData = await c.req.formData();
     const fileEntry = formData.get("file");
 
     if (!fileEntry || !(fileEntry instanceof File)) {
-      return NextResponse.json(
-        { error: "Please select a valid screenshot image file." },
-        { status: 400 }
-      );
+      return c.json({ error: "Please select a valid screenshot image file." }, 400);
     }
 
     const mimeType = (fileEntry.type || "").toLowerCase();
     const ext = ALLOWED_IMAGE_MIME_TYPES[mimeType];
     if (!ext) {
-      return NextResponse.json(
+      return c.json(
         { error: "Unsupported image format. Please upload a PNG, JPG, WebP, or AVIF image." },
-        { status: 400 }
+        400
       );
     }
 
     if (fileEntry.size <= 0) {
-      return NextResponse.json(
-        { error: "Uploaded image file is empty." },
-        { status: 400 }
-      );
+      return c.json({ error: "Uploaded image file is empty." }, 400);
     }
 
     if (fileEntry.size > MAX_SCREENSHOT_SIZE_BYTES) {
-      return NextResponse.json(
-        { error: "Screenshot image exceeds the 8 MB maximum file size limit." },
-        { status: 400 }
-      );
+      return c.json({ error: "Screenshot image exceeds the 8 MB maximum file size limit." }, 400);
     }
 
     const arrayBuffer = await fileEntry.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     if (!hasValidImageSignature(buffer, mimeType)) {
-      return NextResponse.json(
+      return c.json(
         { error: "Invalid image binary signature. Please upload a genuine PNG, JPG, WebP, or AVIF screenshot." },
-        { status: 400 }
+        400
       );
     }
 
@@ -139,9 +116,9 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
-      return NextResponse.json(
+      return c.json(
         { error: `Failed to upload screenshot to storage: ${uploadError.message}` },
-        { status: 400 }
+        400
       );
     }
 
@@ -149,17 +126,17 @@ export async function POST(req: NextRequest) {
       .from(SCREENSHOT_BUCKET_NAME)
       .getPublicUrl(storagePath);
 
-    return NextResponse.json(
+    return c.json(
       {
         url: publicUrlData.publicUrl,
         storagePath,
         fileName: sanitizedFileName,
         fileSize: buffer.byteLength,
       },
-      { status: 201 }
+      201
     );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to upload screenshot";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return c.json({ error: message }, 400);
   }
-}
+});

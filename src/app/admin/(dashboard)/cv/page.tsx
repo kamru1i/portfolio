@@ -363,6 +363,7 @@ export default function AdminCvManagementPage() {
               </button>
               <a
                 href="/api/cv/pdf?download=1"
+                download="Kamrul-Islam-CV.pdf"
                 className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-mono-custom text-xs border border-white/10 transition-colors"
               >
                 Download PDF

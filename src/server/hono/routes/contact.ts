@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { Hono } from "hono";
 import { Resend } from "resend";
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
@@ -7,7 +7,6 @@ const rateLimitMap = new Map<string, number[]>();
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
-  // Prune stale entries periodically to bound memory usage
   if (rateLimitMap.size > 500) {
     for (const [key, timestamps] of rateLimitMap.entries()) {
       const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
@@ -43,66 +42,58 @@ function escapeHtml(text: string): string {
     .replace(/'/g, "&#039;");
 }
 
-export async function POST(request: Request) {
+export const contactRoute = new Hono();
+
+contactRoute.post("/", async (c) => {
   try {
-    const forwardedFor = request.headers.get("x-forwarded-for");
+    const forwardedFor = c.req.header("x-forwarded-for");
     const clientIp =
-      request.headers.get("x-nf-client-connection-ip") ||
+      c.req.header("x-nf-client-connection-ip") ||
       (forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown-ip");
 
     if (isRateLimited(clientIp)) {
-      return NextResponse.json(
+      return c.json(
         { error: "Too many inquiries submitted recently. Please wait a few minutes and try again." },
-        { status: 429 }
+        429
       );
     }
 
-    const body = await request.json();
+    const body = await c.req.json();
     const { name, email, company, projectType, budgetRange, timeline, details, botCheck } = body;
 
-    // Honeypot spam protection
     if (botCheck) {
-      return NextResponse.json(
-        { error: "Spam submission detected." },
-        { status: 400 }
-      );
+      return c.json({ error: "Spam submission detected." }, 400);
     }
 
-    // Required field validation & sanitization
     if (!name || typeof name !== "string" || !name.trim()) {
-      return NextResponse.json(
-        { error: "Name is required." },
-        { status: 400 }
-      );
+      return c.json({ error: "Name is required." }, 400);
     }
     const cleanName = sanitizeSingleLine(name, 100);
 
     if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      return NextResponse.json(
-        { error: "A valid email address is required." },
-        { status: 400 }
-      );
+      return c.json({ error: "A valid email address is required." }, 400);
     }
     const cleanEmail = sanitizeSingleLine(email, 120);
 
     if (!projectType || typeof projectType !== "string") {
-      return NextResponse.json(
-        { error: "Project type is required." },
-        { status: 400 }
-      );
+      return c.json({ error: "Project type is required." }, 400);
     }
     const cleanProjectType = sanitizeSingleLine(projectType, 100);
 
     if (!details || typeof details !== "string" || !details.trim()) {
-      return NextResponse.json(
-        { error: "Project details are required." },
-        { status: 400 }
-      );
+      return c.json({ error: "Project details are required." }, 400);
     }
     const cleanDetails = details.replace(/\0/g, "").trim().slice(0, 5000);
-    const cleanCompany = company && typeof company === "string" ? sanitizeSingleLine(company, 100) || "N/A" : "N/A";
-    const cleanBudget = budgetRange && typeof budgetRange === "string" ? sanitizeSingleLine(budgetRange, 60) || "Not specified" : "Not specified";
-    const cleanTimeline = timeline && typeof timeline === "string" ? sanitizeSingleLine(timeline, 60) || "Not specified" : "Not specified";
+    const cleanCompany =
+      company && typeof company === "string" ? sanitizeSingleLine(company, 100) || "N/A" : "N/A";
+    const cleanBudget =
+      budgetRange && typeof budgetRange === "string"
+        ? sanitizeSingleLine(budgetRange, 60) || "Not specified"
+        : "Not specified";
+    const cleanTimeline =
+      timeline && typeof timeline === "string"
+        ? sanitizeSingleLine(timeline, 60) || "Not specified"
+        : "Not specified";
 
     const recipient = process.env.CONTACT_TO_EMAIL || "hello@kamrulislam.me";
     const sender = process.env.CONTACT_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
@@ -115,7 +106,6 @@ export async function POST(request: Request) {
       timeStyle: "medium",
     });
 
-    // Plain text version
     const textContent = `
 ========================================
 NEW PROJECT ENQUIRY — KAMRUL ISLAM
@@ -145,7 +135,6 @@ Recipient:         ${recipient}
 ========================================
 `.trim();
 
-    // High-fidelity dark editorial HTML template
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -202,9 +191,6 @@ Recipient:         ${recipient}
         ? "Kamrul Islam (No-Reply) <onboarding@resend.dev>"
         : sender.replace(/<[^>]+>/, "<noreply@kamrulislam.me>"));
 
-    // -------------------------------------------------------------------------
-    // CLIENT COURTESY CONFIRMATION (AUTO-REPLY RECEIPT)
-    // -------------------------------------------------------------------------
     const autoReplyText = `
 ============================================================
 PROJECT ENQUIRY RECEIVED — KAMRUL ISLAM
@@ -257,8 +243,6 @@ https://kamrulislam.me
 </head>
 <body style="margin: 0; padding: 32px 16px; background-color: #080808; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ededed;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #121212; border: 1px solid #262626; border-radius: 16px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.6);">
-    
-    <!-- Header -->
     <div style="padding: 28px 32px; border-bottom: 1px solid #222; background: linear-gradient(180deg, #181818 0%, #121212 100%);">
       <div style="margin-bottom: 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #10b981; font-family: monospace; font-weight: 600;">
         ● ENQUIRY RECEIVED
@@ -267,7 +251,6 @@ https://kamrulislam.me
       <p style="margin: 8px 0 0 0; font-size: 14px; color: #a1a1a1; line-height: 1.5;">Your project enquiry has been delivered directly to Kamrul Islam.</p>
     </div>
 
-    <!-- Status & Commitment -->
     <div style="padding: 24px 32px; background-color: #141414; border-bottom: 1px solid #222;">
       <table style="width: 100%; border-collapse: collapse;">
         <tr>
@@ -282,7 +265,6 @@ https://kamrulislam.me
       </table>
     </div>
     
-    <!-- Submission Summary Table -->
     <div style="padding: 32px;">
       <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; font-family: monospace; margin-bottom: 14px;">Summary of Your Submission</div>
       
@@ -305,13 +287,11 @@ https://kamrulislam.me
         </tr>
       </table>
 
-      <!-- Project Brief Box -->
       <div style="margin-top: 16px; margin-bottom: 24px;">
         <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; font-family: monospace; margin-bottom: 8px;">Your Project Brief</div>
         <div style="background-color: #181818; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.6; color: #d4d4d4; white-space: pre-wrap; word-break: break-word;">${escapeHtml(cleanDetails)}</div>
       </div>
 
-      <!-- No-Reply Warning Banner -->
       <div style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 14px 16px;">
         <div style="font-size: 12px; font-weight: 600; color: #fbbf24; margin-bottom: 4px; font-family: monospace;">⚠️ AUTOMATED NO-REPLY NOTIFICATION</div>
         <div style="font-size: 12px; color: #d1d5db; line-height: 1.5;">
@@ -324,7 +304,6 @@ https://kamrulislam.me
       </div>
     </div>
 
-    <!-- Footer -->
     <div style="padding: 20px 32px; border-top: 1px solid #222; background-color: #0d0d0d; font-size: 11px; color: #666; font-family: monospace; line-height: 1.6;">
       <div>Received: ${escapeHtml(submissionTimeDhaka)} (GMT+6)</div>
       <div style="margin-top: 4px; color: #888;">Kamrul Islam · Lead Video Editor, Web Developer &amp; IT Specialist</div>
@@ -338,23 +317,20 @@ https://kamrulislam.me
     if (!apiKey) {
       console.warn(
         `[Contact API Notice]: RESEND_API_KEY environment variable is not configured. ` +
-        `Enquiry from "${cleanName}" <${cleanEmail}> was received and logged to server console. ` +
-        `To activate real email delivery to ${recipient}, please set RESEND_API_KEY in your .env.local file.`
+          `Enquiry from "${cleanName}" <${cleanEmail}> was received and logged to server console.`
       );
 
-      return NextResponse.json(
+      return c.json(
         {
           error: "Email delivery service is awaiting RESEND_API_KEY configuration.",
           code: "PROVIDER_KEY_MISSING",
         },
-        { status: 503 }
+        503
       );
     }
 
-    // Initialize Resend with secure server-side API key
     const resend = new Resend(apiKey);
 
-    // 1. Send Primary Notification to Kamrul Islam
     const { data, error } = await resend.emails.send({
       from: sender,
       to: [recipient],
@@ -366,22 +342,15 @@ https://kamrulislam.me
 
     if (error) {
       console.error("[Resend Delivery Error]:", error);
-      return NextResponse.json(
+      return c.json(
         {
           error: error.message || "Email provider could not initiate delivery.",
           code: "PROVIDER_ERROR",
         },
-        { status: 502 }
+        502
       );
     }
 
-    console.log("[Resend Delivery Success]:", {
-      id: data?.id,
-      to: recipient,
-      replyTo: cleanEmail,
-    });
-
-    // 2. Send Automated Courtesy Confirmation Receipt to Client
     let autoReplyDeliveryId: string | null = null;
     let autoReplyErrorMessage: string | null = null;
     try {
@@ -394,39 +363,27 @@ https://kamrulislam.me
       });
 
       if (autoReplyResult.error) {
-        autoReplyErrorMessage = autoReplyResult.error.message || "Auto-reply awaiting verified domain at resend.com/domains";
-        console.warn("[Auto-Reply Notice]: Client confirmation email could not be sent:", autoReplyResult.error);
+        autoReplyErrorMessage =
+          autoReplyResult.error.message || "Auto-reply awaiting verified domain at resend.com/domains";
       } else {
         autoReplyDeliveryId = autoReplyResult.data?.id || null;
-        console.log("[Auto-Reply Success]: Courtesy confirmation delivered to client:", {
-          client: cleanEmail,
-          deliveryId: autoReplyDeliveryId,
-        });
       }
     } catch (autoReplyErr: unknown) {
       autoReplyErrorMessage =
         autoReplyErr instanceof Error
           ? autoReplyErr.message
           : "Auto-reply awaiting verified domain at resend.com/domains";
-      console.warn("[Auto-Reply Non-Fatal Exception]:", autoReplyErrorMessage);
     }
 
-    return NextResponse.json({
+    return c.json({
       success: true,
       message: "Enquiry delivered successfully.",
       deliveryId: data?.id,
       autoReplyDeliveryId,
-      ...(autoReplyErrorMessage
-        ? {
-            autoReplyNotice: autoReplyErrorMessage,
-          }
-        : {}),
+      ...(autoReplyErrorMessage ? { autoReplyNotice: autoReplyErrorMessage } : {}),
     });
   } catch (error: unknown) {
     console.error("[Contact API Internal Error]:", error);
-    return NextResponse.json(
-      { error: "Internal server error processing contact submission." },
-      { status: 500 }
-    );
+    return c.json({ error: "Internal server error processing contact submission." }, 500);
   }
-}
+});
