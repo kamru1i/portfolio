@@ -262,12 +262,22 @@ const structuredData = {
         "https://www.facebook.com/kamru1i/",
         "https://www.instagram.com/kamru1i/",
         "https://www.tiktok.com/@kamru1i",
+        "https://wa.me/8801601000691",
       ],
       worksFor: {
         "@type": "Organization",
         name: "B&F Corporate",
       },
       email: "mailto:hello@kamrulislam.me",
+      telephone: "+880 1601 000 691",
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+880-1601-000691",
+        email: "hello@kamrulislam.me",
+        contactType: "customer support",
+        url: "https://wa.me/8801601000691",
+        availableLanguage: ["English", "Bengali", "Hindi"],
+      },
       alumniOf: {
         "@type": "EducationalOrganization",
         name: "Port City International University (PCIU)",

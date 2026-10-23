@@ -506,6 +506,15 @@ export default async function CurriculumVitaePage() {
                       className="text-white underline underline-offset-4 hover:text-emerald-400 transition-colors"
                     >
                       hello@kamrulislam.me
+                    </a>{" "}
+                    or via Phone &amp; <strong className="text-white font-normal">WhatsApp Business</strong> at{" "}
+                    <a
+                      href="https://wa.me/8801601000691"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white underline underline-offset-4 hover:text-emerald-400 transition-colors"
+                    >
+                      +880 1601 000 691
                     </a>
                     .
                   </p>
@@ -517,6 +526,14 @@ export default async function CurriculumVitaePage() {
                     className="px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
                   >
                     hello@kamrulislam.me ↗
+                  </a>
+                  <a
+                    href="https://wa.me/8801601000691"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 font-mono-custom text-xs uppercase tracking-wider border border-emerald-500/30 transition-all"
+                  >
+                    WhatsApp Business ↗
                   </a>
                   <Link
                     href="/projects"

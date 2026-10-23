@@ -1,5 +1,5 @@
 import { Database, ProjectType, VideoProvider, AspectRatio, WebPreviewMode } from "./database";
-import { PortfolioProject } from "@/lib/portfolio-data";
+import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
 
 export type { ProjectType, VideoProvider, AspectRatio, WebPreviewMode };
 
@@ -26,6 +26,15 @@ export interface ResolvedVideoMeta {
  */
 export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioProject {
   const isEmbed = record.preview_mode ? record.preview_mode === "iframe" : record.can_embed;
+  const fallbackMatch = PORTFOLIO_DATA.showcaseProjects.find(
+    (p) =>
+      (record.slug && p.slug === record.slug) ||
+      (record.live_url && p.liveUrl === record.live_url)
+  );
+  const defaultThumb =
+    fallbackMatch?.thumbnail ||
+    (record.type === "video" ? "/images/work-1-biqolpo.png" : "/images/aurexa/aurexa-project-1.png");
+
   return {
     id: record.id,
     slug: record.slug || undefined,
@@ -34,7 +43,7 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
     client: record.client_name || undefined,
     year: record.year || "",
     description: record.description,
-    thumbnail: record.preview_image_url || (record.type === "video" ? "/images/work-1-biqolpo.png" : "/images/aurexa/aurexa-project-1.png"),
+    thumbnail: record.preview_image_url || defaultThumb,
     previewImageUrl: record.preview_image_url || undefined,
     videoUrl: record.video_url || undefined,
     videoType: record.video_provider || "other",

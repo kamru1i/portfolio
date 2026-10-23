@@ -36,16 +36,47 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
   // Web states
   const [liveUrl, setLiveUrl] = useState(project.live_url || "");
   const [githubUrl, setGithubUrl] = useState(project.github_url || "");
-  const [previewMode, setPreviewMode] = useState<WebPreviewMode>(
+  const [previewMode] = useState<WebPreviewMode>(
     project.preview_mode || (project.can_embed === false ? "fallback" : "iframe")
   );
   const [webPreviewImageUrl, setWebPreviewImageUrl] = useState(
     !isVideo ? project.preview_image_url || "" : ""
   );
+  const [uploadingScreenshot, setUploadingScreenshot] = useState(false);
+  const [screenshotError, setScreenshotError] = useState<string | null>(null);
 
   // Submission state
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleUploadScreenshot = async (file: File) => {
+    setUploadingScreenshot(true);
+    setScreenshotError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/admin/upload-screenshot", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to upload screenshot");
+      }
+
+      if (data.url) {
+        setWebPreviewImageUrl(data.url);
+      }
+    } catch (err: unknown) {
+      setScreenshotError(
+        err instanceof Error ? err.message : "Failed to upload screenshot image"
+      );
+    } finally {
+      setUploadingScreenshot(false);
+    }
+  };
 
   // Auto-resolve video if URL changed
   const handleResolveVideo = async (urlToResolve = videoUrl) => {
@@ -340,7 +371,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
         ) : (
           <div className="p-6 rounded-2xl bg-[#141416] border border-white/10 space-y-5">
             <h3 className="font-mono-custom text-xs uppercase tracking-wider text-purple-400">
-              Web Application Links & Preview
+              Web Application Links & Homepage Screenshot
             </h3>
 
             <div>
@@ -354,6 +385,9 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
                 required
                 className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
               />
+              <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
+                When visitors click the project card, it opens the interactive live preview iframe with direct links to this Live Website and GitHub.
+              </p>
             </div>
 
             <div>
@@ -368,93 +402,106 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
               />
             </div>
 
-            {/* Web Preview Mode Selector */}
+            {/* Homepage Screenshot Upload & Static Preview */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
                 <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
-                  Web Preview Mode *
+                  Homepage Screenshot (Static Card View) *
                 </label>
-                <span className="font-mono-custom text-[11px] text-[#777]">
-                  Active: <strong className="text-white">{previewMode === "iframe" ? "Live Iframe" : "Fallback Showcase"}</strong>
+                <span className="font-mono-custom text-[11px] text-emerald-400">
+                  {webPreviewImageUrl ? "Screenshot Ready ✓" : "Upload PNG / JPG / WebP"}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Option 1: Live Iframe */}
-                <button
-                  type="button"
-                  onClick={() => setPreviewMode("iframe")}
-                  className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-3 ${
-                    previewMode === "iframe"
-                      ? "bg-white/10 border-white text-white shadow-sm ring-1 ring-white/20"
-                      : "bg-white/[0.02] border-white/10 text-[#888] hover:border-white/20 hover:text-white"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xl">🖥️</span>
-                      <span className="font-mono-custom text-[10px] px-2 py-0.5 rounded-full bg-sky-950/60 text-sky-300 border border-sky-800/50 uppercase">
-                        Interactive
-                      </span>
-                    </div>
-                    <span className="font-sans text-xs font-semibold text-white block">
-                      Live Iframe Preview (Auto)
-                    </span>
-                    <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
-                      Embeds the live website directly. Ideal for sites that permit cross-origin framing and don&apos;t run bot verification.
-                    </p>
-                  </div>
-                  <span className="font-mono-custom text-[10px] text-white/50">
-                    {previewMode === "iframe" ? "● Selected Mode" : "○ Click to select"}
-                  </span>
-                </button>
+              {/* Direct File Upload Dropzone */}
+              <div className="p-5 rounded-xl bg-[#18181b] border border-dashed border-white/20 hover:border-white/40 transition-colors flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-1 text-center sm:text-left">
+                  <p className="font-sans text-sm font-medium text-white">
+                    Upload Homepage Screenshot Image
+                  </p>
+                  <p className="font-mono-custom text-[11px] text-[#888]">
+                    Displayed statically on the project card for instant loading. Supports PNG, JPG, WebP, or AVIF (max 8 MB).
+                  </p>
+                </div>
 
-                {/* Option 2: Fallback Showcase */}
-                <button
-                  type="button"
-                  onClick={() => setPreviewMode("fallback")}
-                  className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-3 ${
-                    previewMode === "fallback"
-                      ? "bg-white/10 border-white text-white shadow-sm ring-1 ring-white/20"
-                      : "bg-white/[0.02] border-white/10 text-[#888] hover:border-white/20 hover:text-white"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xl">🛡️</span>
-                      <span className="font-mono-custom text-[10px] px-2 py-0.5 rounded-full bg-amber-950/60 text-amber-300 border border-amber-800/50 uppercase">
-                        Shielded
-                      </span>
-                    </div>
-                    <span className="font-sans text-xs font-semibold text-white block">
-                      Security-Shielded Fallback Preview
-                    </span>
-                    <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
-                      Recommended for Cloudflare (&ldquo;Please wait while your request is being verified...&rdquo;), Turnstile, or strict CSP. Displays domain favicon, snapshot, and direct Open CTA.
-                    </p>
-                  </div>
-                  <span className="font-mono-custom text-[10px] text-white/50">
-                    {previewMode === "fallback" ? "● Selected Mode" : "○ Click to select"}
-                  </span>
-                </button>
+                <label className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-2 shrink-0 shadow-sm">
+                  {uploadingScreenshot ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                      <span>Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>📤 Upload Image</span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/avif"
+                    disabled={uploadingScreenshot}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleUploadScreenshot(file);
+                        e.target.value = "";
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
               </div>
-            </div>
 
-            {/* Optional Fallback Preview Screenshot/Artwork */}
-            <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
-                Preview Screenshot / Thumbnail Image URL (Optional)
-              </label>
-              <input
-                type="text"
-                value={webPreviewImageUrl}
-                onChange={(e) => setWebPreviewImageUrl(e.target.value)}
-                placeholder="/images/aurexa/aurexa-project-3.png or https://..."
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
-              />
-              <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
-                Optional visual asset for the fallback showcase. If blank, automatically renders a clean branded canvas with the domain&apos;s live favicon.
-              </p>
+              {screenshotError && (
+                <div className="p-3 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
+                  {screenshotError}
+                </div>
+              )}
+
+              {/* Live Screenshot Card Preview */}
+              {webPreviewImageUrl && (
+                <div className="p-4 rounded-xl bg-black/50 border border-white/10 flex flex-col sm:flex-row items-center gap-4">
+                  <div className="relative w-full sm:w-48 h-28 rounded-lg overflow-hidden bg-[#0e0e0e] border border-white/15 shrink-0">
+                    <Image
+                      src={webPreviewImageUrl}
+                      alt="Homepage screenshot preview"
+                      fill
+                      unoptimized
+                      className="object-cover object-top"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-2 w-full">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono-custom text-[11px] uppercase px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/50">
+                        Active Static Card Screenshot
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setWebPreviewImageUrl("")}
+                        className="font-mono-custom text-[11px] text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <p className="font-mono-custom text-xs text-[#888] truncate">
+                      {webPreviewImageUrl}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Optional manual URL input */}
+              <div>
+                <label className="block font-mono-custom text-[11px] text-[#777] mb-1.5 uppercase">
+                  Or Paste Screenshot Image URL / Path Directly
+                </label>
+                <input
+                  type="text"
+                  value={webPreviewImageUrl}
+                  onChange={(e) => setWebPreviewImageUrl(e.target.value)}
+                  placeholder="/images/aurexa/aurexa-project-3.png or https://..."
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-xs font-mono-custom focus:outline-none focus:border-white/30"
+                />
+              </div>
             </div>
           </div>
         )}

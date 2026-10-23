@@ -168,17 +168,28 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                   </a>
                 </div>
 
-                {/* Phone */}
+                {/* Phone & WhatsApp Business */}
                 <div>
                   <p className="text-[#888] font-mono-custom text-[11px] uppercase tracking-widest mb-1.5">
-                    Phone
+                    Phone &amp; WhatsApp Business
                   </p>
-                  <a
-                    href={`tel:${PORTFOLIO_DATA.brand.phone.replace(/[^0-9+]/g, "")}`}
-                    className="text-lg sm:text-xl md:text-2xl text-white font-medium hover:text-white/80 transition-colors"
-                  >
-                    {PORTFOLIO_DATA.brand.phone}
-                  </a>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <a
+                      href={`tel:${PORTFOLIO_DATA.brand.phone.replace(/[^0-9+]/g, "")}`}
+                      className="text-lg sm:text-xl md:text-2xl text-white font-medium hover:text-white/80 transition-colors"
+                    >
+                      {PORTFOLIO_DATA.brand.phone}
+                    </a>
+                    <a
+                      href={PORTFOLIO_DATA.brand.whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-mono-custom text-[11px] uppercase tracking-wider transition-colors"
+                    >
+                      <span>WhatsApp Business</span>
+                      <span>↗</span>
+                    </a>
+                  </div>
                 </div>
 
                 {/* Location */}

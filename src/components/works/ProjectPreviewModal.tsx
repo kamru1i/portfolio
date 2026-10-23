@@ -40,12 +40,11 @@ function ProjectPreviewModalContent({
   project: PortfolioProject;
   onClose: () => void;
 }) {
-  const isInitialFallback = project.previewMode === "fallback" || project.canEmbed === false;
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
   const [viewportMode, setViewportMode] = useState<ViewportMode>("desktop");
   const [activeMode, setActiveMode] = useState<ModalPreviewMode>(
-    isInitialFallback ? "fallback" : "iframe"
+    project.liveUrl ? "iframe" : "fallback"
   );
 
   // Handle ESC key to dismiss

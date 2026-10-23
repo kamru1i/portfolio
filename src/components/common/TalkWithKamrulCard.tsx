@@ -63,6 +63,25 @@ export function TalkWithKamrulCard({
         </span>
       </div>
 
+      {/* Direct Phone & WhatsApp Business Row */}
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10 font-mono-custom text-xs">
+        <a
+          href={`tel:${PORTFOLIO_DATA.brand.phone.replace(/[^0-9+]/g, "")}`}
+          className="text-white/90 hover:text-white transition-colors"
+        >
+          {PORTFOLIO_DATA.brand.phone}
+        </a>
+        <a
+          href={PORTFOLIO_DATA.brand.whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[11px] uppercase tracking-wider transition-colors"
+        >
+          <span>WhatsApp Business</span>
+          <span>↗</span>
+        </a>
+      </div>
+
       {/* Contact CTA Button (optional) */}
       {showButton && (
         <Link

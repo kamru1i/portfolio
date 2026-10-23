@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- Uses raw <img> with onError fallback for arbitrary external favicons and screenshots */
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { PortfolioProject } from "@/lib/portfolio-data";
 
@@ -24,92 +24,38 @@ export function AurexaCaseStudyCard({
   project,
   onPreviewWeb,
 }: AurexaCaseStudyCardProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState<number>(0.28);
-  const [cardHeight, setCardHeight] = useState<number>(480);
+  const [imageError, setImageError] = useState(false);
 
-  const isEmbeddable = (project.previewMode ? project.previewMode === "iframe" : project.canEmbed !== false) && Boolean(project.liveUrl);
   const displayDomain = getDisplayDomain(project.liveUrl);
   const previewImage = project.previewImageUrl || project.thumbnail;
   const faviconUrl = `https://www.google.com/s2/favicons?domain=${displayDomain}&sz=64`;
-
-  // Dynamically compute iframe scale so it fills 100% of the card width with zero void or side bar
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const updateSize = () => {
-      if (containerRef.current) {
-        const w = containerRef.current.offsetWidth;
-        const h = containerRef.current.offsetHeight;
-        if (w > 0) {
-          // Standard virtual desktop viewport width is 1280px.
-          // Scale factor: w / 1280 guarantees rendered width === w (exact card width, 0px margin)
-          setScale(w / 1280);
-        }
-        if (h > 0) {
-          setCardHeight(h);
-        }
-      }
-    };
-
-    updateSize();
-    const ro = new ResizeObserver(updateSize);
-    ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, []);
+  const hasValidScreenshot = Boolean(previewImage) && !imageError;
 
   return (
     <div
-      ref={containerRef}
       data-project-id={project.id}
       onClick={() => {
         onPreviewWeb(project);
       }}
       className="relative group w-full h-[450px] sm:h-[460px] lg:h-[470px] xl:h-[485px] rounded-2xl sm:rounded-3xl border border-white/10 hover:border-white/25 bg-[#0e0e0e] overflow-hidden select-none cursor-pointer transition-all duration-500 shadow-[0_12px_40px_rgba(0,0,0,0.5)] flex flex-col justify-between"
     >
-      {/* Background: Live Homepage Preview (Iframe scaled to 100% card width) or Security-Shielded Canvas */}
-      {isEmbeddable && project.liveUrl ? (
+      {/* Background: Static Homepage Screenshot (Zero iframe lag on card grid) */}
+      {hasValidScreenshot ? (
         <div className="absolute inset-0 z-0 overflow-hidden bg-[#0d0e12] rounded-2xl sm:rounded-3xl">
-          {/* Virtual Desktop Viewport (1280px dynamically scaled to exactly 100% card width) */}
-          <div
-            style={{
-              width: 1280,
-              height: Math.max(1600, Math.round(cardHeight / (scale || 0.28))),
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
-            }}
-            className="pointer-events-none select-none origin-top-left"
-          >
-            <div className="w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.03] origin-top-left">
-              <iframe
-                src={project.liveUrl}
-                title={`${project.title} live homepage`}
-                loading="lazy"
-                tabIndex={-1}
-                aria-hidden="true"
-                sandbox="allow-scripts allow-same-origin"
-                className="w-full h-full border-0 bg-white"
-              />
-            </div>
-          </div>
+          <img
+            src={previewImage}
+            alt={`${project.title} homepage screenshot`}
+            loading="lazy"
+            onError={() => setImageError(true)}
+            className="w-full h-full object-cover object-top transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.04]"
+          />
 
           {/* Ambient Dark Gradients for Crisp Text Contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/30 to-black/90 pointer-events-none transition-opacity duration-300 group-hover:opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/25 to-black/90 pointer-events-none transition-opacity duration-300 group-hover:opacity-40" />
         </div>
       ) : (
-        /* Intentional Polished Live Web Preview Canvas for Security-Shielded Sites */
+        /* Static Fallback Canvas when no screenshot image is available */
         <div className="absolute inset-0 z-0 overflow-hidden bg-[#0a0b10] rounded-2xl sm:rounded-3xl flex flex-col justify-center items-center p-6 sm:p-7">
-          {/* Ambient Screenshot Layer if available */}
-          {previewImage && (
-            <div className="absolute inset-0 overflow-hidden opacity-30 group-hover:opacity-40 transition-opacity duration-700">
-              <img
-                src={previewImage}
-                alt=""
-                className="w-full h-full object-cover object-top scale-105 group-hover:scale-110 transition-transform duration-700 blur-[1px]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/90" />
-            </div>
-          )}
-
           {/* Subtle Ambient Radial Lighting & Grid Pattern */}
           <div
             className="absolute inset-0 opacity-25 pointer-events-none"
@@ -159,24 +105,6 @@ export function AurexaCaseStudyCard({
             <p className="font-sans font-medium text-base text-white tracking-tight">
               {project.title}
             </p>
-
-            <span className="mt-1 font-mono-custom text-[10px] sm:text-[11px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-800/30">
-              Security-Shielded Deployment
-            </span>
-
-            {/* Direct Open Action */}
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="mt-4 px-4 py-2 rounded-xl bg-white text-black font-sans text-xs font-medium hover:bg-neutral-200 transition-all flex items-center gap-1.5 shadow-md hover:scale-105"
-              >
-                <span>Open Live Site</span>
-                <span>↗</span>
-              </a>
-            )}
           </div>
 
           {/* Ambient Bottom Fade */}
@@ -189,7 +117,7 @@ export function AurexaCaseStudyCard({
         <div className="flex items-center gap-2 mb-1.5">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="font-mono-custom text-[11px] uppercase tracking-wider text-emerald-400 font-medium">
-            {isEmbeddable ? "Live Preview" : "Live Production"}
+            Live Production
           </span>
           <span className="text-white/30 text-xs">•</span>
           <span className="font-mono-custom text-[11px] text-white/50 truncate max-w-[150px]">
@@ -212,7 +140,7 @@ export function AurexaCaseStudyCard({
         </span>
 
         <span className="font-mono-custom text-[11px] text-white/40 border border-white/10 px-2 py-0.5 rounded-full bg-white/5">
-          {isEmbeddable ? "Interactive Iframe" : "Shielded Link"}
+          Click for Live Preview
         </span>
       </div>
 

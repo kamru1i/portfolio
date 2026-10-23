@@ -40,11 +40,12 @@ export function ContactHeroOptions() {
     },
     {
       id: "start-conversation",
-      title: "Start a conversation",
+      title: "WhatsApp Business & Phone",
       description:
-        "Reach out directly for quick questions, project inquiries, or collaboration opportunities.",
-      actionText: "Start enquiry",
-      actionHref: "#get-in-touch",
+        "Message directly on WhatsApp Business or call +880 1601 000 691 for quick questions, project inquiries, or collaboration.",
+      actionText: `${PORTFOLIO_DATA.brand.phone} (WhatsApp)`,
+      actionHref: PORTFOLIO_DATA.brand.whatsappUrl,
+      isExternal: true,
       icon: (
         <svg
           width="24"
@@ -149,6 +150,8 @@ export function ContactHeroOptions() {
             {opt.isExternal ? (
               <a
                 href={opt.actionHref}
+                target={opt.actionHref.startsWith("http") ? "_blank" : undefined}
+                rel={opt.actionHref.startsWith("http") ? "noopener noreferrer" : undefined}
                 className="inline-flex items-center justify-between w-full font-mono-custom text-xs sm:text-sm text-white/90 hover:text-white transition-colors group/link"
               >
                 <span className="truncate pr-2">{opt.actionText}</span>
