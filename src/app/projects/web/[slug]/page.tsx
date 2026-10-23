@@ -139,7 +139,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(webProjectJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webProjectJsonLd).replace(/</g, "\\u003c") }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />

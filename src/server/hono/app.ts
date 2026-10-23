@@ -147,6 +147,8 @@ app.post("/admin/auth/logout", async (c) => {
 
 // Centralized Admin Auth Guard for all other /api/admin/* endpoints
 app.use("/admin/*", async (c, next) => {
+  c.header("Cache-Control", "no-store, no-cache, must-revalidate, private");
+
   if (c.req.path === "/api/admin/auth/logout") {
     return next();
   }

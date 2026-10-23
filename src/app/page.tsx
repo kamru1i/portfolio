@@ -41,7 +41,7 @@ export default async function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeProfileJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeProfileJsonLd).replace(/</g, "\\u003c") }}
       />
       <HomePageClient initialProjects={initialProjects} />
     </>

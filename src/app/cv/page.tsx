@@ -171,7 +171,7 @@ export default async function CurriculumVitaePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
 
       <Navigation isRevealed={true} />
@@ -510,13 +510,13 @@ export default async function CurriculumVitaePage() {
                     or{" "}
                     <span className="inline-flex items-center gap-1.5 align-middle">
                       <a
-                        href="tel:+8801601000691"
+                        href="tel:+8801839006867"
                         className="text-white underline underline-offset-4 hover:text-emerald-400 transition-colors"
                       >
-                        +880 1601 000 691
+                        (+880) 1839 00 6867
                       </a>
                       <a
-                        href="https://wa.me/8801601000691"
+                        href="https://wa.me/8801839006867"
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Chat on WhatsApp"

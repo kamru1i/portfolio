@@ -262,20 +262,20 @@ const structuredData = {
         "https://www.facebook.com/kamru1i/",
         "https://www.instagram.com/kamru1i/",
         "https://www.tiktok.com/@kamru1i",
-        "https://wa.me/8801601000691",
+        "https://wa.me/8801839006867",
       ],
       worksFor: {
         "@type": "Organization",
         name: "B&F Corporate",
       },
       email: "mailto:hello@kamrulislam.me",
-      telephone: "+880 1601 000 691",
+      telephone: "(+880) 1839 00 6867",
       contactPoint: {
         "@type": "ContactPoint",
-        telephone: "+880-1601-000691",
+        telephone: "+880-1839-006867",
         email: "hello@kamrulislam.me",
         contactType: "customer support",
-        url: "https://wa.me/8801601000691",
+        url: "https://wa.me/8801839006867",
         availableLanguage: ["English", "Bengali", "Hindi"],
       },
       alumniOf: {
@@ -392,7 +392,7 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
         />
       </head>
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black min-h-screen">

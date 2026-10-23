@@ -131,7 +131,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicePageJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicePageJsonLd).replace(/</g, "\\u003c") }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />

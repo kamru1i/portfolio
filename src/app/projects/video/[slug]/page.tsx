@@ -171,7 +171,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoPageJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoPageJsonLd).replace(/</g, "\\u003c") }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />

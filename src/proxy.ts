@@ -7,13 +7,10 @@ export async function proxy(request: NextRequest) {
     request,
   });
 
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    "https://uilbqehatpncchadwjza.supabase.co";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpbGJxZWhhdHBuY2NoYWR3anphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTU4MjgsImV4cCI6MjEwNzEzMTgyOH0.XjgR3JQ4dAhm3B693WJjWqKUDyeiC8m7md6xtFnnRVg";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     return response;
@@ -43,9 +40,21 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Protect /admin routes (excluding /admin/login)
+  // Protect /admin routes (excluding /admin/login) with both authentication and admin_users allowlist check
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     if (!user) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
+      return NextResponse.redirect(loginUrl);
+    }
+
+    const { data: adminRecord } = await supabase
+      .from("admin_users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!adminRecord) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/admin/login";
       return NextResponse.redirect(loginUrl);

@@ -58,6 +58,11 @@ contactRoute.post("/", async (c) => {
       );
     }
 
+    const contentLength = Number(c.req.header("content-length") || 0);
+    if (contentLength > 32 * 1024) {
+      return c.json({ error: "Request payload is too large." }, 413);
+    }
+
     const body = await c.req.json();
     const { name, email, company, projectType, budgetRange, timeline, details, botCheck } = body;
 

@@ -222,17 +222,29 @@ export async function getAllProjectsForAdmin(
   };
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function sanitizeTagsArray(rawTags: unknown): string[] {
+  if (!Array.isArray(rawTags)) return [];
+  return rawTags
+    .filter((t): t is string => typeof t === "string")
+    .map((t) => t.replace(/[\r\n\0]+/g, " ").trim().slice(0, 50))
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
 /**
  * Retrieves a single project by ID.
  */
 export async function getProjectById(id: string): Promise<ProjectRecord | null> {
+  if (!UUID_REGEX.test(id.trim())) return null;
   const supabase = await createClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase
     .from("projects")
     .select("*")
-    .eq("id", id)
+    .eq("id", id.trim())
     .single();
 
   if (error || !data) return null;
@@ -373,20 +385,27 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
   const previewMode = input.preview_mode === "fallback" || input.can_embed === false ? "fallback" : "iframe";
   const canEmbed = input.type === "web" ? previewMode === "iframe" : (input.can_embed ?? false);
 
+  // Explicitly whitelist allowed columns & bound string lengths to prevent mass-assignment
   const insertData: ProjectInsert = {
-    ...input,
-    slug,
+    type: input.type,
+    title: input.title.trim().slice(0, 200),
+    slug: slug.slice(0, 200),
+    description: (input.description || "").trim().slice(0, 5000),
+    client_name: input.client_name ? String(input.client_name).trim().slice(0, 120) : null,
+    year: input.year ? String(input.year).trim().slice(0, 20) : null,
     video_url: cleanVideoUrl,
     live_url: cleanLiveUrl,
     github_url: cleanGithubUrl,
     preview_image_url: previewImageUrl,
     video_provider: videoProvider,
-    video_id: videoId,
+    video_id: videoId ? String(videoId).trim().slice(0, 100) : null,
     aspect_ratio: aspectRatio,
+    tags: sanitizeTagsArray(input.tags),
     manual_priority: manualPriority,
     preview_mode: input.type === "web" ? previewMode : null,
     can_embed: canEmbed,
-    sort_order: manualPriority ?? (input.sort_order ?? 0),
+    is_published: Boolean(input.is_published),
+    sort_order: manualPriority ?? (Number(input.sort_order) || 0),
     published_at: input.is_published ? (input.published_at || now) : null,
   };
 
@@ -428,13 +447,67 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
  * Updates an existing project and triggers cache revalidation.
  */
 export async function updateProject(id: string, updates: ProjectUpdate): Promise<ProjectRecord> {
+  if (!UUID_REGEX.test(id.trim())) {
+    throw new Error("Invalid project ID format.");
+  }
   const supabase = await createClient();
   if (!supabase) {
     throw new Error("Supabase is not configured.");
   }
 
-  // If publishing for the first time, set published_at
-  const updatePayload: ProjectUpdate = { ...updates };
+  // Explicitly whitelist allowed update fields to prevent mass-assignment of id or created_at
+  const updatePayload: ProjectUpdate = {};
+
+  if (updates.type !== undefined) {
+    if (!["video", "web"].includes(updates.type)) {
+      throw new Error("Project type must be either 'video' or 'web'.");
+    }
+    updatePayload.type = updates.type;
+  }
+  if (updates.title !== undefined) {
+    const cleanTitle = String(updates.title).trim().slice(0, 200);
+    if (!cleanTitle) throw new Error("Project title cannot be empty.");
+    updatePayload.title = cleanTitle;
+  }
+  if (updates.slug !== undefined) {
+    const cleanSlug = generateSlug(String(updates.slug));
+    if (cleanSlug) updatePayload.slug = cleanSlug.slice(0, 200);
+  }
+  if (updates.description !== undefined) {
+    updatePayload.description = String(updates.description).trim().slice(0, 5000);
+  }
+  if (updates.client_name !== undefined) {
+    updatePayload.client_name = updates.client_name
+      ? String(updates.client_name).trim().slice(0, 120)
+      : null;
+  }
+  if (updates.year !== undefined) {
+    updatePayload.year = updates.year ? String(updates.year).trim().slice(0, 20) : null;
+  }
+  if (updates.tags !== undefined) {
+    updatePayload.tags = sanitizeTagsArray(updates.tags);
+  }
+  if (updates.is_published !== undefined) {
+    updatePayload.is_published = Boolean(updates.is_published);
+  }
+  if (updates.published_at !== undefined) {
+    updatePayload.published_at = updates.published_at;
+  }
+  if (updates.sort_order !== undefined) {
+    updatePayload.sort_order = Number(updates.sort_order) || 0;
+  }
+  if (updates.video_provider !== undefined) {
+    updatePayload.video_provider = updates.video_provider;
+  }
+  if (updates.video_id !== undefined) {
+    updatePayload.video_id = updates.video_id ? String(updates.video_id).trim().slice(0, 100) : null;
+  }
+  if (updates.aspect_ratio !== undefined) {
+    if (!(VALID_ASPECT_RATIOS as readonly string[]).includes(updates.aspect_ratio)) {
+      throw new Error("Invalid aspect ratio format.");
+    }
+    updatePayload.aspect_ratio = updates.aspect_ratio;
+  }
 
   if (updates.video_url !== undefined) {
     updatePayload.video_url = sanitizeProjectUrl(updates.video_url, "Video URL");
@@ -451,12 +524,6 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
       "Preview Image URL",
       true
     );
-  }
-  if (
-    updates.aspect_ratio !== undefined &&
-    !(VALID_ASPECT_RATIOS as readonly string[]).includes(updates.aspect_ratio)
-  ) {
-    throw new Error("Invalid aspect ratio format.");
   }
 
   if (updates.is_published === true && !updates.published_at) {
@@ -533,12 +600,15 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
  * Deletes a project.
  */
 export async function deleteProject(id: string): Promise<boolean> {
+  if (!UUID_REGEX.test(id.trim())) {
+    throw new Error("Invalid project ID format.");
+  }
   const supabase = await createClient();
   if (!supabase) {
     throw new Error("Supabase is not configured.");
   }
 
-  const { error } = await supabase.from("projects").delete().eq("id", id);
+  const { error } = await supabase.from("projects").delete().eq("id", id.trim());
   if (error) {
     throw new Error(`Failed to delete project: ${error.message}`);
   }

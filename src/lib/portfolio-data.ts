@@ -153,9 +153,9 @@ export const PORTFOLIO_DATA = {
     location: "Chittagong, Bangladesh",
     timezone: "Asia/Dhaka", // UTC+6
     email: "hello@kamrulislam.me",
-    phone: "+880 1601 000 691",
-    whatsapp: "+880 1601 000 691",
-    whatsappUrl: "https://wa.me/8801601000691",
+    phone: "(+880) 1839 00 6867",
+    whatsapp: "(+880) 1839 00 6867",
+    whatsappUrl: "https://wa.me/8801839006867",
     socials: [
       { label: "LI", name: "LinkedIn", url: "https://www.linkedin.com/in/kamru1i/" },
       { label: "GH", name: "GitHub", url: "https://github.com/kamru1i" },
