@@ -57,6 +57,12 @@ export default async function AdminDashboardLayout({
                 + New Project
               </Link>
               <Link
+                href="/admin/inquiries"
+                className="px-3 py-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                Inquiries
+              </Link>
+              <Link
                 href="/admin/cv"
                 className="px-3 py-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
               >

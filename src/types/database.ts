@@ -10,6 +10,7 @@ export type ProjectType = "video" | "web";
 export type VideoProvider = "youtube" | "vimeo" | "tiktok" | "facebook" | "instagram" | "twitter" | "local" | "other";
 export type AspectRatio = "16:9" | "9:16" | "1:1" | "4:3" | "5:4";
 export type WebPreviewMode = "iframe" | "fallback";
+export type InquiryStatus = "unread" | "read" | "replied" | "archived";
 
 export interface Database {
   public: {
@@ -23,6 +24,9 @@ export interface Database {
           description: string;
           client_name: string | null;
           year: string | null;
+          role: string | null;
+          overview: string | null;
+          deliverables: string[];
           video_url: string | null;
           video_provider: VideoProvider | null;
           video_id: string | null;
@@ -48,6 +52,9 @@ export interface Database {
           description?: string;
           client_name?: string | null;
           year?: string | null;
+          role?: string | null;
+          overview?: string | null;
+          deliverables?: string[];
           video_url?: string | null;
           video_provider?: VideoProvider | null;
           video_id?: string | null;
@@ -73,6 +80,9 @@ export interface Database {
           description?: string;
           client_name?: string | null;
           year?: string | null;
+          role?: string | null;
+          overview?: string | null;
+          deliverables?: string[];
           video_url?: string | null;
           video_provider?: VideoProvider | null;
           video_id?: string | null;
@@ -87,6 +97,51 @@ export interface Database {
           published_at?: string | null;
           sort_order?: number;
           manual_priority?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      contact_inquiries: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          company: string | null;
+          project_type: string;
+          budget_range: string | null;
+          timeline: string | null;
+          details: string;
+          status: InquiryStatus;
+          email_delivered: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          email: string;
+          company?: string | null;
+          project_type: string;
+          budget_range?: string | null;
+          timeline?: string | null;
+          details: string;
+          status?: InquiryStatus;
+          email_delivered?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          email?: string;
+          company?: string | null;
+          project_type?: string;
+          budget_range?: string | null;
+          timeline?: string | null;
+          details?: string;
+          status?: InquiryStatus;
+          email_delivered?: boolean;
           created_at?: string;
           updated_at?: string;
         };

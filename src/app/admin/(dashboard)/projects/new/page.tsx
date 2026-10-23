@@ -18,6 +18,9 @@ export default function NewProjectPage() {
   const [clientName, setClientName] = useState("");
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [description, setDescription] = useState("");
+  const [role, setRole] = useState("");
+  const [overview, setOverview] = useState("");
+  const [deliverablesInput, setDeliverablesInput] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [manualPriority, setManualPriority] = useState("");
   const [isPublished, setIsPublished] = useState(true);
@@ -147,6 +150,11 @@ export default function NewProjectPage() {
         .map((t) => t.trim())
         .filter(Boolean);
 
+      const deliverables = deliverablesInput
+        .split(",")
+        .map((d) => d.trim())
+        .filter(Boolean);
+
       const payload = {
         type: projectType,
         title: title.trim(),
@@ -154,6 +162,9 @@ export default function NewProjectPage() {
         client_name: clientName.trim() || null,
         year: year.trim() || null,
         description: description.trim(),
+        role: role.trim() || null,
+        overview: overview.trim() || null,
+        deliverables,
         tags,
         manual_priority: parsedPriority,
         is_published: isPublished,
@@ -617,13 +628,13 @@ export default function NewProjectPage() {
 
           <div>
             <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
-              Description
+              Short Summary / Description
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Detailed description of the project, story, or architectural highlights..."
+              placeholder="Concise summary displayed on project cards and the top of the case study page..."
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
             />
           </div>
@@ -636,9 +647,74 @@ export default function NewProjectPage() {
               type="text"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
-              placeholder="e.g. Premiere Pro, After Effects, Sound Design"
+              placeholder={
+                projectType === "video"
+                  ? "e.g. Premiere Pro, DaVinci Resolve, Sound Design"
+                  : "e.g. Next.js 16, TypeScript, Tailwind CSS, Supabase"
+              }
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
             />
+          </div>
+
+          {/* Case Study Detail Fields */}
+          <div className="pt-4 border-t border-white/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-mono-custom text-xs uppercase tracking-wider text-emerald-400">
+                Case Study Page Details (Optional)
+              </h4>
+              <span className="font-mono-custom text-[11px] text-[#666]">
+                Displayed on /projects/{projectType}/[slug]
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                  Your Role
+                </label>
+                <input
+                  type="text"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  placeholder={
+                    projectType === "video"
+                      ? "e.g. Lead Video Editor & Colorist"
+                      : "e.g. Full-Stack Developer & UI Engineer"
+                  }
+                  className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
+                />
+              </div>
+
+              <div>
+                <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                  Deliverables (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={deliverablesInput}
+                  onChange={(e) => setDeliverablesInput(e.target.value)}
+                  placeholder={
+                    projectType === "video"
+                      ? "e.g. 4K Master Cut, Color Grading, Audio Mix"
+                      : "e.g. Production Web App, Admin CMS, REST API"
+                  }
+                  className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                Detailed Case Study Overview
+              </label>
+              <textarea
+                rows={4}
+                value={overview}
+                onChange={(e) => setOverview(e.target.value)}
+                placeholder="In-depth breakdown of the architecture, editing workflow, challenges solved, and final impact..."
+                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
+              />
+            </div>
           </div>
 
           {/* Manual Display Priority */}

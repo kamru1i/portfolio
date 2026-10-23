@@ -1,6 +1,14 @@
 import { createClient } from "./supabase/server";
 import { PORTFOLIO_DATA, PortfolioProject } from "./portfolio-data";
-import { ProjectInsert, ProjectRecord, ProjectUpdate, mapProjectRecordToPortfolio, compareProjectsByPriorityAndRecency } from "@/types/project";
+import {
+  ProjectInsert,
+  ProjectRecord,
+  ProjectUpdate,
+  mapProjectRecordToPortfolio,
+  compareProjectsByPriorityAndRecency,
+  extractCaseStudyFromRecord,
+  encodeCaseStudyIntoDescription,
+} from "@/types/project";
 import { resolveVideoMetadata } from "./video-metadata";
 import { revalidatePath, revalidateTag } from "next/cache";
 
@@ -204,7 +212,7 @@ export async function getAllProjectsForAdmin(
     throw new Error(`Failed to load projects: ${error.message}`);
   }
 
-  const rawProjects = (data as ProjectRecord[]) || [];
+  const rawProjects = ((data as ProjectRecord[]) || []).map(normalizeProjectRecord);
   const total = count || rawProjects.length;
   const totalPages = Math.ceil(total / safePageSize) || 1;
 
@@ -224,13 +232,24 @@ export async function getAllProjectsForAdmin(
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function sanitizeTagsArray(rawTags: unknown): string[] {
+function sanitizeTagsArray(rawTags: unknown, maxItemLen = 50, maxItems = 20): string[] {
   if (!Array.isArray(rawTags)) return [];
   return rawTags
     .filter((t): t is string => typeof t === "string")
-    .map((t) => t.replace(/[\r\n\0]+/g, " ").trim().slice(0, 50))
+    .map((t) => t.replace(/[\r\n\0]+/g, " ").trim().slice(0, maxItemLen))
     .filter(Boolean)
-    .slice(0, 20);
+    .slice(0, maxItems);
+}
+
+function normalizeProjectRecord(record: ProjectRecord): ProjectRecord {
+  const extracted = extractCaseStudyFromRecord(record);
+  return {
+    ...record,
+    description: extracted.description,
+    role: extracted.role,
+    overview: extracted.overview,
+    deliverables: extracted.deliverables,
+  };
 }
 
 /**
@@ -248,7 +267,7 @@ export async function getProjectById(id: string): Promise<ProjectRecord | null> 
     .single();
 
   if (error || !data) return null;
-  return data as ProjectRecord;
+  return normalizeProjectRecord(data as ProjectRecord);
 }
 
 /**
@@ -385,14 +404,22 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
   const previewMode = input.preview_mode === "fallback" || input.can_embed === false ? "fallback" : "iframe";
   const canEmbed = input.type === "web" ? previewMode === "iframe" : (input.can_embed ?? false);
 
+  const cleanDescription = (input.description || "").trim().slice(0, 5000);
+  const cleanRole = input.role ? String(input.role).replace(/[\r\n\0]+/g, " ").trim().slice(0, 150) : null;
+  const cleanOverview = input.overview ? String(input.overview).replace(/\0/g, "").trim().slice(0, 8000) : null;
+  const cleanDeliverables = sanitizeTagsArray(input.deliverables, 120, 20);
+
   // Explicitly whitelist allowed columns & bound string lengths to prevent mass-assignment
   const insertData: ProjectInsert = {
     type: input.type,
     title: input.title.trim().slice(0, 200),
     slug: slug.slice(0, 200),
-    description: (input.description || "").trim().slice(0, 5000),
+    description: cleanDescription,
     client_name: input.client_name ? String(input.client_name).trim().slice(0, 120) : null,
     year: input.year ? String(input.year).trim().slice(0, 20) : null,
+    role: cleanRole,
+    overview: cleanOverview,
+    deliverables: cleanDeliverables,
     video_url: cleanVideoUrl,
     live_url: cleanLiveUrl,
     github_url: cleanGithubUrl,
@@ -415,9 +442,28 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
     .select()
     .single();
 
-  // Gracefully retry without preview_mode if column is not yet present on remote DB
-  if (error && error.message && error.message.includes("preview_mode")) {
-    const { preview_mode: _, ...fallbackInsert } = insertData;
+  // Gracefully retry if case-study or preview_mode columns are not yet present on remote DB
+  if (
+    error &&
+    error.message &&
+    (error.message.includes("role") ||
+      error.message.includes("overview") ||
+      error.message.includes("deliverables") ||
+      error.message.includes("preview_mode"))
+  ) {
+    const {
+      role: _r,
+      overview: _o,
+      deliverables: _d,
+      preview_mode: _p,
+      ...fallbackInsert
+    } = insertData;
+    fallbackInsert.description = encodeCaseStudyIntoDescription(
+      cleanDescription,
+      cleanRole,
+      cleanOverview,
+      cleanDeliverables
+    );
     const retry = await supabase
       .from("projects")
       .insert(fallbackInsert)
@@ -440,7 +486,7 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
     // tag revalidation fallback
   }
 
-  return data as ProjectRecord;
+  return normalizeProjectRecord(data as ProjectRecord);
 }
 
 /**
@@ -483,6 +529,19 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
   }
   if (updates.year !== undefined) {
     updatePayload.year = updates.year ? String(updates.year).trim().slice(0, 20) : null;
+  }
+  if (updates.role !== undefined) {
+    updatePayload.role = updates.role
+      ? String(updates.role).replace(/[\r\n\0]+/g, " ").trim().slice(0, 150)
+      : null;
+  }
+  if (updates.overview !== undefined) {
+    updatePayload.overview = updates.overview
+      ? String(updates.overview).replace(/\0/g, "").trim().slice(0, 8000)
+      : null;
+  }
+  if (updates.deliverables !== undefined) {
+    updatePayload.deliverables = sanitizeTagsArray(updates.deliverables, 120, 20);
   }
   if (updates.tags !== undefined) {
     updatePayload.tags = sanitizeTagsArray(updates.tags);
@@ -568,9 +627,50 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
     .select()
     .single();
 
-  // Gracefully retry without preview_mode if column is not yet present on remote DB
-  if (error && error.message && error.message.includes("preview_mode")) {
-    const { preview_mode: _, ...fallbackPayload } = updatePayload;
+  // Gracefully retry if case-study or preview_mode columns are not yet present on remote DB
+  if (
+    error &&
+    error.message &&
+    (error.message.includes("role") ||
+      error.message.includes("overview") ||
+      error.message.includes("deliverables") ||
+      error.message.includes("preview_mode"))
+  ) {
+    const {
+      role: _r,
+      overview: _o,
+      deliverables: _d,
+      preview_mode: _p,
+      ...fallbackPayload
+    } = updatePayload;
+    if (
+      updatePayload.description !== undefined ||
+      updatePayload.role !== undefined ||
+      updatePayload.overview !== undefined ||
+      updatePayload.deliverables !== undefined
+    ) {
+      const existing = await getProjectById(id);
+      const baseDesc =
+        updatePayload.description !== undefined
+          ? updatePayload.description
+          : existing?.description || "";
+      const roleVal =
+        updatePayload.role !== undefined ? updatePayload.role : existing?.role || null;
+      const overviewVal =
+        updatePayload.overview !== undefined
+          ? updatePayload.overview
+          : existing?.overview || null;
+      const delivVal =
+        updatePayload.deliverables !== undefined
+          ? updatePayload.deliverables
+          : existing?.deliverables || [];
+      fallbackPayload.description = encodeCaseStudyIntoDescription(
+        baseDesc,
+        roleVal,
+        overviewVal,
+        delivVal
+      );
+    }
     const retry = await supabase
       .from("projects")
       .update(fallbackPayload)
@@ -593,7 +693,7 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
     // fallback
   }
 
-  return data as ProjectRecord;
+  return normalizeProjectRecord(data as ProjectRecord);
 }
 
 /**

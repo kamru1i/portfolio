@@ -160,6 +160,14 @@ export default function AdminDashboardPage() {
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <Link
+            href="/admin/inquiries"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-all"
+          >
+            <span>📬</span>
+            <span>Client Inquiries</span>
+          </Link>
+
+          <Link
             href="/admin/cv"
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-all"
           >

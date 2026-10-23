@@ -17,6 +17,11 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
   const [clientName, setClientName] = useState(project.client_name || "");
   const [year, setYear] = useState(project.year || "");
   const [description, setDescription] = useState(project.description || "");
+  const [role, setRole] = useState(project.role || "");
+  const [overview, setOverview] = useState(project.overview || "");
+  const [deliverablesInput, setDeliverablesInput] = useState(
+    (project.deliverables || []).join(", ")
+  );
   const [tagsInput, setTagsInput] = useState((project.tags || []).join(", "));
   const [manualPriority, setManualPriority] = useState<string>(
     project.manual_priority ? project.manual_priority.toString() : project.sort_order && project.sort_order > 0 ? project.sort_order.toString() : ""
@@ -135,12 +140,20 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
         .map((t) => t.trim())
         .filter(Boolean);
 
+      const deliverables = deliverablesInput
+        .split(",")
+        .map((d) => d.trim())
+        .filter(Boolean);
+
       const payload = {
         title: title.trim(),
         slug: slug.trim(),
         client_name: clientName.trim() || null,
         year: year.trim() || null,
         description: description.trim(),
+        role: role.trim() || null,
+        overview: overview.trim() || null,
+        deliverables,
         tags,
         manual_priority: parsedPriority,
         is_published: isPublished,
@@ -568,7 +581,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
 
           <div>
             <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
-              Description
+              Short Summary / Description
             </label>
             <textarea
               rows={3}
@@ -588,6 +601,67 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
               onChange={(e) => setTagsInput(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white text-sm font-mono-custom focus:outline-none focus:border-white/30"
             />
+          </div>
+
+          {/* Case Study Detail Fields */}
+          <div className="pt-4 border-t border-white/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-mono-custom text-xs uppercase tracking-wider text-emerald-400">
+                Case Study Page Details (Optional)
+              </h4>
+              <span className="font-mono-custom text-[11px] text-[#666]">
+                Displayed on /projects/{project.type}/{slug || project.id}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                  Your Role
+                </label>
+                <input
+                  type="text"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  placeholder={
+                    isVideo
+                      ? "e.g. Lead Video Editor & Colorist"
+                      : "e.g. Full-Stack Developer & UI Engineer"
+                  }
+                  className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
+                />
+              </div>
+
+              <div>
+                <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                  Deliverables (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={deliverablesInput}
+                  onChange={(e) => setDeliverablesInput(e.target.value)}
+                  placeholder={
+                    isVideo
+                      ? "e.g. 4K Master Cut, Color Grading, Audio Mix"
+                      : "e.g. Production Web App, Admin CMS, REST API"
+                  }
+                  className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                Detailed Case Study Overview
+              </label>
+              <textarea
+                rows={4}
+                value={overview}
+                onChange={(e) => setOverview(e.target.value)}
+                placeholder="In-depth breakdown of the architecture, editing workflow, challenges solved, and final impact..."
+                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
+              />
+            </div>
           </div>
 
           {/* Manual Display Priority */}

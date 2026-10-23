@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { Resend } from "resend";
+import { saveContactInquiry } from "@/lib/inquiries-service";
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_REQUESTS_PER_WINDOW = 5;
@@ -319,72 +320,97 @@ https://kamrulislam.me
 </html>
 `.trim();
 
+    let emailDelivered = false;
+    let deliveryId: string | null = null;
+    let autoReplyDeliveryId: string | null = null;
+    let autoReplyErrorMessage: string | null = null;
+    let resendErrorMessage: string | null = null;
+
     if (!apiKey) {
       console.warn(
         `[Contact API Notice]: RESEND_API_KEY environment variable is not configured. ` +
-          `Enquiry from "${cleanName}" <${cleanEmail}> was received and logged to server console.`
+          `Enquiry from "${cleanName}" <${cleanEmail}> will be stored in Admin Inquiries Inbox.`
       );
+      resendErrorMessage = "RESEND_API_KEY not configured";
+    } else {
+      try {
+        const resend = new Resend(apiKey);
+        const { data, error } = await resend.emails.send({
+          from: sender,
+          to: [recipient],
+          replyTo: cleanEmail,
+          subject: `[Portfolio Enquiry] ${cleanProjectType} — ${cleanName}`,
+          text: textContent,
+          html: htmlContent,
+        });
 
-      return c.json(
-        {
-          error: "Email delivery service is awaiting RESEND_API_KEY configuration.",
-          code: "PROVIDER_KEY_MISSING",
-        },
-        503
-      );
+        if (error) {
+          console.error("[Resend Delivery Error]:", error);
+          resendErrorMessage = error.message || "Email provider could not initiate delivery.";
+        } else {
+          emailDelivered = true;
+          deliveryId = data?.id || null;
+
+          try {
+            const autoReplyResult = await resend.emails.send({
+              from: autoReplySender,
+              to: [cleanEmail],
+              subject: `[Received] Thank you for your inquiry — Kamrul Islam`,
+              text: autoReplyText,
+              html: autoReplyHtml,
+            });
+
+            if (autoReplyResult.error) {
+              autoReplyErrorMessage =
+                autoReplyResult.error.message ||
+                "Auto-reply awaiting verified domain at resend.com/domains";
+            } else {
+              autoReplyDeliveryId = autoReplyResult.data?.id || null;
+            }
+          } catch (autoReplyErr: unknown) {
+            autoReplyErrorMessage =
+              autoReplyErr instanceof Error
+                ? autoReplyErr.message
+                : "Auto-reply awaiting verified domain at resend.com/domains";
+          }
+        }
+      } catch (resendException: unknown) {
+        console.error("[Resend Exception]:", resendException);
+        resendErrorMessage =
+          resendException instanceof Error ? resendException.message : "Email provider exception";
+      }
     }
 
-    const resend = new Resend(apiKey);
-
-    const { data, error } = await resend.emails.send({
-      from: sender,
-      to: [recipient],
-      replyTo: cleanEmail,
-      subject: `[Portfolio Enquiry] ${cleanProjectType} — ${cleanName}`,
-      text: textContent,
-      html: htmlContent,
+    // Always persist inquiry to Admin Inquiries Inbox (Supabase + runtime fallback)
+    const backupResult = await saveContactInquiry({
+      name: cleanName,
+      email: cleanEmail,
+      company: cleanCompany === "N/A" ? null : cleanCompany,
+      project_type: cleanProjectType,
+      budget_range: cleanBudget === "Not specified" ? null : cleanBudget,
+      timeline: cleanTimeline === "Not specified" ? null : cleanTimeline,
+      details: cleanDetails,
+      email_delivered: emailDelivered,
     });
 
-    if (error) {
-      console.error("[Resend Delivery Error]:", error);
+    if (!emailDelivered && !backupResult.saved) {
       return c.json(
         {
-          error: error.message || "Email provider could not initiate delivery.",
-          code: "PROVIDER_ERROR",
+          error: resendErrorMessage || "Unable to deliver or store inquiry at this time.",
+          code: "DELIVERY_FAILED",
         },
         502
       );
     }
 
-    let autoReplyDeliveryId: string | null = null;
-    let autoReplyErrorMessage: string | null = null;
-    try {
-      const autoReplyResult = await resend.emails.send({
-        from: autoReplySender,
-        to: [cleanEmail],
-        subject: `[Received] Thank you for your inquiry — Kamrul Islam`,
-        text: autoReplyText,
-        html: autoReplyHtml,
-      });
-
-      if (autoReplyResult.error) {
-        autoReplyErrorMessage =
-          autoReplyResult.error.message || "Auto-reply awaiting verified domain at resend.com/domains";
-      } else {
-        autoReplyDeliveryId = autoReplyResult.data?.id || null;
-      }
-    } catch (autoReplyErr: unknown) {
-      autoReplyErrorMessage =
-        autoReplyErr instanceof Error
-          ? autoReplyErr.message
-          : "Auto-reply awaiting verified domain at resend.com/domains";
-    }
-
     return c.json({
       success: true,
-      message: "Enquiry delivered successfully.",
-      deliveryId: data?.id,
+      message: emailDelivered
+        ? "Enquiry delivered successfully."
+        : "Enquiry received and saved to Admin Inbox.",
+      deliveryId,
       autoReplyDeliveryId,
+      savedToInbox: backupResult.saved,
       ...(autoReplyErrorMessage ? { autoReplyNotice: autoReplyErrorMessage } : {}),
     });
   } catch (error: unknown) {

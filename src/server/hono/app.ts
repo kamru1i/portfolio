@@ -23,6 +23,12 @@ import {
   uploadAndReplaceCvDocument,
 } from "@/lib/cv-service";
 import { PortfolioProject } from "@/lib/portfolio-data";
+import {
+  deleteInquiry,
+  getAllInquiriesForAdmin,
+  updateInquiryStatus,
+} from "@/lib/inquiries-service";
+import { InquiryStatus } from "@/types/database";
 import { contactRoute } from "./routes/contact";
 import { uploadScreenshotRoute } from "./routes/upload-screenshot";
 
@@ -388,6 +394,41 @@ app.delete("/admin/cv", async (c) => {
     return c.json({ deleted: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to delete CV document";
+    return c.json({ error: message }, 400);
+  }
+});
+
+// 9. GET, PATCH, DELETE /api/admin/inquiries
+app.get("/admin/inquiries", async (c) => {
+  try {
+    const result = await getAllInquiriesForAdmin();
+    return c.json(result);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to load inquiries";
+    return c.json({ error: message }, 500);
+  }
+});
+
+app.patch("/admin/inquiries/:id", async (c) => {
+  const id = c.req.param("id");
+  try {
+    const body = await c.req.json();
+    const status = body.status as InquiryStatus;
+    const inquiry = await updateInquiryStatus(id, status);
+    return c.json({ inquiry });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to update inquiry";
+    return c.json({ error: message }, 400);
+  }
+});
+
+app.delete("/admin/inquiries/:id", async (c) => {
+  const id = c.req.param("id");
+  try {
+    await deleteInquiry(id);
+    return c.json({ deleted: true });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to delete inquiry";
     return c.json({ error: message }, 400);
   }
 });
