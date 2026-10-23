@@ -31,21 +31,56 @@ export const metadata: Metadata = {
 export default async function ProjectsArchivePage() {
   const publishedProjects = await getPublishedProjects();
 
-  const breadcrumbJsonLd = {
+  const projectsArchiveJsonLd = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://kamrulislam.me",
+        "@type": "CollectionPage",
+        "@id": "https://kamrulislam.me/projects#collection",
+        url: "https://kamrulislam.me/projects",
+        name: "Projects & Works Archive — Kamrul Islam",
+        description:
+          "Complete portfolio archive of commercial video editing productions, AI-assisted content creations, and full-stack web applications by Kamrul Islam.",
+        inLanguage: "en-US",
+        author: {
+          "@id": "https://kamrulislam.me/#person",
+        },
+        mainEntity: {
+          "@type": "ItemList",
+          numberOfItems: publishedProjects.length,
+          itemListElement: publishedProjects.slice(0, 30).map((project, idx) => {
+            const slug = project.slug || project.id;
+            const itemUrl =
+              project.type === "video"
+                ? `https://kamrulislam.me/projects/video/${slug}`
+                : `https://kamrulislam.me/projects/web/${slug}`;
+            return {
+              "@type": "ListItem",
+              position: idx + 1,
+              url: itemUrl,
+              name: project.title,
+              description: project.description,
+            };
+          }),
+        },
       },
       {
-        "@type": "ListItem",
-        position: 2,
-        name: "Projects & Works",
-        item: "https://kamrulislam.me/projects",
+        "@type": "BreadcrumbList",
+        "@id": "https://kamrulislam.me/projects#breadcrumb",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://kamrulislam.me",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Projects & Works",
+            item: "https://kamrulislam.me/projects",
+          },
+        ],
       },
     ],
   };
@@ -54,7 +89,9 @@ export default async function ProjectsArchivePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(projectsArchiveJsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />

@@ -26,21 +26,38 @@ export const metadata: Metadata = {
 };
 
 export default function ContactUsPage() {
-  const breadcrumbJsonLd = {
+  const contactPageJsonLd = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://kamrulislam.me",
+        "@type": "ContactPage",
+        "@id": "https://kamrulislam.me/contact-us#contactpage",
+        url: "https://kamrulislam.me/contact-us",
+        name: "Contact Kamrul Islam — Video Editing, AI Content & Web Development",
+        description:
+          "Get in touch with Kamrul Islam (hello@kamrulislam.me) about commercial video editing, AI-assisted content production, modern web development, and digital infrastructure projects.",
+        inLanguage: "en-US",
+        mainEntity: {
+          "@id": "https://kamrulislam.me/#person",
+        },
       },
       {
-        "@type": "ListItem",
-        position: 2,
-        name: "Contact",
-        item: "https://kamrulislam.me/contact-us",
+        "@type": "BreadcrumbList",
+        "@id": "https://kamrulislam.me/contact-us#breadcrumb",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://kamrulislam.me",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Contact",
+            item: "https://kamrulislam.me/contact-us",
+          },
+        ],
       },
     ],
   };
@@ -49,7 +66,9 @@ export default function ContactUsPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(contactPageJsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <ContactPageContent />
     </>

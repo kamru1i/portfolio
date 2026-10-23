@@ -91,6 +91,45 @@ export default async function AdminDashboardLayout({
             <AdminNavLogout />
           </div>
         </div>
+
+        {/* Mobile Navigation Bar (visible on < md screens) */}
+        <nav
+          aria-label="Admin mobile navigation"
+          className="md:hidden w-full border-t border-white/10 bg-[#0f0f12] px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar font-mono-custom text-xs"
+        >
+          <Link
+            href="/admin"
+            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/90 whitespace-nowrap shrink-0 transition-colors"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/admin/projects/new"
+            className="px-3 py-1.5 rounded-lg bg-white text-black font-medium whitespace-nowrap shrink-0 transition-colors"
+          >
+            + New Project
+          </Link>
+          <Link
+            href="/admin/inquiries"
+            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/90 whitespace-nowrap shrink-0 transition-colors"
+          >
+            Inquiries
+          </Link>
+          <Link
+            href="/admin/cv"
+            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/90 whitespace-nowrap shrink-0 transition-colors"
+          >
+            CV / PDF
+          </Link>
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 whitespace-nowrap shrink-0 transition-colors ml-auto"
+          >
+            Live Site ↗
+          </Link>
+        </nav>
       </header>
 
       {/* Main Content Area */}

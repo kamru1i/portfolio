@@ -505,7 +505,7 @@ export default function AdminCvManagementPage() {
             </div>
           </div>
 
-          <div className="w-full h-[640px] rounded-xl overflow-hidden border border-white/10 bg-[#0c0c0e]">
+          <div className="w-full h-[420px] sm:h-[640px] rounded-xl overflow-hidden border border-white/10 bg-[#0c0c0e]">
             <iframe
               src={`/api/cv/pdf?id=${encodeURIComponent(previewDoc.id)}&preview=1#view=FitH`}
               title={`Preview ${previewDoc.title}`}
@@ -571,7 +571,7 @@ export default function AdminCvManagementPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 self-end sm:self-center shrink-0">
+                <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-0 self-end sm:self-center shrink-0">
                   <button
                     type="button"
                     onClick={() => setPreviewDoc(doc)}

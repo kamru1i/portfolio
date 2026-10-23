@@ -404,7 +404,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Right Actions: Status & Controls */}
-                <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
+                <div className="flex flex-wrap items-center justify-end gap-2.5 w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-0 self-end sm:self-center shrink-0">
                   {/* Publish Toggle Button */}
                   <button
                     type="button"

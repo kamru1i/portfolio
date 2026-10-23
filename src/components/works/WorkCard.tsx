@@ -75,7 +75,7 @@ export function WorkCard({
         onLivePreviewClick={() => onPreviewWeb?.(normalizedProject)}
       />
 
-      {/* Card Title - Pure Gambarino 22px */}
+      {/* Card Title - Pure Gambarino 22px + Case Study Link */}
       <div className="mt-4 sm:mt-5 flex items-baseline justify-between gap-3">
         <h3 className="font-gambarino text-[20px] sm:text-[22px] font-normal leading-[1.2] text-white">
           <Link
@@ -86,6 +86,14 @@ export function WorkCard({
             {normalizedProject.title}
           </Link>
         </h3>
+
+        <Link
+          href={detailHref}
+          onClick={(e) => e.stopPropagation()}
+          className="font-mono-custom text-[11px] uppercase tracking-wider text-white/55 hover:text-white shrink-0 transition-colors"
+        >
+          Case Study →
+        </Link>
       </div>
     </div>
   );

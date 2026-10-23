@@ -133,19 +133,28 @@ export function WebCaseStudyCard({
         </p>
       </div>
 
-      {/* Default State: Bottom Metadata (@Year + Status) */}
-      <div className="relative z-10 p-5 sm:p-5 lg:p-5 xl:p-6 flex items-center justify-between transition-transform duration-300 group-hover:translate-y-1">
+      {/* Default State: Bottom Metadata (@Year + Case Study Link + Preview Pill) */}
+      <div className="relative z-10 p-5 sm:p-5 lg:p-5 xl:p-6 flex items-center justify-between gap-2 transition-transform duration-300 group-hover:translate-y-1">
         <span className="font-mono-custom text-xs sm:text-sm text-[#888]">
           @{project.year || "2026"}
         </span>
 
-        <span className="font-mono-custom text-[11px] text-white/40 border border-white/10 px-2 py-0.5 rounded-full bg-white/5">
-          Click for Live Preview
-        </span>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/projects/web/${project.slug || project.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="font-mono-custom text-[11px] text-white/80 hover:text-white border border-white/15 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm transition-colors"
+          >
+            Details →
+          </Link>
+          <span className="font-mono-custom text-[11px] text-white/50 border border-white/10 px-2.5 py-0.5 rounded-full bg-white/5">
+            Live Preview
+          </span>
+        </div>
       </div>
 
       {/* Interactive Card Hover Overlay */}
-      <div className="absolute inset-0 z-20 bg-black/85 backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out flex flex-col justify-between p-5 sm:p-5 lg:p-5 xl:p-6">
+      <div className="absolute inset-0 z-20 bg-black/85 backdrop-blur-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 ease-out flex flex-col justify-between p-5 sm:p-5 lg:p-5 xl:p-6">
         {/* Top spacer to balance layout */}
         <div className="w-full" />
 

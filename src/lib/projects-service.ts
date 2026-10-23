@@ -64,7 +64,9 @@ export async function getPublishedProjects(): Promise<PortfolioProject[]> {
       return [...PORTFOLIO_DATA.showcaseProjects].sort(compareProjectsByPriorityAndRecency);
     }
 
-    const projects = (data as ProjectRecord[]).map(mapProjectRecordToPortfolio);
+    const projects = (data as ProjectRecord[])
+      .map(normalizeProjectRecord)
+      .map(mapProjectRecordToPortfolio);
     return projects.sort(compareProjectsByPriorityAndRecency);
   } catch {
     return [...PORTFOLIO_DATA.showcaseProjects].sort(compareProjectsByPriorityAndRecency);
@@ -243,12 +245,24 @@ function sanitizeTagsArray(rawTags: unknown, maxItemLen = 50, maxItems = 20): st
 
 function normalizeProjectRecord(record: ProjectRecord): ProjectRecord {
   const extracted = extractCaseStudyFromRecord(record);
+  const recordSlug = (record.slug || "").toLowerCase();
+  const recordTitle = (record.title || "").toLowerCase();
+  const fallbackMatch = PORTFOLIO_DATA.showcaseProjects.find(
+    (p) =>
+      (p.slug && p.slug.toLowerCase() === recordSlug) ||
+      p.title.toLowerCase() === recordTitle ||
+      generateSlug(p.title) === recordSlug
+  );
+
   return {
     ...record,
     description: extracted.description,
-    role: extracted.role,
-    overview: extracted.overview,
-    deliverables: extracted.deliverables,
+    role: extracted.role || fallbackMatch?.role || null,
+    overview: extracted.overview || fallbackMatch?.overview || null,
+    deliverables:
+      extracted.deliverables.length > 0
+        ? extracted.deliverables
+        : fallbackMatch?.deliverables || [],
   };
 }
 

@@ -219,16 +219,16 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
           {/* MEDIA SECTION: Interactive Iframe Viewport or Shielded Canvas */}
           {/* ============================================================ */}
           <section className="w-full mb-20 md:mb-28">
-            <div className="w-full h-[540px] sm:h-[620px] md:h-[700px] rounded-2xl overflow-hidden border border-white/15 bg-[#0e0e0e] shadow-[0_30px_70px_rgba(0,0,0,0.85)] flex flex-col">
+            <div className="w-full h-[420px] sm:h-[580px] md:h-[700px] rounded-2xl overflow-hidden border border-white/15 bg-[#0e0e0e] shadow-[0_30px_70px_rgba(0,0,0,0.85)] flex flex-col">
               {/* Header preview bar */}
-              <div className="px-4 py-2.5 bg-[#181818] border-b border-white/10 flex items-center justify-between text-xs font-mono-custom text-[#888]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block" />
-                  <span className="ml-2 text-white/70 hidden sm:inline">{project.liveUrl || "Deployment View"}</span>
+              <div className="px-4 py-2.5 bg-[#181818] border-b border-white/10 flex items-center justify-between gap-2 text-xs font-mono-custom text-[#888]">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block shrink-0" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block shrink-0" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block shrink-0" />
+                  <span className="ml-2 text-white/70 truncate hidden sm:inline">{project.liveUrl || "Deployment View"}</span>
                 </div>
-                <span className="text-[11px] text-emerald-400">
+                <span className="text-[11px] text-emerald-400 shrink-0">
                   {isEmbeddable ? "Interactive Live View" : "Security Shielded View"}
                 </span>
               </div>

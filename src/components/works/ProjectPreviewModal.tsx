@@ -220,6 +220,19 @@ function ProjectPreviewModalContent({
 
             {/* Right: Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              {/* Compact Mobile Mode Toggle (< md) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveMode((prev) => (prev === "iframe" ? "fallback" : "iframe"));
+                  setHasError(false);
+                }}
+                className="md:hidden px-2.5 py-1.5 rounded-full bg-white/10 text-white font-mono-custom text-[11px] border border-white/10 transition-colors"
+                title="Switch between Live Iframe and Fallback View"
+              >
+                {activeMode === "iframe" ? "🛡️ Fallback" : "🖥️ Live"}
+              </button>
+
               {project.githubUrl && (
                 <a
                   href={project.githubUrl}
