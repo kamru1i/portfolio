@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { PortfolioProject } from "@/lib/portfolio-data";
 
-interface AurexaCaseStudyCardProps {
+interface WebCaseStudyCardProps {
   project: PortfolioProject;
   onPreviewWeb: (project: PortfolioProject) => void;
 }
@@ -20,10 +20,10 @@ function getDisplayDomain(url?: string): string {
   }
 }
 
-export function AurexaCaseStudyCard({
+export function WebCaseStudyCard({
   project,
   onPreviewWeb,
-}: AurexaCaseStudyCardProps) {
+}: WebCaseStudyCardProps) {
   const [imageError, setImageError] = useState(false);
 
   const displayDomain = getDisplayDomain(project.liveUrl);
@@ -144,7 +144,7 @@ export function AurexaCaseStudyCard({
         </span>
       </div>
 
-      {/* Aurexa Hover Overlay matching approved reference */}
+      {/* Interactive Card Hover Overlay */}
       <div className="absolute inset-0 z-20 bg-black/85 backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out flex flex-col justify-between p-5 sm:p-5 lg:p-5 xl:p-6">
         {/* Top spacer to balance layout */}
         <div className="w-full" />
@@ -161,7 +161,7 @@ export function AurexaCaseStudyCard({
 
         {/* Bottom Actions Row: Emblem Icon + Client on Left, Arrow Button on Right */}
         <div className="flex items-center justify-between w-full pt-1">
-          {/* Left: 4-bar Equalizer Emblem Icon + Client Name matching Image 2 */}
+          {/* Left: 4-bar Equalizer Emblem Icon + Client Name */}
           <div className="flex items-center gap-2.5">
             <div className="flex items-center gap-[3px]" aria-hidden="true">
               <span className="w-1 h-3.5 bg-neutral-400 rounded-full" />

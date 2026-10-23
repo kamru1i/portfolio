@@ -36,12 +36,12 @@ export function FaqSection() {
             {/* FAQ Pill Badge */}
             <SectionBadge label={faqData.badge || "FAQ"} />
 
-            {/* Patrick Jane Editorial Serif Headline */}
+            {/* Editorial Serif Headline */}
             <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase text-balance">
               {faqData.title}
             </h2>
 
-            {/* Aurexa Supporting Subtitle */}
+            {/* Supporting Subtitle */}
             <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] mt-5 sm:mt-6 leading-relaxed max-w-md">
               {faqData.subtitle}
             </p>

@@ -41,7 +41,7 @@ export function ProjectMedia({
 
   return (
     <div className={`relative w-full ${aspectClass} overflow-hidden bg-black rounded-xl sm:rounded-2xl border border-white/10 select-none shadow-[0_12px_35px_rgba(0,0,0,0.5)]`}>
-      {/* Parallax Image Frame matching Patrick Jane exact motion */}
+      {/* Parallax Image Frame */}
       <motion.div
         style={parallaxY ? { y: parallaxY } : undefined}
         className="absolute inset-x-0 top-[-15%] h-[130%] w-full will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
@@ -65,7 +65,7 @@ export function ProjectMedia({
         </div>
       )}
 
-      {/* Web Desktop Hover Action Overlay matching Patrick Jane minimalism */}
+      {/* Web Desktop Hover Action Overlay */}
       {!isVideo && (
         <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 p-4 z-10">
           {project.githubUrl && (

@@ -32,9 +32,9 @@ export function ServicesSection() {
       <div id="expertise" className="absolute -top-24 pointer-events-none" />
       <HairlineRule className="mb-14 md:mb-20" />
 
-      {/* Header: Patrick Jane Title (Left) + Aurexa Subtitle (Right) */}
+      {/* Header: Editorial Title (Left) + Supporting Subtitle (Right) */}
       <div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
-        {/* Left: Patrick Jane Style Title */}
+        {/* Left: Editorial Title */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -48,7 +48,7 @@ export function ServicesSection() {
           </h2>
         </motion.div>
 
-        {/* Right: Aurexa-Style Supporting Subtitle */}
+        {/* Right: Supporting Subtitle */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export function ServicesSection() {
         </motion.div>
       </div>
 
-      {/* Stacked Service Cards in Aurexa/FAQ Unified Pattern */}
+      {/* Stacked Service Cards */}
       <div
         className="w-full flex flex-col gap-3.5 sm:gap-4"
         onMouseLeave={() => {
@@ -114,7 +114,7 @@ export function ServicesSection() {
                 </div>
               </div>
 
-              {/* Active State: Aurexa-Style Pill Image + Title Sliding Marquee Ribbon */}
+              {/* Active State: Pill Image + Title Sliding Marquee Ribbon */}
               <AnimatePresence>
                 {isHovered && (
                   <motion.div

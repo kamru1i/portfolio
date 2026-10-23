@@ -52,7 +52,7 @@ function ContactInner() {
             </motion.p>
           </div>
 
-          {/* Section 2: Aurexa-Style 4 Quick Contact Options */}
+          {/* Section 2: 4 Quick Contact Options */}
           <ContactHeroOptions />
 
           {/* Section 3: Get In Touch (Left Info / Right Interactive Form) */}

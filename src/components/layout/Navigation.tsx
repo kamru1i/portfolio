@@ -55,7 +55,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Continuous Aurexa-style scroll interpolation
+  // Continuous scroll interpolation
   const { scrollY } = useScroll();
 
   // Scroll interpolation range: 0px -> 160px for full compaction
@@ -223,7 +223,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
         </nav>
       </motion.header>
 
-      {/* Full-Screen Aurexa-Style Navigation Menu Overlay */}
+      {/* Full-Screen Navigation Menu Overlay */}
       <FullScreenMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}

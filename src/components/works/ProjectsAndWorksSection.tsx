@@ -6,8 +6,8 @@ import { HairlineRule } from "@/components/common/HairlineRule";
 import { SectionBadge } from "@/components/common/SectionBadge";
 import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
 import { compareProjectsByPriorityAndRecency } from "@/types/project";
-import { PatrickJaneSelectedWorks } from "./PatrickJaneSelectedWorks";
-import { AurexaCaseStudies } from "./AurexaCaseStudies";
+import { VideoSelectedWorks } from "./VideoSelectedWorks";
+import { WebCaseStudies } from "./WebCaseStudies";
 import { VideoPlayerModal } from "./VideoPlayerModal";
 import { ProjectPreviewModal } from "./ProjectPreviewModal";
 
@@ -62,9 +62,9 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
       {/* Hairline Divider Rule */}
       <HairlineRule className="mb-10 md:mb-14" />
 
-      {/* Section Header: Patrick Jane Title (Left) + Subtitle (Right) — SHARED for both Video & Web */}
+      {/* Section Header: Title (Left) + Subtitle (Right) — SHARED for both Video & Web */}
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-8 sm:mb-10">
-        {/* Left: Section Badge + Patrick Jane Headline */}
+        {/* Left: Section Badge + Headline */}
         <motion.div
           initial={{ opacity: 0, x: 60 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -142,7 +142,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
         </div>
       </div>
 
-      {/* Tab Content: Video (Patrick Jane Selected Works) vs Web (Aurexa Cards Setup) */}
+      {/* Tab Content: Video (Selected Works) vs Web (Web Case Studies) */}
       <AnimatePresence mode="wait">
         {activeTab === "video" ? (
           <motion.div
@@ -153,8 +153,8 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
             className="w-full"
           >
-            {/* Patrick Jane 5-Card Selected Works Grid */}
-            <PatrickJaneSelectedWorks
+            {/* 5-Card Selected Works Grid */}
+            <VideoSelectedWorks
               projects={videoProjects}
               onPlayVideo={(p) => setActiveVideoProject(p)}
             />
@@ -168,8 +168,8 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
             className="w-full"
           >
-            {/* Aurexa Cards Setup (purely the cards grid, zero extra headers/stats) */}
-            <AurexaCaseStudies
+            {/* Web Case Studies Cards Grid */}
+            <WebCaseStudies
               projects={webProjects}
               onPreviewWeb={(p) => setActiveWebProject(p)}
             />

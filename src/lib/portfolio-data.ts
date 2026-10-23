@@ -520,7 +520,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "High-performance editorial portfolio engineered with Next.js, Framer Motion, and Supabase integration.",
-      thumbnail: "/images/aurexa/aurexa-project-1.png",
+      thumbnail: "/images/web-projects/web-project-1.png",
       githubUrl: "https://github.com/kamru1i/portfolio",
       liveUrl: "https://kamrulislam.me",
       canEmbed: true,
@@ -544,7 +544,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Interactive photocard customization platform with dynamic layout tools and responsive canvas rendering.",
-      thumbnail: "/images/aurexa/aurexa-project-2.png",
+      thumbnail: "/images/web-projects/web-project-2.png",
       githubUrl: "https://github.com/kamrul-islam-dev",
       liveUrl: "https://photocard-five.vercel.app/",
       canEmbed: false,
@@ -569,7 +569,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Digital agency platform featuring scalable design architecture, performance optimization, and client management.",
-      thumbnail: "/images/aurexa/aurexa-project-3.png",
+      thumbnail: "/images/web-projects/web-project-3.png",
       liveUrl: "https://webwing.co.uk/",
       canEmbed: false,
       previewMode: "fallback",
@@ -593,7 +593,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Interactive culinary showcase featuring traditional recipes, dynamic chef profiles, and custom ordering flow.",
-      thumbnail: "/images/aurexa/aurexa-project-4.png",
+      thumbnail: "/images/web-projects/web-project-4.png",
       liveUrl: "https://japanese-master-chef.web.app/",
       canEmbed: true,
       tags: ["React.js", "Firebase", "Tailwind CSS", "REST API"],
@@ -616,7 +616,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Comprehensive dance academy management portal featuring class bookings, student portals, and schedule calendars.",
-      thumbnail: "/images/aurexa/aurexa-project-5.png",
+      thumbnail: "/images/web-projects/web-project-5.png",
       liveUrl: "https://rhythmverse-dance-school.web.app/",
       canEmbed: true,
       tags: ["React.js", "Firebase Auth", "Tailwind CSS", "Express"],
@@ -639,7 +639,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Modern job search and candidate pipeline platform engineered for rapid recruitment matches and resume tracking.",
-      thumbnail: "/images/aurexa/aurexa-project-6.png",
+      thumbnail: "/images/web-projects/web-project-6.png",
       liveUrl: "https://talent-hub-assignment-09.netlify.app/",
       canEmbed: true,
       tags: ["React.js", "Tailwind CSS", "Netlify", "Job Engine"],
@@ -662,7 +662,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Full-featured toy marketplace web application with product listings, user authentication, and shopping cart management.",
-      thumbnail: "/images/aurexa/aurexa-project-1.png",
+      thumbnail: "/images/web-projects/web-project-1.png",
       liveUrl: "https://toy-marketplace-assignment-11.web.app/",
       canEmbed: true,
       tags: ["React.js", "Firebase", "Tailwind CSS", "MongoDB"],
@@ -685,7 +685,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "High-density responsive news portal featuring categorization by region, real-time article feeds, and reader authentication.",
-      thumbnail: "/images/aurexa/aurexa-project-2.png",
+      thumbnail: "/images/web-projects/web-project-2.png",
       liveUrl: "https://the-news-dragon-client-8ae38.web.app/",
       canEmbed: true,
       tags: ["React.js", "Express.js", "Bootstrap", "Firebase"],

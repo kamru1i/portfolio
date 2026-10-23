@@ -9,7 +9,7 @@ interface KamrulBrandWordmarkProps {
 
 /**
  * Precision Architectural Vector Wordmark for "KAMRUL I®"
- * Recreating the Aurexa oversized brutalist/editorial aesthetic (539x78 aspect ratio)
+ * Designed with an oversized brutalist/editorial aesthetic (539x78 aspect ratio)
  * with heavyweight geometric stems, aerodynamic cuts, and razor-sharp vector fidelity.
  */
 export function KamrulBrandWordmark({

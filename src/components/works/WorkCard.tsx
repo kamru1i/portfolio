@@ -23,7 +23,7 @@ export function WorkCard({
 }: WorkCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Parallax scrubbing within card media container matching Patrick Jane exactly
+  // Parallax scrubbing within card media container
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
@@ -66,7 +66,7 @@ export function WorkCard({
         else if (normalizedProject.liveUrl) onPreviewWeb?.(normalizedProject);
       }}
     >
-      {/* Square Media Frame matching Patrick Jane reference (352x352 small, 704x704 large) */}
+      {/* Square Media Frame (352x352 small, 704x704 large) */}
       <ProjectMedia
         project={normalizedProject}
         isLarge={isLarge}
@@ -75,7 +75,7 @@ export function WorkCard({
         onLivePreviewClick={() => onPreviewWeb?.(normalizedProject)}
       />
 
-      {/* Card Title - Pure Gambarino 22px matching Patrick Jane reference */}
+      {/* Card Title - Pure Gambarino 22px */}
       <div className="mt-4 sm:mt-5 flex items-baseline justify-between gap-3">
         <h3 className="font-gambarino text-[20px] sm:text-[22px] font-normal leading-[1.2] text-white">
           <Link

@@ -364,7 +364,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
                 })}
               </div>
               <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
-                Controls thumbnail card proportion in Patrick Jane works grid and video player dialog.
+                Controls thumbnail card proportion in the video works grid and video player dialog.
               </p>
             </div>
           </div>
@@ -498,7 +498,7 @@ export function EditProjectForm({ project }: { project: ProjectRecord }) {
                   type="text"
                   value={webPreviewImageUrl}
                   onChange={(e) => setWebPreviewImageUrl(e.target.value)}
-                  placeholder="/images/aurexa/aurexa-project-3.png or https://..."
+                  placeholder="/images/web-projects/web-project-3.png or https://..."
                   className="w-full px-4 py-2.5 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-xs font-mono-custom focus:outline-none focus:border-white/30"
                 />
               </div>

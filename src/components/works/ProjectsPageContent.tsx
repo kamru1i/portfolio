@@ -9,7 +9,7 @@ import { PortfolioProject, PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { compareProjectsByPriorityAndRecency } from "@/types/project";
 import { VideoPlayerModal } from "./VideoPlayerModal";
 import { ProjectPreviewModal } from "./ProjectPreviewModal";
-import { AurexaCaseStudyCard } from "./AurexaCaseStudyCard";
+import { WebCaseStudyCard } from "./WebCaseStudyCard";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { SectionBadge } from "@/components/common/SectionBadge";
 
@@ -414,8 +414,8 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                     transition={{ duration: 0.4, delay: (idx % 8) * 0.05 }}
                     className="w-full flex flex-col"
                   >
-                    {/* Aurexa Case Study Card with Interactive Preview */}
-                    <AurexaCaseStudyCard
+                    {/* Web Case Study Card with Interactive Preview */}
+                    <WebCaseStudyCard
                       project={project}
                       onPreviewWeb={(p) => setActiveWebModal(p)}
                     />

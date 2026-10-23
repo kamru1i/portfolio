@@ -185,7 +185,7 @@ export function CurtainFooter() {
         <HairlineRule />
       </div>
 
-      {/* Patrick Jane Top Metadata Row */}
+      {/* Top Metadata Row */}
       <div className="w-full flex items-center justify-between gap-2 text-[#888] font-mono-custom text-[11px] sm:text-xs pt-3 pb-2 border-b border-white/5">
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           <KamrulBrandWordmark className="h-3.5 sm:h-4 w-auto inline-block text-white" />
@@ -213,7 +213,7 @@ export function CurtainFooter() {
         <canvas ref={canvasRef} className="w-full h-full block" />
       </div>
 
-      {/* Giant Central Navigation Links (Patrick Jane Editorial Hierarchy) */}
+      {/* Giant Central Navigation Links (Editorial Hierarchy) */}
       <div className="relative z-10 flex flex-col items-center justify-center space-y-1.5 sm:space-y-2.5 my-auto">
         <Link
           href="/#projects"

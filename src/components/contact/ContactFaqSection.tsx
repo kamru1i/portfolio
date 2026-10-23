@@ -62,7 +62,7 @@ const CONTACT_FAQS: ContactFaqItem[] = [
 ];
 
 export function ContactFaqSection() {
-  // Start with first question open for immediate discovery matching Aurexa
+  // Start with first question open for immediate discovery
   const [openIds, setOpenIds] = useState<string[]>([CONTACT_FAQS[0].id]);
 
   const toggleItem = (id: string) => {
@@ -73,7 +73,7 @@ export function ContactFaqSection() {
 
   return (
     <section className="w-full select-none pb-28 md:pb-36">
-      {/* Centered Section Header matching Aurexa reference */}
+      {/* Centered Section Header */}
       <div className="w-full flex flex-col items-center text-center mb-12 sm:mb-16">
         <SectionBadge label="FAQ" />
 
@@ -86,7 +86,7 @@ export function ContactFaqSection() {
         </p>
       </div>
 
-      {/* Accordion List matching Aurexa panel styling */}
+      {/* Accordion List */}
       <div className="w-full max-w-4xl mx-auto flex flex-col gap-3.5 sm:gap-4">
         {CONTACT_FAQS.map((item, index) => {
           const isOpen = openIds.includes(item.id);

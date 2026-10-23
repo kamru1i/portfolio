@@ -22,7 +22,7 @@ export interface ResolvedVideoMeta {
 
 /**
  * Adapter function that maps a database ProjectRecord to the UI PortfolioProject model,
- * ensuring 100% backward and visual compatibility with Patrick Jane & Aurexa components.
+ * ensuring 100% backward and visual compatibility with Video & Web project card components.
  */
 export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioProject {
   const isEmbed = record.preview_mode ? record.preview_mode === "iframe" : record.can_embed;
@@ -33,7 +33,7 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
   );
   const defaultThumb =
     fallbackMatch?.thumbnail ||
-    (record.type === "video" ? "/images/work-1-biqolpo.png" : "/images/aurexa/aurexa-project-1.png");
+    (record.type === "video" ? "/images/work-1-biqolpo.png" : "/images/web-projects/web-project-1.png");
 
   return {
     id: record.id,

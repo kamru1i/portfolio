@@ -237,7 +237,7 @@ export default function NewProjectPage() {
             <div className="text-2xl mb-2">🎬</div>
             <div className="font-sans font-medium text-base text-white">Video Project</div>
             <p className="font-mono-custom text-xs text-[#888] mt-1">
-              Patrick Jane editorial layout, 16:9 or 9:16, YouTube/TikTok auto-metadata.
+              Editorial video showcase layout, 16:9 or 9:16, YouTube/TikTok auto-metadata.
             </p>
           </button>
 
@@ -253,7 +253,7 @@ export default function NewProjectPage() {
             <div className="text-2xl mb-2">🌐</div>
             <div className="font-sans font-medium text-base text-white">Web Project</div>
             <p className="font-mono-custom text-xs text-[#888] mt-1">
-              Aurexa 3-column case study cards, live preview modal, GitHub integration.
+              4-column web case study cards, live preview modal, GitHub integration.
             </p>
           </button>
         </div>
@@ -404,7 +404,7 @@ export default function NewProjectPage() {
                 })}
               </div>
               <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
-                Source of truth for Patrick Jane editorial works card display and player stage modal.
+                Source of truth for editorial works card display and player stage modal.
               </p>
             </div>
           </div>
@@ -543,7 +543,7 @@ export default function NewProjectPage() {
                   type="text"
                   value={webPreviewImageUrl}
                   onChange={(e) => setWebPreviewImageUrl(e.target.value)}
-                  placeholder="/images/aurexa/aurexa-project-3.png or https://..."
+                  placeholder="/images/web-projects/web-project-3.png or https://..."
                   className="w-full px-4 py-2.5 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-xs font-mono-custom focus:outline-none focus:border-white/30"
                 />
               </div>

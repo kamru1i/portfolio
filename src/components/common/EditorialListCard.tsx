@@ -16,7 +16,7 @@ interface EditorialListCardProps {
 }
 
 /**
- * EditorialListCard — Reusable FAQ/Aurexa Card Pattern
+ * EditorialListCard — Reusable Editorial Card Pattern
  * Unifies the visual language across Services, Milestones, and FAQ:
  * - Rounded 14px card geometry
  * - Charcoal dark surface (#1a1a1a) with subtle border (#ffffff14)

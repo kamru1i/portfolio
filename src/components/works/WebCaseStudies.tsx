@@ -3,25 +3,25 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { PortfolioProject } from "@/lib/portfolio-data";
-import { AurexaCaseStudyCard } from "./AurexaCaseStudyCard";
+import { WebCaseStudyCard } from "./WebCaseStudyCard";
 
-interface AurexaCaseStudiesProps {
+interface WebCaseStudiesProps {
   projects: PortfolioProject[];
   onPreviewWeb: (project: PortfolioProject) => void;
 }
 
-export function AurexaCaseStudies({
+export function WebCaseStudies({
   projects,
   onPreviewWeb,
-}: AurexaCaseStudiesProps) {
+}: WebCaseStudiesProps) {
   if (!projects || projects.length === 0) return null;
 
-  // Strict display limit of 8 projects for the Aurexa case studies overview
+  // Strict display limit of 8 projects for the web case studies overview
   const displayedProjects = projects.slice(0, 8);
 
   return (
     <div className="w-full select-none pb-20">
-      {/* Pure Aurexa Case Study Cards Grid Setup (4 cards per row on desktop) */}
+      {/* Web Case Study Cards Grid Setup (4 cards per row on desktop) */}
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-5 lg:gap-6 items-stretch">
         {displayedProjects.map((project, index) => (
           <motion.div
@@ -36,7 +36,7 @@ export function AurexaCaseStudies({
             }}
             className="w-full flex"
           >
-            <AurexaCaseStudyCard
+            <WebCaseStudyCard
               project={project}
               onPreviewWeb={onPreviewWeb}
             />

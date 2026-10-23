@@ -2,18 +2,18 @@ import Link from "next/link";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { WorkCard } from "./WorkCard";
 
-interface PatrickJaneSelectedWorksProps {
+interface VideoSelectedWorksProps {
   projects: PortfolioProject[];
   onPlayVideo: (project: PortfolioProject) => void;
 }
 
-export function PatrickJaneSelectedWorks({
+export function VideoSelectedWorks({
   projects,
   onPlayVideo,
-}: PatrickJaneSelectedWorksProps) {
+}: VideoSelectedWorksProps) {
   if (!projects || projects.length === 0) return null;
 
-  // Strict display limit of 5 projects for the Patrick Jane selected works overview
+  // Strict display limit of 5 projects for the video selected works overview
   const displayedProjects = projects.slice(0, 5);
 
   return (

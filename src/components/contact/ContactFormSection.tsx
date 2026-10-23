@@ -168,7 +168,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
         <TalkWithKamrulCard showButton={false} />
       </motion.div>
 
-      {/* Right Column: Aurexa-Style Interactive Form */}
+      {/* Right Column: Interactive Form */}
       <motion.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -244,7 +244,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
                   onChange={(e) => setFormData({ ...formData, botCheck: e.target.value })}
                 />
               </div>
-              {/* Row 1: Budget Range & Timeline Selectors matching Aurexa */}
+              {/* Row 1: Budget Range & Timeline Selectors */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="budgetRange" className="block font-sans text-xs sm:text-sm text-[#888] mb-1.5">
