@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { WorkCard } from "./WorkCard";
 
@@ -83,7 +84,7 @@ export function VideoSelectedWorks({
                   aria-label="Explore more video projects"
                 >
                   <span>Explore More</span>
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </Link>
               </div>
             </div>
@@ -99,7 +100,7 @@ export function VideoSelectedWorks({
             className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/4 hover:bg-white/8 border border-white/10 text-white font-mono-custom text-xs uppercase tracking-wider transition-colors"
           >
             <span>Explore More Video Projects</span>
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
+            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
       )}

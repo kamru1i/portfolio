@@ -3,8 +3,22 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  FolderKanban,
+  FolderPlus,
+  Inbox,
+  FileText,
+  Menu,
+  X,
+  ArrowUpRight,
+  type LucideIcon,
+} from "lucide-react";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 import { AdminNavLogout } from "@/app/admin/(dashboard)/AdminNavLogout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 interface AdminSidebarShellProps {
   userEmail: string;
@@ -22,7 +36,7 @@ interface NavItem {
   id: NavItemId;
   label: string;
   href: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
 }
 
 interface NavGroup {
@@ -38,24 +52,7 @@ const NAV_GROUPS: NavGroup[] = [
         id: "dashboard",
         label: "Dashboard",
         href: "/admin",
-        icon: (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.85"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <rect width="7" height="9" x="3" y="3" rx="1" />
-            <rect width="7" height="5" x="14" y="3" rx="1" />
-            <rect width="7" height="9" x="14" y="12" rx="1" />
-            <rect width="7" height="5" x="3" y="16" rx="1" />
-          </svg>
-        ),
+        icon: LayoutDashboard,
       },
     ],
   },
@@ -66,46 +63,13 @@ const NAV_GROUPS: NavGroup[] = [
         id: "all-projects",
         label: "All Projects",
         href: "/admin#projects-manager",
-        icon: (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.85"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
-            <path d="M8 10v4" />
-            <path d="M12 10v2" />
-            <path d="M16 10v6" />
-          </svg>
-        ),
+        icon: FolderKanban,
       },
       {
         id: "new-project",
         label: "New Project",
         href: "/admin/projects/new",
-        icon: (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.85"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 10v6" />
-            <path d="M9 13h6" />
-            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
-          </svg>
-        ),
+        icon: FolderPlus,
       },
     ],
   },
@@ -116,22 +80,7 @@ const NAV_GROUPS: NavGroup[] = [
         id: "inquiries",
         label: "Client Inquiries",
         href: "/admin/inquiries",
-        icon: (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.85"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
-            <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-          </svg>
-        ),
+        icon: Inbox,
       },
     ],
   },
@@ -142,25 +91,7 @@ const NAV_GROUPS: NavGroup[] = [
         id: "cv",
         label: "CV / Resume",
         href: "/admin/cv",
-        icon: (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.85"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" x2="8" y1="13" y2="13" />
-            <line x1="16" x2="8" y1="17" y2="17" />
-            <line x1="10" x2="8" y1="9" y2="9" />
-          </svg>
-        ),
+        icon: FileText,
       },
     ],
   },
@@ -233,26 +164,6 @@ export function AdminSidebarShell({
     }
   }, [pathname, isAllProjectsMode]);
 
-  // Close mobile drawer on Escape key and lock background body scroll while open
-  useEffect(() => {
-    if (!mobileDrawerOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setMobileDrawerOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [mobileDrawerOpen]);
-
   const activeNavId: NavItemId =
     navOverride && navOverride.fromPathname === pathname
       ? navOverride.targetId
@@ -316,33 +227,21 @@ export function AdminSidebarShell({
           aria-label="Kamrul Islam CMS Dashboard"
         >
           <KamrulBrandWordmark className="h-[21px] w-auto text-white shrink-0" />
-          <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/15 tracking-wider">
+          <Badge variant="default" className="px-2 py-0.5 text-[10px]">
             CMS
-          </span>
+          </Badge>
         </Link>
 
         {/* Close Drawer button on mobile only */}
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="icon-sm"
           onClick={() => setMobileDrawerOpen(false)}
           aria-label="Close navigation drawer"
-          className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 hover:bg-white/10 text-[#aaa] hover:text-white border border-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+          className="md:hidden text-[#aaa] hover:text-white"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
+          <X className="h-4 w-4" aria-hidden="true" />
+        </Button>
       </div>
 
       {/* Scrollable Navigation Groups (scrolls only when content exceeds 100dvh) */}
@@ -360,6 +259,7 @@ export function AdminSidebarShell({
             <div className="space-y-1">
               {group.items.map((item) => {
                 const isActive = activeNavId === item.id;
+                const Icon = item.icon;
                 return (
                   <Link
                     key={item.id}
@@ -378,15 +278,14 @@ export function AdminSidebarShell({
                         className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-white"
                       />
                     )}
-                    <span
-                      className={`shrink-0 transition-colors ${
+                    <Icon
+                      aria-hidden="true"
+                      className={`h-4 w-4 shrink-0 transition-colors ${
                         isActive
                           ? "text-white"
                           : "text-[#7c7c86] group-hover:text-white"
                       }`}
-                    >
-                      {item.icon}
-                    </span>
+                    />
                     <span className="truncate">{item.label}</span>
                   </Link>
                 );
@@ -431,27 +330,13 @@ export function AdminSidebarShell({
         {renderSidebarContent()}
       </aside>
 
-      {/* Accessible Mobile Off-Canvas Sidebar Drawer (< 768px) */}
-      {mobileDrawerOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-50 flex"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Admin navigation drawer"
-        >
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
-            onClick={() => setMobileDrawerOpen(false)}
-            aria-hidden="true"
-          />
-
-          {/* Drawer Panel */}
-          <aside className="relative z-10 w-[268px] max-w-[85vw] h-screen h-dvh flex flex-col bg-[#111114] border-r border-white/15 shadow-2xl select-none">
-            {renderSidebarContent()}
-          </aside>
-        </div>
-      )}
+      {/* Accessible Mobile Off-Canvas Sidebar Drawer (< 768px) via shadcn Sheet */}
+      <Sheet open={mobileDrawerOpen} onOpenChange={setMobileDrawerOpen}>
+        <SheetContent side="left" className="md:hidden">
+          <SheetTitle className="sr-only">Admin Navigation Drawer</SheetTitle>
+          {renderSidebarContent()}
+        </SheetContent>
+      </Sheet>
 
       {/* Flexible Full-Width Main Content Region */}
       <div className="flex-1 min-w-0 md:pl-[244px] lg:pl-[264px] min-h-screen min-h-dvh flex flex-col">
@@ -459,29 +344,16 @@ export function AdminSidebarShell({
         <header className="sticky top-0 z-30 h-14 sm:h-16 w-full bg-[#0c0c0e]/85 backdrop-blur-md border-b border-white/8 px-4 sm:px-6 lg:px-8 xl:px-10 flex items-center justify-between gap-4 select-none">
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile Hamburger Toggle */}
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="icon"
               onClick={() => setMobileDrawerOpen(true)}
               aria-label="Open navigation menu"
               aria-expanded={mobileDrawerOpen}
-              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 shrink-0"
+              className="md:hidden shrink-0"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
+              <Menu className="h-[18px] w-[18px]" aria-hidden="true" />
+            </Button>
 
             {/* Minimal Breadcrumb */}
             <div className="flex items-center gap-2 font-mono-custom text-xs text-[#888] truncate">
@@ -517,20 +389,7 @@ export function AdminSidebarShell({
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 hover:text-white font-mono-custom text-xs border border-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             >
               <span>Live Site</span>
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M7 17L17 7" />
-                <path d="M7 7h10v10" />
-              </svg>
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
         </header>

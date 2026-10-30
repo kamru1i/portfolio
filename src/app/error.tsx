@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Navigation } from "@/components/layout/Navigation";
 import { HairlineRule } from "@/components/common/HairlineRule";
 
@@ -41,16 +42,18 @@ export default function GlobalErrorPage({
             <button
               type="button"
               onClick={() => reset()}
-              className="px-6 py-3 rounded-full bg-white text-black font-sans font-medium text-xs sm:text-sm hover:bg-neutral-200 transition-colors cursor-pointer"
+              className="px-6 py-3 rounded-full bg-white text-black font-sans font-medium text-xs sm:text-sm hover:bg-neutral-200 transition-colors cursor-pointer inline-flex items-center gap-2"
             >
-              Try Again ↻
+              <span>Try Again</span>
+              <RotateCcw className="h-3.5 w-3.5" />
             </button>
 
             <Link
               href="/"
-              className="px-6 py-3 rounded-full bg-white/8 hover:bg-white/15 text-white font-mono-custom text-xs sm:text-sm border border-white/12 transition-colors"
+              className="px-6 py-3 rounded-full bg-white/8 hover:bg-white/15 text-white font-mono-custom text-xs sm:text-sm border border-white/12 transition-colors inline-flex items-center gap-2"
             >
-              ← Return Home
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Return Home</span>
             </Link>
 
             <Link

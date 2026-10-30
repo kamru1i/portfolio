@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ArrowDown, ArrowUpRight, Download, Loader2 } from "lucide-react";
 
 interface CvPdfViewerProps {
   hasPublishedPdf: boolean;
@@ -53,7 +54,7 @@ export function CvPdfViewer({
               className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
             >
               <span>Request PDF Copy via Email</span>
-              <span>↗</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
 
             <Link
@@ -67,7 +68,8 @@ export function CvPdfViewer({
               href="#cv-summary"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-[#aaa] hover:text-white font-mono-custom text-xs uppercase tracking-wider transition-colors"
             >
-              <span>Read Full CV Below ↓</span>
+              <span>Read Full CV Below</span>
+              <ArrowDown className="h-3.5 w-3.5" />
             </a>
           </div>
         </div>
@@ -110,7 +112,7 @@ export function CvPdfViewer({
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
           >
             <span>Open PDF in New Tab</span>
-            <span>↗</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
 
           <a
@@ -119,7 +121,7 @@ export function CvPdfViewer({
             className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
           >
             <span>Download CV</span>
-            <span>↓</span>
+            <Download className="h-3.5 w-3.5" />
           </a>
         </div>
       </div>
@@ -135,7 +137,8 @@ export function CvPdfViewer({
             download="Kamrul-Islam-CV.pdf"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-black font-mono-custom text-xs uppercase tracking-wider font-medium"
           >
-            <span>Download CV (PDF) ↓</span>
+            <span>Download CV (PDF)</span>
+            <Download className="h-3.5 w-3.5" />
           </a>
           <a
             href="/api/cv/pdf"
@@ -143,7 +146,8 @@ export function CvPdfViewer({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10"
           >
-            <span>Open Full Screen ↗</span>
+            <span>Open Full Screen</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
         </div>
       </div>
@@ -161,17 +165,19 @@ export function CvPdfViewer({
             <a
               href="/api/cv/pdf?download=1"
               download="Kamrul-Islam-CV.pdf"
-              className="px-5 py-2.5 rounded-full bg-white text-black font-mono-custom text-xs uppercase tracking-wider font-medium"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-mono-custom text-xs uppercase tracking-wider font-medium"
             >
-              Download Kamrul-Islam-CV.pdf ↓
+              <span>Download Kamrul-Islam-CV.pdf</span>
+              <Download className="h-3.5 w-3.5" />
             </a>
             <a
               href="/api/cv/pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-full bg-white/10 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white/10 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10"
             >
-              Open PDF in New Tab ↗
+              <span>Open PDF in New Tab</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </div>
         </div>
@@ -179,7 +185,7 @@ export function CvPdfViewer({
         <div className="relative w-full h-[520px] sm:h-[680px] lg:h-[860px] bg-[#0b0b0d]">
           {!viewerLoaded && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0b0b0d] z-10 pointer-events-none">
-              <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+              <Loader2 className="w-8 h-8 text-white animate-spin" />
               <span className="font-mono-custom text-xs text-[#888] uppercase tracking-wider">
                 Loading {title}...
               </span>

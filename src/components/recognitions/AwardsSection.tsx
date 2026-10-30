@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { EditorialListCard } from "@/components/common/EditorialListCard";
@@ -108,9 +109,7 @@ export function AwardsSection() {
                     </div>
                     <h3 className="font-sans text-xl sm:text-2xl md:text-3xl text-white font-normal tracking-tight transition-colors group-hover:text-white flex items-center gap-2">
                       <span>{item.role}</span>
-                      <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-emerald-400 text-lg hidden sm:inline">
-                        →
-                      </span>
+                      <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-emerald-400 hidden sm:inline" />
                     </h3>
                     <p className="font-mono-custom text-xs sm:text-sm text-[#777] mt-1.5 leading-relaxed group-hover:text-[#aaa] transition-colors">
                       {item.highlight}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { getPublishedCvDocument } from "@/lib/cv-service";
 import { serializeJsonLd } from "@/lib/url-utils";
@@ -295,7 +296,7 @@ export default async function CurriculumVitaePage() {
                       className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
                     >
                       <span>Download CV (PDF)</span>
-                      <span>↓</span>
+                      <Download className="h-3.5 w-3.5" />
                     </a>
                     <a
                       href="/api/cv/pdf"
@@ -304,7 +305,7 @@ export default async function CurriculumVitaePage() {
                       className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
                     >
                       <span>Open PDF</span>
-                      <span>↗</span>
+                      <ArrowUpRight className="h-3.5 w-3.5" />
                     </a>
                   </>
                 ) : (
@@ -313,7 +314,7 @@ export default async function CurriculumVitaePage() {
                     className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
                   >
                     <span>Request PDF CV</span>
-                    <span>↗</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
                   </a>
                 )}
 
@@ -376,9 +377,10 @@ export default async function CurriculumVitaePage() {
                             </span>
                             <Link
                               href={`/services/${pillar.serviceSlug}`}
-                              className="font-mono-custom text-[11px] uppercase tracking-wider text-[#aaa] hover:text-white transition-colors"
+                              className="font-mono-custom text-[11px] uppercase tracking-wider text-[#aaa] hover:text-white transition-colors inline-flex items-center gap-1"
                             >
-                              Service Spec →
+                              <span>Service Spec</span>
+                              <ArrowRight className="h-3 w-3" />
                             </Link>
                           </div>
 
@@ -494,7 +496,7 @@ export default async function CurriculumVitaePage() {
                             className="self-start sm:self-center inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/6 hover:bg-white text-white hover:text-black font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all shrink-0"
                           >
                             <span>Full Role Dossier</span>
-                            <span>→</span>
+                            <ArrowRight className="h-3.5 w-3.5" />
                           </Link>
                         </div>
 
@@ -547,7 +549,7 @@ export default async function CurriculumVitaePage() {
                       className="inline-flex items-center gap-2 font-mono-custom text-xs uppercase tracking-wider text-white hover:text-emerald-400 transition-colors"
                     >
                       <span>View Complete Academic Dossier</span>
-                      <span>→</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>
@@ -645,15 +647,17 @@ export default async function CurriculumVitaePage() {
                 <div className="flex flex-wrap items-center gap-3 shrink-0">
                   <a
                     href="mailto:hello@kamrulislam.me"
-                    className="px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
+                    className="px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all inline-flex items-center gap-1.5"
                   >
-                    hello@kamrulislam.me ↗
+                    <span>hello@kamrulislam.me</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
                   </a>
                   <Link
                     href="/projects"
-                    className="px-6 py-3.5 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
+                    className="px-6 py-3.5 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all inline-flex items-center gap-1.5"
                   >
-                    Explore Portfolio Works →
+                    <span>Explore Portfolio Works</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>

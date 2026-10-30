@@ -2,9 +2,34 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import {
+  Plus,
+  Search,
+  Film,
+  Globe,
+  ShieldAlert,
+  Monitor,
+  Pencil,
+  Trash2,
+  ArrowLeft,
+  ArrowRight,
+  Loader2,
+} from "lucide-react";
 import { ProjectRecord } from "@/types/project";
 import { getDisplayDomain } from "@/lib/url-utils";
-import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type FilterTab = "all" | "video" | "web" | "published" | "drafts";
 
@@ -153,9 +178,9 @@ export default function AdminDashboardPage() {
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <Link
             href="/admin/projects/new"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 active:scale-95 transition-all shadow-sm"
+            className={buttonVariants({ variant: "default", size: "default", className: "px-5 py-2.5 h-auto" })}
           >
-            <span className="text-base leading-none font-bold">+</span>
+            <Plus className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
             <span>Add New Project</span>
           </Link>
         </div>
@@ -163,50 +188,50 @@ export default function AdminDashboardPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-[#888] uppercase tracking-wider block mb-1">
             Total
           </span>
           <span className="font-sans text-2xl font-semibold text-white">
             {stats.total}
           </span>
-        </div>
+        </Card>
 
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-emerald-400/80 uppercase tracking-wider block mb-1">
             Published
           </span>
           <span className="font-sans text-2xl font-semibold text-emerald-400">
             {stats.published}
           </span>
-        </div>
+        </Card>
 
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-amber-400/80 uppercase tracking-wider block mb-1">
             Drafts
           </span>
           <span className="font-sans text-2xl font-semibold text-amber-400">
             {stats.drafts}
           </span>
-        </div>
+        </Card>
 
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-sky-400/80 uppercase tracking-wider block mb-1">
             Video
           </span>
           <span className="font-sans text-2xl font-semibold text-sky-400">
             {stats.video}
           </span>
-        </div>
+        </Card>
 
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10 col-span-2 sm:col-span-1">
+        <Card className="p-4 rounded-xl col-span-2 sm:col-span-1">
           <span className="font-mono-custom text-[11px] text-purple-400/80 uppercase tracking-wider block mb-1">
             Web
           </span>
           <span className="font-sans text-2xl font-semibold text-purple-400">
             {stats.web}
           </span>
-        </div>
+        </Card>
       </div>
 
       {/* Filter Tabs & Search Controls */}
@@ -215,7 +240,11 @@ export default function AdminDashboardPage() {
         className="scroll-mt-20 flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2"
       >
         {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#141416] border border-white/10">
+        <div
+          role="tablist"
+          aria-label="Filter projects by category or status"
+          className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#141416] border border-white/10"
+        >
           {(
             [
               { id: "all", label: "All Projects" },
@@ -228,11 +257,13 @@ export default function AdminDashboardPage() {
             <button
               key={tab.id}
               type="button"
+              role="tab"
+              aria-selected={activeTab === tab.id}
               onClick={() => {
                 setActiveTab(tab.id);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all ${
+              className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 activeTab === tab.id
                   ? "bg-white/15 text-white font-medium shadow-sm"
                   : "text-[#888] hover:text-white"
@@ -245,17 +276,21 @@ export default function AdminDashboardPage() {
 
         {/* Search Bar */}
         <div className="relative w-full md:w-72">
-          <input
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#666]"
+          />
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
+            aria-label="Search projects"
             placeholder="Search projects..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#141416] border border-white/10 text-white placeholder-white/20 text-xs font-mono-custom focus:outline-none focus:border-white/30 transition-all"
+            className="pl-9 pr-4 py-2 h-9 bg-[#141416] text-xs font-mono-custom"
           />
-          <span className="absolute left-3 top-2.5 text-[#666] text-xs">🔍</span>
         </div>
       </div>
 
@@ -268,25 +303,27 @@ export default function AdminDashboardPage() {
 
       {/* Projects List */}
       {loading ? (
-        <div className="p-16 text-center rounded-2xl bg-[#141416] border border-white/10">
-          <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin mx-auto mb-3" />
+        <Card className="p-16 text-center">
+          <Loader2 className="w-7 h-7 text-white animate-spin mx-auto mb-3" aria-hidden="true" />
           <p className="font-mono-custom text-xs text-[#888]">Loading projects from database...</p>
-        </div>
+        </Card>
       ) : filteredProjects.length === 0 ? (
-        <div className="p-16 text-center rounded-2xl bg-[#141416] border border-white/10">
+        <Card className="p-16 text-center">
           <p className="font-mono-custom text-sm text-[#888] mb-4">No projects match the selected criteria.</p>
           <Link
             href="/admin/projects/new"
-            className="inline-flex px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-mono-custom text-xs border border-white/10 transition-colors"
+            className={buttonVariants({ variant: "secondary", size: "default" })}
           >
-            Create Your First Project
+            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Create Your First Project</span>
           </Link>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-2xl bg-[#141416] border border-white/10 overflow-hidden shadow-sm divide-y divide-white/5">
+        <Card className="overflow-hidden divide-y divide-white/5">
           {paginatedProjects.map((project) => {
             const isVideo = project.type === "video";
             const is916 = project.aspect_ratio === "9:16";
+            const isFallback = project.preview_mode === "fallback" || project.can_embed === false;
 
             return (
               <div
@@ -316,8 +353,8 @@ export default function AdminDashboardPage() {
                         }}
                       />
                     ) : (
-                      <span className="text-xs text-[#666] font-mono-custom">
-                        {isVideo ? "🎬" : "🌐"}
+                      <span className="text-[#666]" aria-hidden="true">
+                        {isVideo ? <Film className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
                       </span>
                     )}
 
@@ -332,31 +369,33 @@ export default function AdminDashboardPage() {
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       {/* Priority Badge */}
                       {project.manual_priority ? (
-                        <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-amber-950/60 text-amber-300 border border-amber-800/50 font-medium">
+                        <Badge variant="warning" className="font-medium">
                           Priority #{project.manual_priority}
-                        </span>
+                        </Badge>
                       ) : (
-                        <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/4 text-[#888] border border-white/5">
+                        <Badge variant="muted">
                           Priority: Date
-                        </span>
+                        </Badge>
                       )}
 
-                      <span className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
-                        isVideo
-                          ? "bg-sky-950/40 text-sky-300 border-sky-800/40"
-                          : "bg-purple-950/40 text-purple-300 border-purple-800/40"
-                      }`}>
-                        {isVideo ? `Video • ${project.aspect_ratio}` : "Web Project"}
-                      </span>
+                      <Badge variant={isVideo ? "info" : "purple"}>
+                        {isVideo ? (
+                          <Film className="h-3 w-3" aria-hidden="true" />
+                        ) : (
+                          <Globe className="h-3 w-3" aria-hidden="true" />
+                        )}
+                        <span>{isVideo ? `Video • ${project.aspect_ratio}` : "Web Project"}</span>
+                      </Badge>
 
                       {!isVideo && (
-                        <span className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
-                          (project.preview_mode === "fallback" || project.can_embed === false)
-                            ? "bg-amber-950/40 text-amber-300 border-amber-800/40"
-                            : "bg-emerald-950/40 text-emerald-300 border-emerald-800/40"
-                        }`}>
-                          {(project.preview_mode === "fallback" || project.can_embed === false) ? "🛡️ Fallback" : "🖥️ Live Iframe"}
-                        </span>
+                        <Badge variant={isFallback ? "warning" : "success"}>
+                          {isFallback ? (
+                            <ShieldAlert className="h-3 w-3" aria-hidden="true" />
+                          ) : (
+                            <Monitor className="h-3 w-3" aria-hidden="true" />
+                          )}
+                          <span>{isFallback ? "Fallback" : "Live Iframe"}</span>
+                        </Badge>
                       )}
 
                       {project.client_name && (
@@ -385,15 +424,12 @@ export default function AdminDashboardPage() {
                 {/* Right Actions: Status & Controls */}
                 <div className="flex flex-wrap items-center justify-end gap-2.5 w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-0 self-end sm:self-center shrink-0">
                   {/* Publish Toggle Button */}
-                  <button
-                    type="button"
+                  <Button
+                    variant={project.is_published ? "success" : "warning"}
+                    size="sm"
                     onClick={() => handleTogglePublish(project)}
                     disabled={togglingId === project.id}
-                    className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider border transition-all flex items-center gap-1.5 ${
-                      project.is_published
-                        ? "bg-emerald-950/40 border-emerald-800/40 text-emerald-300 hover:bg-emerald-900/50"
-                        : "bg-amber-950/40 border-amber-800/40 text-amber-300 hover:bg-amber-900/50"
-                    }`}
+                    className="uppercase tracking-wider"
                   >
                     <span
                       className={`w-1.5 h-1.5 rounded-full ${
@@ -401,24 +437,26 @@ export default function AdminDashboardPage() {
                       }`}
                     />
                     <span>{project.is_published ? "Published" : "Draft"}</span>
-                  </button>
+                  </Button>
 
                   {/* Edit Link */}
                   <Link
                     href={`/admin/projects/${project.id}/edit`}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
+                    className={buttonVariants({ variant: "secondary", size: "sm" })}
                   >
-                    Edit
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Edit</span>
                   </Link>
 
                   {/* Delete Button */}
-                  <button
-                    type="button"
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     onClick={() => setConfirmDeleteProject(project)}
-                    className="px-3 py-1.5 rounded-lg bg-red-950/30 hover:bg-red-900/40 text-red-300 font-mono-custom text-xs border border-red-800/30 transition-colors"
                   >
-                    Delete
-                  </button>
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Delete</span>
+                  </Button>
                 </div>
               </div>
             );
@@ -434,65 +472,82 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                 >
-                  ← Previous
-                </button>
+                  <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Previous</span>
+                </Button>
 
                 <span className="font-mono-custom text-xs text-[#aaa] px-2">
                   Page {currentPage} of {totalPages}
                 </span>
 
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                 >
-                  Next →
-                </button>
+                  <span>Next</span>
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </Button>
               </div>
             </div>
           )}
-        </div>
+        </Card>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {confirmDeleteProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-[#161618] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4">
-            <h3 className="font-sans font-medium text-lg text-white">
-              Delete Project?
-            </h3>
-            <p className="font-mono-custom text-xs text-[#aaa] leading-relaxed">
-              Are you sure you want to permanently delete <strong className="text-white font-semibold">&ldquo;{confirmDeleteProject.title}&rdquo;</strong>?
-              This action cannot be undone.
-            </p>
-
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
-              <button
-                type="button"
-                onClick={() => setConfirmDeleteProject(null)}
-                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deletingId === confirmDeleteProject.id}
-                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono-custom text-xs font-medium transition-colors disabled:opacity-50"
-              >
-                {deletingId === confirmDeleteProject.id ? "Deleting..." : "Confirm Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete Confirmation Modal via shadcn Dialog */}
+      <Dialog
+        open={Boolean(confirmDeleteProject)}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDeleteProject(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Project?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete{" "}
+              <strong className="text-white font-semibold">
+                &ldquo;{confirmDeleteProject?.title}&rdquo;
+              </strong>
+              ? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setConfirmDeleteProject(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructiveSolid"
+              onClick={handleDelete}
+              disabled={Boolean(
+                confirmDeleteProject && deletingId === confirmDeleteProject.id
+              )}
+            >
+              {confirmDeleteProject && deletingId === confirmDeleteProject.id ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Confirm Delete</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

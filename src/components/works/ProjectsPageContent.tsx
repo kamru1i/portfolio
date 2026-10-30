@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, Film, Play } from "lucide-react";
 import { PortfolioProject, PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { compareProjectsByPriorityAndRecency } from "@/types/project";
 import { VideoPlayerModal } from "./VideoPlayerModal";
@@ -125,7 +126,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
           href="/#projects"
           className="group inline-flex items-center gap-2 font-mono-custom text-xs sm:text-sm text-[#888] hover:text-white uppercase tracking-wider transition-colors"
         >
-          <span className="group-hover:-translate-x-1 transition-transform">←</span>
+          <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform" />
           <span>Back to Overview</span>
         </Link>
       </div>
@@ -295,7 +296,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                       {/* Center Play Button Overlay */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-lg">
-                          <span className="text-sm font-sans ml-0.5">▶</span>
+                          <Play className="h-4 w-4 fill-current ml-0.5" />
                         </div>
                       </div>
 
@@ -341,7 +342,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                           aria-label={`Play ${project.title}`}
                         >
                           <span>Play</span>
-                          <span>▶</span>
+                          <Play className="h-3 w-3 fill-current" />
                         </button>
 
                         <Link
@@ -350,7 +351,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                           aria-label={`View full details for ${project.title}`}
                         >
                           <span>Details</span>
-                          <span>→</span>
+                          <ArrowRight className="h-3.5 w-3.5" />
                         </Link>
                       </div>
                     </div>
@@ -361,8 +362,8 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
           ) : (
             /* Polished Empty State for aspect ratio filters with no items */
             <div className="w-full py-20 px-6 rounded-2xl bg-white/2 border border-white/10 text-center flex flex-col items-center justify-center">
-              <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl mb-4">
-                🎬
+              <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 mb-4">
+                <Film className="h-6 w-6" />
               </div>
               <h3 className="font-gambarino text-2xl text-white mb-2">
                 No Projects in {selectedFormat} Format
@@ -417,7 +418,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                         aria-label={`View full case study for ${project.title}`}
                       >
                         <span className="group-hover:underline">View Case Study</span>
-                        <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
                   </motion.div>

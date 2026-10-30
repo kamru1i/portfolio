@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { useDhakaClock } from "@/hooks/useDhakaClock";
 import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
@@ -160,40 +161,16 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
               onClick={() => setIsMenuOpen((prev) => !prev)}
               aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={isMenuOpen}
-              className="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/25 text-white text-[12px] sm:text-[13px] font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/25 text-white text-[12px] sm:text-[13px] font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             >
               {isMenuOpen ? (
                 <>
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-white"
-                  >
-                    <path
-                      d="M2 2L12 12M12 2L2 12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                  <X className="h-3.5 w-3.5 text-white" aria-hidden="true" />
                   <span>CLOSE</span>
                 </>
               ) : (
                 <>
-                  <svg
-                    width="16"
-                    height="10"
-                    viewBox="0 0 16 10"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-white"
-                  >
-                    <line y1="1" x2="16" y2="1" stroke="currentColor" strokeWidth="2" />
-                    <line y1="9" x2="16" y2="9" stroke="currentColor" strokeWidth="2" />
-                  </svg>
+                  <Menu className="h-3.5 w-3.5 text-white" aria-hidden="true" />
                   <span>MENU</span>
                 </>
               )}

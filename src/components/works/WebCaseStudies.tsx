@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { WebCaseStudyCard } from "./WebCaseStudyCard";
 
@@ -52,7 +53,7 @@ export function WebCaseStudies({
           aria-label="Explore more web development projects"
         >
           <span>Explore More Web Projects</span>
-          <span className="group-hover:translate-x-1 transition-transform">→</span>
+          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
         </Link>
       </div>
     </div>

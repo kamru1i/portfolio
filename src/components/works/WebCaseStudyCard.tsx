@@ -3,6 +3,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { getDisplayDomain } from "@/lib/url-utils";
 
@@ -134,9 +136,10 @@ export function WebCaseStudyCard({
           <Link
             href={`/projects/web/${project.slug || project.id}`}
             onClick={(e) => e.stopPropagation()}
-            className="font-mono-custom text-[11px] text-white/80 hover:text-white border border-white/15 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm transition-colors"
+            className="inline-flex items-center gap-1 font-mono-custom text-[11px] text-white/80 hover:text-white border border-white/15 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-sm transition-colors"
           >
-            Details →
+            <span>Details</span>
+            <ArrowRight className="h-3 w-3" aria-hidden="true" />
           </Link>
           <span className="font-mono-custom text-[11px] text-white/50 border border-white/10 px-2.5 py-0.5 rounded-full bg-white/5">
             Live Preview
@@ -193,7 +196,7 @@ export function WebCaseStudyCard({
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono-custom text-xs border border-white/10 transition-all flex items-center justify-center shadow-sm"
                 aria-label={`View ${project.title} source on GitHub`}
               >
-                <span>GH</span>
+                <GitHubBrandIcon className="h-4 w-4" aria-hidden="true" />
               </a>
             )}
 
@@ -203,10 +206,10 @@ export function WebCaseStudyCard({
                 e.stopPropagation();
                 onPreviewWeb(project);
               }}
-              className="w-8 h-8 sm:w-9 sm:h-10 sm:px-3 rounded-xl bg-white/20 hover:bg-white text-white hover:text-black transition-all flex items-center justify-center text-sm shadow-sm group-hover:scale-105"
+              className="w-8 h-8 sm:w-9 sm:h-10 sm:px-3 rounded-xl bg-white/20 hover:bg-white text-white hover:text-black transition-all flex items-center justify-center text-sm shadow-sm group-hover:scale-105 cursor-pointer"
               aria-label={`Preview live website for ${project.title}`}
             >
-              <span>→</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>

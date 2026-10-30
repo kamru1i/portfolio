@@ -1,6 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  MapPin,
+  MessageSquare,
+  Send,
+  Zap,
+} from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
 interface ContactOption {
@@ -23,21 +31,7 @@ export function ContactHeroOptions() {
         "Book a short intro call to discuss your project goals, timelines, and creative direction.",
       actionText: "Schedule intro",
       actionHref: "#get-in-touch",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-neutral-300"
-        >
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-      ),
+      icon: <Zap className="h-5 w-5 text-neutral-300" strokeWidth={1.75} />,
     },
     {
       id: "start-conversation",
@@ -48,21 +42,7 @@ export function ContactHeroOptions() {
       actionHref: `tel:${PORTFOLIO_DATA.brand.phone.replace(/[^0-9+]/g, "")}`,
       whatsappHref: PORTFOLIO_DATA.brand.whatsappUrl,
       isExternal: true,
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-neutral-300"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      ),
+      icon: <MessageSquare className="h-5 w-5 text-neutral-300" strokeWidth={1.75} />,
     },
     {
       id: "send-email",
@@ -72,22 +52,7 @@ export function ContactHeroOptions() {
       actionText: PORTFOLIO_DATA.brand.email,
       actionHref: `mailto:${PORTFOLIO_DATA.brand.email}`,
       isExternal: true,
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-neutral-300"
-        >
-          <line x1="22" y1="2" x2="11" y2="13" />
-          <polygon points="22 2 15 22 11 13 2 9 22 2" />
-        </svg>
-      ),
+      icon: <Send className="h-5 w-5 text-neutral-300" strokeWidth={1.75} />,
     },
     {
       id: "studio-location",
@@ -96,22 +61,7 @@ export function ContactHeroOptions() {
         "Working remotely with clients worldwide while collaborating across different time zones.",
       actionText: "Chattogram, BD • Worldwide",
       actionHref: "#get-in-touch",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-neutral-300"
-        >
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-          <circle cx="12" cy="10" r="3" />
-        </svg>
-      ),
+      icon: <MapPin className="h-5 w-5 text-neutral-300" strokeWidth={1.75} />,
     },
   ];
 
@@ -184,9 +134,7 @@ export function ContactHeroOptions() {
                 className="inline-flex items-center justify-between w-full font-mono-custom text-xs sm:text-sm text-white/90 hover:text-white transition-colors group/link"
               >
                 <span className="truncate pr-2">{opt.actionText}</span>
-                <span className="group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform text-[#888] group-hover/link:text-white">
-                  ↗
-                </span>
+                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform text-[#888] group-hover/link:text-white" />
               </a>
             ) : (
               <a
@@ -194,9 +142,7 @@ export function ContactHeroOptions() {
                 className="inline-flex items-center justify-between w-full font-mono-custom text-xs sm:text-sm text-white/90 hover:text-white transition-colors group/link"
               >
                 <span className="truncate pr-2">{opt.actionText}</span>
-                <span className="group-hover/link:translate-x-1 transition-transform text-[#888] group-hover/link:text-white">
-                  →
-                </span>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 group-hover/link:translate-x-1 transition-transform text-[#888] group-hover/link:text-white" />
               </a>
             )}
           </div>

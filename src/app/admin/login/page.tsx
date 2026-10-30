@@ -1,143 +1,178 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, Loader2, Lock, ShieldAlert } from "lucide-react";
+import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get("error");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    errorParam === "unauthorized"
+      ? "Your account does not have administrator privileges."
+      : errorParam === "missing_config"
+      ? "Supabase credentials are not configured yet. Please check .env.local."
+      : null
+  );
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg(null);
+    setErrorMessage(null);
 
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const response = await fetch("/api/admin/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
       });
 
-      if (error) {
-        setErrorMsg(error.message);
+      const payload = (await response.json().catch(() => null)) as {
+        error?: string;
+        ok?: boolean;
+      } | null;
+
+      if (!response.ok) {
+        setErrorMessage(
+          payload?.error || "Authentication failed. Please check your credentials."
+        );
         setLoading(false);
         return;
       }
 
-      if (data?.user) {
-        // Verify that this user is in the admin allowlist
-        const { data: adminRecord, error: adminErr } = await supabase
-          .from("admin_users")
-          .select("id")
-          .eq("id", data.user.id)
-          .single();
-
-        if (adminErr || !adminRecord) {
-          await supabase.auth.signOut();
-          setErrorMsg("Access Denied: Your account is not authorized as an administrator.");
-          setLoading(false);
-          return;
-        }
-
-        router.push("/admin");
-        router.refresh();
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred during login.";
-      setErrorMsg(message);
+      router.push("/admin");
+      router.refresh();
+    } catch {
+      setErrorMessage(
+        "Unable to reach authentication server. Please check your connection and try again."
+      );
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-4 sm:p-6 select-none relative overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-white/2 rounded-full blur-[120px] pointer-events-none" />
-
-      {/* Main card */}
-      <div className="w-full max-w-md relative z-10 bg-[#121214] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/4 border border-white/10 text-white/60 font-mono-custom text-xs uppercase tracking-wider mb-4">
+    <div className="min-h-screen w-full bg-[#09090b] text-white flex flex-col items-center justify-center p-6 select-none">
+      <div className="w-full max-w-[420px]">
+        {/* Top Wordmark Header */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <Link href="/" className="mb-4 hover:opacity-80 transition-opacity">
+            <KamrulBrandWordmark className="h-8 w-auto text-white" />
+          </Link>
+          <Badge variant="default" className="px-3 py-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Restricted Access
-          </div>
-          <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal tracking-tight uppercase">
-            Admin Portal
-          </h1>
-          <p className="font-mono-custom text-xs text-[#888] mt-2">
-            Kamrul Islam Portfolio & Works Management
-          </p>
+            <span>Admin Authentication</span>
+          </Badge>
         </div>
 
-        {/* Error notification */}
-        {errorMsg && (
-          <div className="mb-6 p-3.5 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom leading-relaxed">
-            {errorMsg}
+        {/* Login Card */}
+        <Card className="p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,0.75)]">
+          <div className="flex items-center gap-2.5 mb-1">
+            <Lock className="h-4 w-4 text-emerald-400 shrink-0" aria-hidden="true" />
+            <h1 className="font-sans text-xl font-medium text-white">
+              Sign in to CMS
+            </h1>
           </div>
-        )}
+          <p className="font-mono-custom text-xs text-[#888] mb-6">
+            Authorized administrator access for portfolio projects &amp; metadata.
+          </p>
 
-        {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block font-mono-custom text-xs uppercase tracking-wider text-[#a1a1aa] mb-2">
-              Admin Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-              placeholder="admin@example.com"
-              className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-all"
-            />
-          </div>
+          {errorMessage && (
+            <div className="mb-5 p-3.5 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom leading-relaxed flex items-start gap-2.5">
+              <ShieldAlert className="h-4 w-4 text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
-          <div>
-            <label className="block font-mono-custom text-xs uppercase tracking-wider text-[#a1a1aa] mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••••••"
-              className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-all"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="admin-email" className="mb-1.5">
+                Admin Email
+              </Label>
+              <Input
+                id="admin-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                placeholder="admin@kamrulislam.me"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-6 py-3 px-4 rounded-xl bg-white text-black font-sans font-medium text-sm hover:bg-neutral-200 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+            <div>
+              <Label htmlFor="admin-password" className="mb-1.5">
+                Password
+              </Label>
+              <Input
+                id="admin-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                placeholder="••••••••••••"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              disabled={loading}
+              className="w-full mt-2 font-medium text-sm"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                <span>Sign In to Dashboard</span>
+              )}
+            </Button>
+          </form>
+        </Card>
+
+        <div className="mt-6 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 font-mono-custom text-xs text-[#777] hover:text-white transition-colors"
           >
-            {loading ? (
-              <>
-                <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                <span>Authenticating...</span>
-              </>
-            ) : (
-              <span>Sign In to Dashboard</span>
-            )}
-          </button>
-        </form>
-
-        {/* Footer info */}
-        <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between font-mono-custom text-[11px] text-[#666]">
-          <Link href="/" className="hover:text-white transition-colors">
-            ← Back to Website
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Return to Live Website</span>
           </Link>
-          <span>Private System</span>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen w-full bg-[#09090b] text-white flex items-center justify-center font-mono-custom text-xs text-[#888]">
+          Loading authentication...
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

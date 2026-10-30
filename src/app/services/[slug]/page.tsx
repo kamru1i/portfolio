@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
@@ -146,9 +147,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               href="/#services"
               className="group inline-flex items-center gap-2 font-mono-custom text-xs sm:text-sm text-[#888] hover:text-white uppercase tracking-wider transition-colors"
             >
-              <span className="group-hover:-translate-x-1 transition-transform">
-                ←
-              </span>
+              <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Services</span>
             </Link>
           </div>
@@ -450,9 +449,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                   className="font-gambarino text-3xl sm:text-4xl text-white hover:text-white/80 transition-colors inline-flex items-center gap-3 group"
                 >
                   <span>{nextService.title}</span>
-                  <span className="group-hover:translate-x-2 transition-transform">
-                    →
-                  </span>
+                  <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
                 </Link>
                 <p className="font-mono-custom text-xs sm:text-sm text-[#888] mt-2">
                   {nextService.headline}

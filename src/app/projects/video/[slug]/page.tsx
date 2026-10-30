@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Film } from "lucide-react";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
 import { resolvePlayableEmbedUrl } from "@/lib/video-metadata";
 import { serializeJsonLd } from "@/lib/url-utils";
@@ -174,7 +175,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
               href="/projects?type=video"
               className="group inline-flex items-center gap-2 font-mono-custom text-xs sm:text-sm text-[#888] hover:text-white uppercase tracking-wider transition-colors"
             >
-              <span className="group-hover:-translate-x-1 transition-transform">←</span>
+              <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Video Projects</span>
             </Link>
           </div>
@@ -250,8 +251,8 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                     className="object-cover opacity-30 blur-sm"
                   />
                   <div className="relative z-10 max-w-md p-6 rounded-2xl bg-black/80 backdrop-blur-md border border-white/15 flex flex-col items-center">
-                    <div className="w-14 h-14 rounded-2xl bg-white/8 border border-white/15 flex items-center justify-center text-2xl mb-3">
-                      🎬
+                    <div className="w-14 h-14 rounded-2xl bg-white/8 border border-white/15 flex items-center justify-center text-white/80 mb-3">
+                      <Film className="h-6 w-6" />
                     </div>
                     <h3 className="font-gambarino text-xl text-white mb-2">
                       External Platform Video
@@ -266,7 +267,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                       className="px-6 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
                     >
                       <span>Watch Original Video</span>
-                      <span>↗</span>
+                      <ArrowUpRight className="h-3.5 w-3.5" />
                     </a>
                   </div>
                 </div>
@@ -412,9 +413,10 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                   ).map((deliv) => (
                     <span
                       key={deliv}
-                      className="px-4 py-2 rounded-xl bg-white/3 border border-white/10 font-mono-custom text-xs text-white/90"
+                      className="px-4 py-2 rounded-xl bg-white/3 border border-white/10 font-mono-custom text-xs text-white/90 inline-flex items-center gap-1.5"
                     >
-                      ✓ {deliv}
+                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>{deliv}</span>
                     </span>
                   ))}
                 </div>
@@ -448,7 +450,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                     className="group inline-flex items-center gap-3 font-gambarino text-2xl sm:text-3xl text-white hover:text-emerald-400 transition-colors"
                   >
                     <span>{nextProject.title}</span>
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
 

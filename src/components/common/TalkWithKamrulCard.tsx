@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
@@ -95,12 +96,13 @@ export function TalkWithKamrulCard({
       {showButton && (
         <Link
           href={cardData.ctaHref || "/contact-us"}
-          className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 transition-all duration-200 shadow-md group select-none mt-1"
+          className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 transition-all duration-200 shadow-md group select-none mt-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
         >
           <span>{cardData.ctaText || "Get in touch"}</span>
-          <span className="transition-transform duration-200 group-hover:translate-x-1">
-            →
-          </span>
+          <ArrowRight
+            aria-hidden="true"
+            className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+          />
         </Link>
       )}
     </div>

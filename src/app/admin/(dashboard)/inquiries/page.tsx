@@ -2,8 +2,25 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  Search,
+  Zap,
+  Check,
+  Mail,
+  Archive,
+  Trash2,
+  Eye,
+  EyeOff,
+  Loader2,
+} from "lucide-react";
 import { ContactInquiryRecord } from "@/lib/inquiries-service";
 import { InquiryStatus } from "@/types/database";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 type FilterTab = "all" | InquiryStatus;
 
@@ -129,17 +146,23 @@ export default function AdminInquiriesPage() {
 
         <Link
           href="/admin"
-          className="self-start sm:self-center px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
+          className={buttonVariants({
+            variant: "secondary",
+            size: "default",
+            className: "self-start sm:self-center",
+          })}
         >
-          ← Back to Overview
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>Back to Overview</span>
         </Link>
       </div>
 
       {/* Notice if SQL migration has not been run yet */}
       {tableMissing && (
         <div className="p-4 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-200 text-xs font-mono-custom space-y-2">
-          <div className="font-semibold text-amber-300">
-            ⚡ Runtime Backup Active (Database Migration Pending)
+          <div className="font-semibold text-amber-300 flex items-center gap-2">
+            <Zap className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>Runtime Backup Active (Database Migration Pending)</span>
           </div>
           <p className="text-amber-200/80 leading-relaxed">
             Inquiries are currently being captured in server runtime memory. To enable permanent PostgreSQL storage across deployments, run the migration file{" "}
@@ -153,46 +176,50 @@ export default function AdminInquiriesPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-[#888] uppercase tracking-wider block mb-1">
             Total Inquiries
           </span>
           <span className="font-sans text-2xl font-semibold text-white">
             {stats.total}
           </span>
-        </div>
+        </Card>
 
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-amber-400/80 uppercase tracking-wider block mb-1">
             Unread
           </span>
           <span className="font-sans text-2xl font-semibold text-amber-400">
             {stats.unread}
           </span>
-        </div>
+        </Card>
 
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-emerald-400/80 uppercase tracking-wider block mb-1">
             Replied
           </span>
           <span className="font-sans text-2xl font-semibold text-emerald-400">
             {stats.replied}
           </span>
-        </div>
+        </Card>
 
-        <div className="p-4 rounded-xl bg-[#141416] border border-white/10">
+        <Card className="p-4 rounded-xl">
           <span className="font-mono-custom text-[11px] text-sky-400/80 uppercase tracking-wider block mb-1">
             Archived
           </span>
           <span className="font-sans text-2xl font-semibold text-sky-400">
             {stats.archived}
           </span>
-        </div>
+        </Card>
       </div>
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#141416] border border-white/10">
+        <div
+          role="tablist"
+          aria-label="Filter inquiries by status"
+          className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#141416] border border-white/10"
+        >
           {(
             [
               { id: "all", label: "All" },
@@ -205,8 +232,10 @@ export default function AdminInquiriesPage() {
             <button
               key={tab.id}
               type="button"
+              role="tab"
+              aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all ${
+              className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 activeTab === tab.id
                   ? "bg-white/15 text-white font-medium"
                   : "text-[#888] hover:text-white"
@@ -218,14 +247,18 @@ export default function AdminInquiriesPage() {
         </div>
 
         <div className="relative w-full md:w-72">
-          <input
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#666]"
+          />
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search client inquiries"
             placeholder="Search client, email, brief..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#141416] border border-white/10 text-white placeholder-white/20 text-xs font-mono-custom focus:outline-none focus:border-white/30"
+            className="pl-9 pr-4 py-2 h-9 bg-[#141416] text-xs font-mono-custom"
           />
-          <span className="absolute left-3 top-2.5 text-[#666] text-xs">🔍</span>
         </div>
       </div>
 
@@ -237,18 +270,18 @@ export default function AdminInquiriesPage() {
 
       {/* Inquiries List */}
       {loading ? (
-        <div className="p-16 text-center rounded-2xl bg-[#141416] border border-white/10">
-          <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin mx-auto mb-3" />
+        <Card className="p-16 text-center">
+          <Loader2 className="w-7 h-7 text-white animate-spin mx-auto mb-3" aria-hidden="true" />
           <p className="font-mono-custom text-xs text-[#888]">
             Loading client inquiries...
           </p>
-        </div>
+        </Card>
       ) : filteredInquiries.length === 0 ? (
-        <div className="p-16 text-center rounded-2xl bg-[#141416] border border-white/10">
+        <Card className="p-16 text-center">
           <p className="font-mono-custom text-sm text-[#888]">
             No client inquiries found for this filter.
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="space-y-4">
           {filteredInquiries.map((inquiry) => {
@@ -262,9 +295,9 @@ export default function AdminInquiriesPage() {
             );
 
             return (
-              <div
+              <Card
                 key={inquiry.id}
-                className={`p-5 sm:p-6 rounded-2xl border transition-all space-y-4 ${
+                className={`p-5 sm:p-6 transition-all space-y-4 ${
                   isUnread
                     ? "bg-[#17171b] border-amber-500/30"
                     : "bg-[#141416] border-white/10"
@@ -273,35 +306,35 @@ export default function AdminInquiriesPage() {
                 {/* Top Meta Row */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`font-mono-custom text-[10px] uppercase px-2.5 py-0.5 rounded-full border ${
+                    <Badge
+                      variant={
                         inquiry.status === "unread"
-                          ? "bg-amber-950/60 text-amber-300 border-amber-700/50"
+                          ? "warning"
                           : inquiry.status === "replied"
-                          ? "bg-emerald-950/60 text-emerald-300 border-emerald-700/50"
+                          ? "success"
                           : inquiry.status === "archived"
-                          ? "bg-white/5 text-[#777] border-white/10"
-                          : "bg-sky-950/50 text-sky-300 border-sky-800/40"
-                      }`}
+                          ? "muted"
+                          : "info"
+                      }
                     >
-                      ● {inquiry.status}
-                    </span>
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                      <span>{inquiry.status}</span>
+                    </Badge>
 
-                    <span className="font-mono-custom text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/8 text-white/90 border border-white/10">
+                    <Badge variant="default">
                       {inquiry.project_type}
-                    </span>
+                    </Badge>
 
-                    <span
-                      className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
-                        inquiry.email_delivered
-                          ? "bg-emerald-950/30 text-emerald-400 border-emerald-800/30"
-                          : "bg-amber-950/30 text-amber-400 border-amber-800/30"
-                      }`}
-                    >
-                      {inquiry.email_delivered
-                        ? "Provider Accepted ✓"
-                        : "Saved in Inbox Backup"}
-                    </span>
+                    <Badge variant={inquiry.email_delivered ? "success" : "warning"}>
+                      {inquiry.email_delivered ? (
+                        <>
+                          <Check className="h-3 w-3" aria-hidden="true" />
+                          <span>Provider Accepted</span>
+                        </>
+                      ) : (
+                        <span>Saved in Inbox Backup</span>
+                      )}
+                    </Badge>
 
                     <span className="font-mono-custom text-xs text-[#777]">
                       • {formattedDate}
@@ -319,52 +352,64 @@ export default function AdminInquiriesPage() {
                           handleStatusChange(inquiry.id, "replied");
                         }
                       }}
-                      className="px-3 py-1.5 rounded-lg bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs font-medium transition-colors"
+                      className={buttonVariants({
+                        variant: "default",
+                        size: "sm",
+                        className: "font-mono-custom",
+                      })}
                     >
-                      Reply via Email ↗
+                      <Mail className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Reply via Email</span>
+                      <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
                     </a>
 
                     {inquiry.status === "unread" ? (
-                      <button
-                        type="button"
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         disabled={updatingId === inquiry.id}
                         onClick={() => handleStatusChange(inquiry.id, "read")}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
                       >
-                        Mark Read
-                      </button>
+                        <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Mark Read</span>
+                      </Button>
                     ) : (
-                      <button
-                        type="button"
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         disabled={updatingId === inquiry.id}
                         onClick={() => handleStatusChange(inquiry.id, "unread")}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#aaa] font-mono-custom text-xs border border-white/10 transition-colors"
+                        className="text-[#aaa]"
                       >
-                        Mark Unread
-                      </button>
+                        <EyeOff className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Mark Unread</span>
+                      </Button>
                     )}
 
                     {inquiry.status !== "archived" && (
-                      <button
-                        type="button"
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         disabled={updatingId === inquiry.id}
                         onClick={() =>
                           handleStatusChange(inquiry.id, "archived")
                         }
-                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#aaa] font-mono-custom text-xs border border-white/10 transition-colors"
+                        className="text-[#aaa]"
                       >
-                        Archive
-                      </button>
+                        <Archive className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Archive</span>
+                      </Button>
                     )}
 
-                    <button
-                      type="button"
+                    <Button
+                      variant="destructive"
+                      size="sm"
                       disabled={deletingId === inquiry.id}
                       onClick={() => handleDelete(inquiry.id)}
-                      className="px-3 py-1.5 rounded-lg bg-red-950/30 hover:bg-red-900/40 text-red-300 font-mono-custom text-xs border border-red-800/30 transition-colors"
                     >
-                      Delete
-                    </button>
+                      <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Delete</span>
+                    </Button>
                   </div>
                 </div>
 
@@ -388,7 +433,7 @@ export default function AdminInquiriesPage() {
                   </div>
 
                   <div>
-                    <span className="text-[#666] block">Company & Budget</span>
+                    <span className="text-[#666] block">Company &amp; Budget</span>
                     <span className="text-white/90">
                       {inquiry.company || "Independent"} •{" "}
                       {inquiry.budget_range || "Not specified"}
@@ -407,7 +452,7 @@ export default function AdminInquiriesPage() {
                 <div className="p-4 rounded-xl bg-black/40 border border-white/8 font-sans text-sm text-white/90 whitespace-pre-wrap leading-relaxed select-text">
                   {inquiry.details}
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -47,7 +48,8 @@ export default function NotFound() {
                   href="/"
                   className="px-6 py-3 rounded-full bg-white text-black font-sans font-medium text-xs sm:text-sm hover:bg-neutral-200 transition-colors inline-flex items-center gap-2"
                 >
-                  <span>← Back to Homepage</span>
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  <span>Back to Homepage</span>
                 </Link>
 
                 <Link
@@ -55,7 +57,7 @@ export default function NotFound() {
                   className="px-6 py-3 rounded-full bg-white/8 hover:bg-white/15 text-white font-mono-custom text-xs sm:text-sm border border-white/12 transition-colors inline-flex items-center gap-2"
                 >
                   <span>Explore All Works</span>
-                  <span>↗</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
@@ -105,9 +107,7 @@ export default function NotFound() {
                     <span className="font-mono-custom text-xs text-emerald-400">
                       /{item.index}
                     </span>
-                    <span className="font-mono-custom text-sm text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
-                      ↗
-                    </span>
+                    <ArrowUpRight className="h-4 w-4 text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </div>
 
                   <div className="mt-8">

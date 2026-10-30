@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Metadata } from "next";
+import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
@@ -109,7 +110,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
               href="/#recognitions"
               className="group inline-flex items-center gap-2 font-mono-custom text-xs sm:text-sm text-[#888] hover:text-white uppercase tracking-wider transition-colors"
             >
-              <span className="group-hover:-translate-x-1 transition-transform">←</span>
+              <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Milestones &amp; Recognitions</span>
             </Link>
           </div>
@@ -270,7 +271,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
                       key={ach}
                       className="p-5 rounded-xl bg-white/2 border border-white/10 flex items-start gap-3"
                     >
-                      <span className="text-emerald-400 mt-0.5">✦</span>
+                      <Sparkles className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
                       <p className="font-mono-custom text-xs sm:text-sm text-[#aaa] leading-relaxed">
                         {ach}
                       </p>
@@ -296,7 +297,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
                     className="group inline-flex items-center gap-3 font-gambarino text-2xl sm:text-3xl text-white hover:text-emerald-400 transition-colors"
                   >
                     <span>{nextItem.role} · {nextItem.organization}</span>
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
 

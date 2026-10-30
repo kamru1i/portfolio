@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, ArrowUpRight, Check, Loader2 } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { TalkWithKamrulCard } from "@/components/common/TalkWithKamrulCard";
 
@@ -196,8 +197,8 @@ export function ContactFormSection({ initialService }: { initialService?: string
               exit={{ opacity: 0, scale: 0.95 }}
               className="py-10 flex flex-col items-start space-y-6"
             >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl font-mono-custom">
-                ✓
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <Check className="h-6 w-6" />
               </div>
 
               <div>
@@ -216,7 +217,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
                   className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 transition-all shadow-md group"
                 >
                   <span>Open in Email Client (Backup Copy)</span>
-                  <span className="transition-transform duration-200 group-hover:translate-x-1">↗</span>
+                  <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
 
                 <button
@@ -408,7 +409,8 @@ export function ContactFormSection({ initialService }: { initialService?: string
                     href={generateMailtoUrl()}
                     className="inline-flex items-center gap-1.5 text-white underline hover:no-underline font-medium"
                   >
-                    Click here to send pre-filled email draft directly →
+                    <span>Click here to send pre-filled email draft directly</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </a>
                 </div>
               )}
@@ -422,14 +424,14 @@ export function ContactFormSection({ initialService }: { initialService?: string
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       <span>Sending inquiry...</span>
                     </>
                   ) : (
                     <>
                       <span>Send inquiry</span>
-                      <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs group-hover:translate-x-1 transition-transform">
-                        →
+                      <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                        <ArrowRight className="h-3.5 w-3.5" />
                       </span>
                     </>
                   )}

@@ -3,6 +3,17 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowUpRight,
+  Loader2,
+  Lock,
+  Monitor,
+  ShieldAlert,
+  Smartphone,
+  Tablet,
+  X,
+} from "lucide-react";
+import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { getDisplayDomain } from "@/lib/url-utils";
 import {
@@ -138,7 +149,7 @@ function ProjectPreviewModalContent({
                   }`}
                   title="Render interactive iframe preview"
                 >
-                  <span>🖥️</span>
+                  <Monitor className="h-3.5 w-3.5" />
                   <span>Live Iframe</span>
                 </button>
                 <button
@@ -151,7 +162,7 @@ function ProjectPreviewModalContent({
                   }`}
                   title="Render security-shielded fallback showcase"
                 >
-                  <span>🛡️</span>
+                  <ShieldAlert className="h-3.5 w-3.5" />
                   <span>Fallback View</span>
                 </button>
               </div>
@@ -170,11 +181,7 @@ function ProjectPreviewModalContent({
                         : "text-white/40 hover:text-white"
                     }`}
                   >
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="3" width="20" height="14" rx="2"/>
-                      <line x1="8" y1="21" x2="16" y2="21"/>
-                      <line x1="12" y1="17" x2="12" y2="21"/>
-                    </svg>
+                    <Monitor className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
@@ -187,10 +194,7 @@ function ProjectPreviewModalContent({
                         : "text-white/40 hover:text-white"
                     }`}
                   >
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="4" y="2" width="16" height="20" rx="2"/>
-                      <line x1="12" y1="18" x2="12.01" y2="18"/>
-                    </svg>
+                    <Tablet className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
@@ -203,10 +207,7 @@ function ProjectPreviewModalContent({
                         : "text-white/40 hover:text-white"
                     }`}
                   >
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="5" y="2" width="14" height="20" rx="2"/>
-                      <line x1="12" y1="18" x2="12.01" y2="18"/>
-                    </svg>
+                    <Smartphone className="w-3.5 h-3.5" />
                   </button>
                 </div>
               )}
@@ -221,10 +222,20 @@ function ProjectPreviewModalContent({
                   setActiveMode((prev) => (prev === "iframe" ? "fallback" : "iframe"));
                   setHasError(false);
                 }}
-                className="md:hidden px-2.5 py-1.5 rounded-full bg-white/10 text-white font-mono-custom text-[11px] border border-white/10 transition-colors"
+                className="md:hidden px-2.5 py-1.5 rounded-full bg-white/10 text-white font-mono-custom text-[11px] border border-white/10 transition-colors inline-flex items-center gap-1.5"
                 title="Switch between Live Iframe and Fallback View"
               >
-                {activeMode === "iframe" ? "🛡️ Fallback" : "🖥️ Live"}
+                {activeMode === "iframe" ? (
+                  <>
+                    <ShieldAlert className="h-3 w-3" />
+                    <span>Fallback</span>
+                  </>
+                ) : (
+                  <>
+                    <Monitor className="h-3 w-3" />
+                    <span>Live</span>
+                  </>
+                )}
               </button>
 
               {project.githubUrl && (
@@ -232,10 +243,11 @@ function ProjectPreviewModalContent({
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-2.5 sm:px-3 py-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs border border-white/10 transition-colors flex items-center gap-1"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs border border-white/10 transition-colors flex items-center gap-1.5"
                 >
+                  <GitHubBrandIcon className="h-3.5 w-3.5" />
                   <span>GitHub</span>
-                  <span>↗</span>
+                  <ArrowUpRight className="h-3 w-3" />
                 </a>
               )}
 
@@ -247,7 +259,7 @@ function ProjectPreviewModalContent({
                   className="px-3 sm:px-3.5 py-1.5 rounded-full bg-white text-black hover:bg-neutral-200 font-sans text-xs font-medium transition-colors flex items-center gap-1 shadow-sm"
                 >
                   <span>Live</span>
-                  <span>↗</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
               )}
 
@@ -257,7 +269,7 @@ function ProjectPreviewModalContent({
                 aria-label="Close project preview"
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors ml-0.5"
               >
-                ✕
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -269,7 +281,7 @@ function ProjectPreviewModalContent({
               <div className={`relative h-full transition-all duration-300 mx-auto ${viewportWidthClass} flex flex-col items-center justify-center`}>
                 {!iframeLoaded && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0d0d0d] z-10">
-                    <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                    <Loader2 className="w-8 h-8 text-white animate-spin" />
                     <p className="font-mono-custom text-xs text-[#888]">
                       Connecting to live preview...
                     </p>
@@ -292,9 +304,10 @@ function ProjectPreviewModalContent({
                   <button
                     type="button"
                     onClick={() => setActiveMode("fallback")}
-                    className="px-3 py-1.5 rounded-lg bg-black/80 hover:bg-black text-white/80 hover:text-white font-mono-custom text-[11px] border border-white/20 shadow-lg backdrop-blur-sm transition-all"
+                    className="px-3 py-1.5 rounded-lg bg-black/80 hover:bg-black text-white/80 hover:text-white font-mono-custom text-[11px] border border-white/20 shadow-lg backdrop-blur-sm transition-all inline-flex items-center gap-1.5"
                   >
-                    Seeing challenge/verification? Switch to Fallback ↗
+                    <span>Seeing challenge/verification? Switch to Fallback</span>
+                    <ArrowUpRight className="h-3 w-3" />
                   </button>
                 </div>
               </div>
@@ -336,8 +349,9 @@ function ProjectPreviewModalContent({
                       <span className="font-mono-custom text-xs text-white/80 truncate">
                         https://{displayDomain}
                       </span>
-                      <span className="font-mono-custom text-[10px] text-amber-300/90 px-1.5 py-0.2 rounded bg-amber-950/50 border border-amber-800/40 hidden sm:inline-block">
-                        🔒 Shielded
+                      <span className="font-mono-custom text-[10px] text-amber-300/90 px-1.5 py-0.2 rounded bg-amber-950/50 border border-amber-800/40 hidden sm:inline-flex items-center gap-1">
+                        <Lock className="h-2.5 w-2.5" />
+                        <span>Shielded</span>
                       </span>
                     </div>
 
@@ -350,7 +364,7 @@ function ProjectPreviewModalContent({
                         className="font-mono-custom text-[11px] text-white/70 hover:text-white px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1 shrink-0"
                       >
                         <span>Open</span>
-                        <span>↗</span>
+                        <ArrowUpRight className="h-3 w-3" />
                       </a>
                     )}
                   </div>
@@ -393,7 +407,7 @@ function ProjectPreviewModalContent({
                     <div className="relative sm:absolute sm:bottom-4 sm:left-4 sm:right-4 w-full sm:w-auto p-3.5 sm:p-4 sm:rounded-xl bg-black/90 sm:bg-black/80 backdrop-blur-md border-t sm:border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xl">
                       <div className="flex items-center gap-3 min-w-0 text-center sm:text-left">
                         <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 hidden xs:flex sm:flex">
-                          🛡️
+                          <ShieldAlert className="h-5 w-5" />
                         </div>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
@@ -430,7 +444,7 @@ function ProjectPreviewModalContent({
                             className="px-4 py-2 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-all flex items-center gap-1.5 shadow-md hover:scale-105"
                           >
                             <span>Open Live Site</span>
-                            <span>↗</span>
+                            <ArrowUpRight className="h-3.5 w-3.5" />
                           </a>
                         )}
                       </div>

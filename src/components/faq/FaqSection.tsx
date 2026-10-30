@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { SectionBadge } from "@/components/common/SectionBadge";
@@ -99,9 +100,9 @@ export function FaqSection() {
                     <motion.span
                       animate={{ rotate: isOpen ? 45 : 0 }}
                       transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="text-lg leading-none select-none font-light inline-block"
+                      className="inline-flex items-center justify-center select-none"
                     >
-                      +
+                      <Plus className="h-4 w-4" />
                     </motion.span>
                   </div>
                 </button>

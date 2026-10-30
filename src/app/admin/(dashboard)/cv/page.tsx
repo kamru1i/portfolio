@@ -2,7 +2,33 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import {
+  ArrowUpRight,
+  X,
+  Upload,
+  FileText,
+  Eye,
+  Download,
+  Trash2,
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
+} from "lucide-react";
 import { CvDocumentRecord } from "@/lib/cv-service";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 function formatFileSize(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 KB";
@@ -246,59 +272,62 @@ export default function AdminCvManagementPage() {
             href="/cv"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-all"
+            className={buttonVariants({ variant: "secondary", size: "default" })}
           >
             <span>View Public /cv Page</span>
-            <span>↗</span>
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
         </div>
       </div>
 
       {/* Feedback Alerts */}
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
-          {errorMsg}
+        <div className="p-4 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom flex items-start gap-2.5">
+          <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-800/40 text-emerald-200 text-xs font-mono-custom">
-          {successMsg}
+        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-800/40 text-emerald-200 text-xs font-mono-custom flex items-start gap-2.5">
+          <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <span>{successMsg}</span>
         </div>
       )}
 
       {/* Main Grid: Active Status + Upload Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left 7 cols: Active Published CV Status */}
-        <div className="lg:col-span-7 p-6 rounded-2xl bg-[#141416] border border-white/10 flex flex-col justify-between space-y-6">
+        <Card className="lg:col-span-7 p-6 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <span className="font-mono-custom text-xs uppercase tracking-wider text-[#888]">
                 Active Public CV Status
               </span>
               {activeDocument ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/50 border border-emerald-800/50 text-emerald-300 font-mono-custom text-[11px] uppercase tracking-wider">
+                <Badge variant="success" className="px-2.5 py-1 text-[11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Published on /cv
-                </span>
+                  <span>Published on /cv</span>
+                </Badge>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-950/50 border border-amber-800/50 text-amber-300 font-mono-custom text-[11px] uppercase tracking-wider">
+                <Badge variant="warning" className="px-2.5 py-1 text-[11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  No Active PDF (HTML Summary Mode)
-                </span>
+                  <span>No Active PDF (HTML Summary Mode)</span>
+                </Badge>
               )}
             </div>
 
             {loading ? (
               <div className="py-12 text-center">
-                <div className="w-7 h-7 rounded-full border-2 border-white/20 border-t-white animate-spin mx-auto mb-3" />
+                <Loader2 className="w-7 h-7 text-white animate-spin mx-auto mb-3" aria-hidden="true" />
                 <p className="font-mono-custom text-xs text-[#888]">Checking CV status...</p>
               </div>
             ) : activeDocument ? (
               <div className="space-y-4 pt-2">
                 <div>
-                  <h2 className="font-sans text-xl font-medium text-white">
-                    {activeDocument.title}
+                  <h2 className="font-sans text-xl font-medium text-white flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-emerald-400 shrink-0" aria-hidden="true" />
+                    <span>{activeDocument.title}</span>
                   </h2>
                   <p className="font-mono-custom text-xs text-[#888] mt-1 break-all">
                     File: <span className="text-white/90">{activeDocument.file_name}</span>
@@ -347,129 +376,136 @@ export default function AdminCvManagementPage() {
 
           {activeDocument && (
             <div className="flex flex-wrap items-center gap-2.5 pt-4 border-t border-white/10">
-              <button
-                type="button"
+              <Button
+                variant="default"
                 onClick={() => setPreviewDoc(activeDocument)}
-                className="px-4 py-2 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors"
               >
-                Preview Active PDF
-              </button>
+                <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Preview Active PDF</span>
+              </Button>
               <a
                 href="/api/cv/pdf?download=1"
                 download="Kamrul-Islam-CV.pdf"
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-mono-custom text-xs border border-white/10 transition-colors"
+                className={buttonVariants({ variant: "secondary", size: "default" })}
               >
-                Download PDF
+                <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Download PDF</span>
               </a>
-              <button
-                type="button"
+              <Button
+                variant="warning"
                 onClick={() => handleTogglePublish(activeDocument)}
                 disabled={updatingId === activeDocument.id}
-                className="px-4 py-2 rounded-xl bg-amber-950/40 hover:bg-amber-900/50 text-amber-300 font-mono-custom text-xs border border-amber-800/40 transition-colors disabled:opacity-50"
               >
                 {updatingId === activeDocument.id ? "Updating..." : "Unpublish"}
-              </button>
+              </Button>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Right 5 cols: Upload / Replace Form */}
-        <form
-          onSubmit={handleUploadSubmit}
-          className="lg:col-span-5 p-6 rounded-2xl bg-[#141416] border border-white/10 space-y-5"
-        >
-          <div>
-            <h2 className="font-sans text-lg font-medium text-white">
-              {activeDocument ? "Replace or Upload New CV PDF" : "Upload Official CV PDF"}
-            </h2>
-            <p className="font-mono-custom text-xs text-[#888] mt-1">
-              Strict PDF validation: <code className="text-white/80">.pdf</code> extension, <code className="text-white/80">application/pdf</code> MIME, <code className="text-white/80">%PDF-</code> binary signature, max 10 MB.
-            </p>
-          </div>
-
-          <div className="space-y-4">
+        <Card className="lg:col-span-5 p-6">
+          <form onSubmit={handleUploadSubmit} className="space-y-5">
             <div>
-              <label className="block font-mono-custom text-[11px] uppercase tracking-wider text-[#aaa] mb-1.5">
-                PDF File *
+              <h2 className="font-sans text-lg font-medium text-white">
+                {activeDocument ? "Replace or Upload New CV PDF" : "Upload Official CV PDF"}
+              </h2>
+              <p className="font-mono-custom text-xs text-[#888] mt-1">
+                Strict PDF validation: <code className="text-white/80">.pdf</code> extension, <code className="text-white/80">application/pdf</code> MIME, <code className="text-white/80">%PDF-</code> binary signature, max 10 MB.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="cv-file-input" className="text-[11px] mb-1.5">
+                  PDF File *
+                </Label>
+                <input
+                  id="cv-file-input"
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  onChange={handleFileChange}
+                  className="w-full text-xs font-mono-custom text-[#aaa] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-mono-custom file:bg-white/10 file:text-white hover:file:bg-white/15 cursor-pointer bg-black/40 border border-white/10 rounded-xl p-2"
+                />
+                {selectedFile && (
+                  <p className="font-mono-custom text-[11px] text-emerald-400 mt-1.5">
+                    Selected: {selectedFile.name} ({formatFileSize(selectedFile.size)})
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="cv-title-input" className="text-[11px] mb-1.5">
+                  Document Title
+                </Label>
+                <Input
+                  id="cv-title-input"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Kamrul Islam — Curriculum Vitae"
+                  className="px-3.5 py-2 h-9 bg-black/40 text-xs font-mono-custom"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="cv-version-input" className="text-[11px] mb-1.5">
+                  Version Label (Optional)
+                </Label>
+                <Input
+                  id="cv-version-input"
+                  type="text"
+                  value={versionLabel}
+                  onChange={(e) => setVersionLabel(e.target.value)}
+                  placeholder="e.g. 2026 Creative-Tech Edition"
+                  className="px-3.5 py-2 h-9 bg-black/40 text-xs font-mono-custom"
+                />
+              </div>
+
+              <label
+                htmlFor="cv-publish-immediately"
+                className="flex items-start gap-2.5 cursor-pointer pt-1"
+              >
+                <Checkbox
+                  id="cv-publish-immediately"
+                  checked={publishImmediately}
+                  onCheckedChange={setPublishImmediately}
+                  className="mt-0.5"
+                />
+                <span className="font-mono-custom text-xs text-[#ccc] leading-relaxed">
+                  Publish immediately as active CV (cleanly supersedes any currently published PDF)
+                </span>
               </label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,application/pdf"
-                onChange={handleFileChange}
-                className="w-full text-xs font-mono-custom text-[#aaa] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-mono-custom file:bg-white/10 file:text-white hover:file:bg-white/15 cursor-pointer bg-black/40 border border-white/10 rounded-xl p-2"
-              />
-              {selectedFile && (
-                <p className="font-mono-custom text-[11px] text-emerald-400 mt-1.5">
-                  Selected: {selectedFile.name} ({formatFileSize(selectedFile.size)})
-                </p>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={uploading || !selectedFile}
+              className="w-full py-2.5 h-auto"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  <span>Validating &amp; Uploading PDF...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>
+                    {publishImmediately
+                      ? "Upload & Publish CV PDF"
+                      : "Upload as Draft Version"}
+                  </span>
+                </>
               )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="cv-title-input"
-                className="block font-mono-custom text-[11px] uppercase tracking-wider text-[#aaa] mb-1.5"
-              >
-                Document Title
-              </label>
-              <input
-                id="cv-title-input"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Kamrul Islam — Curriculum Vitae"
-                className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono-custom focus:outline-none focus:border-white/30"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="cv-version-input"
-                className="block font-mono-custom text-[11px] uppercase tracking-wider text-[#aaa] mb-1.5"
-              >
-                Version Label (Optional)
-              </label>
-              <input
-                id="cv-version-input"
-                type="text"
-                value={versionLabel}
-                onChange={(e) => setVersionLabel(e.target.value)}
-                placeholder="e.g. 2026 Creative-Tech Edition"
-                className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono-custom focus:outline-none focus:border-white/30"
-              />
-            </div>
-
-            <label className="flex items-start gap-2.5 cursor-pointer pt-1">
-              <input
-                type="checkbox"
-                checked={publishImmediately}
-                onChange={(e) => setPublishImmediately(e.target.checked)}
-                className="mt-0.5 rounded border-white/20 bg-black/40"
-              />
-              <span className="font-mono-custom text-xs text-[#ccc] leading-relaxed">
-                Publish immediately as active CV (cleanly supersedes any currently published PDF)
-              </span>
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            disabled={uploading || !selectedFile}
-            className="w-full py-2.5 px-5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-all disabled:opacity-40 disabled:pointer-events-none"
-          >
-            {uploading
-              ? "Validating & Uploading PDF..."
-              : publishImmediately
-                ? "Upload & Publish CV PDF"
-                : "Upload as Draft Version"}
-          </button>
-        </form>
+            </Button>
+          </form>
+        </Card>
       </div>
 
       {/* Inline Admin PDF Preview Panel */}
       {previewDoc && (
-        <div className="p-6 rounded-2xl bg-[#141416] border border-white/10 space-y-4">
+        <Card className="p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <span className="font-mono-custom text-[10px] uppercase tracking-wider text-emerald-400 block">
@@ -484,17 +520,20 @@ export default function AdminCvManagementPage() {
                 href={`/api/cv/pdf?id=${encodeURIComponent(previewDoc.id)}&preview=1`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-mono-custom text-xs border border-white/10 transition-colors"
+                className={buttonVariants({ variant: "secondary", size: "sm" })}
               >
-                Open in New Tab ↗
+                <span>Open in New Tab</span>
+                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
               </a>
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setPreviewDoc(null)}
-                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#aaa] hover:text-white font-mono-custom text-xs border border-white/10 transition-colors"
+                className="text-[#aaa] hover:text-white"
               >
-                Close Preview ✕
-              </button>
+                <span>Close Preview</span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </Button>
             </div>
           </div>
 
@@ -505,11 +544,11 @@ export default function AdminCvManagementPage() {
               className="w-full h-full border-0"
             />
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Version History & All Uploaded CV Records */}
-      <div className="rounded-2xl bg-[#141416] border border-white/10 overflow-hidden">
+      <Card className="overflow-hidden">
         <div className="p-5 border-b border-white/10 flex items-center justify-between">
           <div>
             <h2 className="font-sans text-base font-medium text-white">
@@ -538,19 +577,13 @@ export default function AdminCvManagementPage() {
               >
                 <div className="space-y-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
-                        doc.is_published
-                          ? "bg-emerald-950/50 text-emerald-300 border-emerald-800/50"
-                          : "bg-white/5 text-[#888] border-white/10"
-                      }`}
-                    >
+                    <Badge variant={doc.is_published ? "success" : "muted"}>
                       {doc.is_published ? "Active / Published" : "Archived / Draft"}
-                    </span>
+                    </Badge>
                     {doc.version_label && (
-                      <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-sky-950/40 text-sky-300 border border-sky-800/40">
+                      <Badge variant="info">
                         {doc.version_label}
-                      </span>
+                      </Badge>
                     )}
                     <span className="font-mono-custom text-xs text-[#777]">
                       {formatFileSize(doc.file_size)} • Updated {formatDateTime(doc.updated_at)}
@@ -565,81 +598,92 @@ export default function AdminCvManagementPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-0 self-end sm:self-center shrink-0">
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setPreviewDoc(doc)}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
                   >
-                    Preview
-                  </button>
+                    <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Preview</span>
+                  </Button>
 
-                  <button
-                    type="button"
+                  <Button
+                    variant={doc.is_published ? "warning" : "success"}
+                    size="sm"
                     onClick={() => handleTogglePublish(doc)}
                     disabled={updatingId === doc.id}
-                    className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs border transition-colors ${
-                      doc.is_published
-                        ? "bg-amber-950/40 hover:bg-amber-900/50 text-amber-300 border-amber-800/40"
-                        : "bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300 border-emerald-800/40"
-                    }`}
                   >
                     {updatingId === doc.id
                       ? "Saving..."
                       : doc.is_published
                         ? "Unpublish"
                         : "Make Active"}
-                  </button>
+                  </Button>
 
-                  <button
-                    type="button"
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     onClick={() => setConfirmDeleteDoc(doc)}
-                    className="px-3 py-1.5 rounded-lg bg-red-950/30 hover:bg-red-900/40 text-red-300 font-mono-custom text-xs border border-red-800/30 transition-colors"
                   >
-                    Delete
-                  </button>
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Delete</span>
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </Card>
 
-      {/* Delete Confirmation Modal */}
-      {confirmDeleteDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-[#161618] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4">
-            <h3 className="font-sans font-medium text-lg text-white">
-              Delete CV PDF?
-            </h3>
-            <p className="font-mono-custom text-xs text-[#aaa] leading-relaxed">
+      {/* Delete Confirmation Modal via shadcn Dialog */}
+      <Dialog
+        open={Boolean(confirmDeleteDoc)}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDeleteDoc(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete CV PDF?</DialogTitle>
+            <DialogDescription>
               Are you sure you want to permanently delete{" "}
-              <strong className="text-white">{confirmDeleteDoc.file_name}</strong>?
-              {confirmDeleteDoc.is_published && (
+              <strong className="text-white">{confirmDeleteDoc?.file_name}</strong>?
+              {confirmDeleteDoc?.is_published && (
                 <span className="block mt-2 text-amber-300">
                   Warning: This is currently the active published CV on /cv. Deleting it will revert /cv to the HTML summary state until another PDF is published.
                 </span>
               )}
-            </p>
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
-              <button
-                type="button"
-                onClick={() => setConfirmDeleteDoc(null)}
-                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteConfirm}
-                disabled={deletingId === confirmDeleteDoc.id}
-                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono-custom text-xs font-medium transition-colors disabled:opacity-50"
-              >
-                {deletingId === confirmDeleteDoc.id ? "Deleting..." : "Confirm Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setConfirmDeleteDoc(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructiveSolid"
+              onClick={handleDeleteConfirm}
+              disabled={Boolean(
+                confirmDeleteDoc && deletingId === confirmDeleteDoc.id
+              )}
+            >
+              {confirmDeleteDoc && deletingId === confirmDeleteDoc.id ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Confirm Delete</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

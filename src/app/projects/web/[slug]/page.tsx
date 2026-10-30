@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Metadata } from "next";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Globe } from "lucide-react";
+import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
 import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
@@ -152,7 +154,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
               href="/projects?type=web"
               className="group inline-flex items-center gap-2 font-mono-custom text-xs sm:text-sm text-[#888] hover:text-white uppercase tracking-wider transition-colors"
             >
-              <span className="group-hover:-translate-x-1 transition-transform">←</span>
+              <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Web Projects</span>
             </Link>
           </div>
@@ -198,7 +200,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                   className="px-6 py-2.5 rounded-full bg-white text-black font-sans font-medium text-xs sm:text-sm hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
                 >
                   <span>Open Live Site</span>
-                  <span>↗</span>
+                  <ArrowUpRight className="h-4 w-4" />
                 </a>
               )}
 
@@ -209,8 +211,9 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                   rel="noopener noreferrer"
                   className="px-6 py-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs sm:text-sm border border-white/10 transition-colors flex items-center gap-2"
                 >
+                  <GitHubBrandIcon className="h-4 w-4" />
                   <span>GitHub Repository</span>
-                  <span>↗</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
               )}
             </div>
@@ -245,8 +248,8 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-[#0a0b10]">
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl mb-4">
-                      🌐
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/80 mb-4">
+                      <Globe className="h-7 w-7" />
                     </div>
                     <h3 className="font-gambarino text-2xl text-white mb-2">
                       External Web Application
@@ -262,7 +265,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                         className="px-6 py-2.5 rounded-full bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2"
                       >
                         <span>Launch Live Website</span>
-                        <span>↗</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
                       </a>
                     )}
                   </div>
@@ -400,9 +403,10 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                   ).map((deliv) => (
                     <span
                       key={deliv}
-                      className="px-4 py-2 rounded-xl bg-white/3 border border-white/10 font-mono-custom text-xs text-white/90"
+                      className="px-4 py-2 rounded-xl bg-white/3 border border-white/10 font-mono-custom text-xs text-white/90 inline-flex items-center gap-1.5"
                     >
-                      ✓ {deliv}
+                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>{deliv}</span>
                     </span>
                   ))}
                 </div>
@@ -436,7 +440,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                     className="group inline-flex items-center gap-3 font-gambarino text-2xl sm:text-3xl text-white hover:text-emerald-400 transition-colors"
                   >
                     <span>{nextProject.title}</span>
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
 

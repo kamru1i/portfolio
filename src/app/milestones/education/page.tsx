@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { PORTFOLIO_DATA, MilestoneItem } from "@/lib/portfolio-data";
 import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
@@ -73,7 +74,7 @@ export default function EducationQualificationsPage() {
               href="/#recognitions"
               className="group inline-flex items-center gap-2 font-mono-custom text-xs sm:text-sm text-[#888] hover:text-white uppercase tracking-wider transition-colors"
             >
-              <span className="group-hover:-translate-x-1 transition-transform">←</span>
+              <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Recognitions &amp; Milestones</span>
             </Link>
           </div>
@@ -329,9 +330,7 @@ export default function EducationQualificationsPage() {
                               key={aIdx}
                               className="p-4 rounded-xl bg-white/2 border border-white/10 flex items-start gap-3"
                             >
-                              <span className="font-mono-custom text-xs text-emerald-400 font-bold shrink-0 mt-0.5">
-                                ✓
-                              </span>
+                              <Check className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
                               <p className="font-mono-custom text-xs sm:text-sm text-[#aaa] leading-relaxed">
                                 {ach}
                               </p>
@@ -364,7 +363,7 @@ export default function EducationQualificationsPage() {
                   className="group inline-flex items-center gap-3 font-gambarino text-2xl sm:text-3xl text-white hover:text-emerald-400 transition-colors"
                 >
                   <span>Explore Career Experience &amp; Positions</span>
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
 

@@ -5,12 +5,29 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
+  Film,
+  Globe,
+  Upload,
+  Monitor,
+  ShieldAlert,
+  Check,
+  Loader2,
+  Trash2,
+  Sparkles,
+} from "lucide-react";
+import {
   AspectRatio,
   ProjectRecord,
   ProjectType,
   VideoProvider,
   WebPreviewMode,
 } from "@/types/project";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ProjectEditorFormProps {
   mode: "create" | "edit";
@@ -295,7 +312,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
 
         <Link
           href="/admin"
-          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
+          className={buttonVariants({ variant: "secondary", size: "default" })}
         >
           Cancel
         </Link>
@@ -303,21 +320,21 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
 
       {/* Discipline Selection (Create) or Fixed Discipline Indicator (Edit) */}
       {!isEdit ? (
-        <div className="p-6 rounded-2xl bg-[#141416] border border-white/10 space-y-4">
-          <label className="block font-mono-custom text-xs uppercase tracking-wider text-[#aaa]">
-            1. Select Project Discipline
-          </label>
+        <Card className="p-6 space-y-4">
+          <Label>1. Select Project Discipline</Label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
               type="button"
               onClick={() => setProjectType("video")}
-              className={`p-5 rounded-xl border text-left transition-all ${
+              className={`p-5 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 isVideo
                   ? "bg-white/10 border-white text-white shadow-md ring-1 ring-white/20"
                   : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
               }`}
             >
-              <div className="text-2xl mb-2">🎬</div>
+              <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-sky-400 mb-3">
+                <Film className="h-5 w-5" aria-hidden="true" />
+              </div>
               <div className="font-sans font-medium text-base text-white">
                 Video Project
               </div>
@@ -329,13 +346,15 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
             <button
               type="button"
               onClick={() => setProjectType("web")}
-              className={`p-5 rounded-xl border text-left transition-all ${
+              className={`p-5 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 !isVideo
                   ? "bg-white/10 border-white text-white shadow-md ring-1 ring-white/20"
                   : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
               }`}
             >
-              <div className="text-2xl mb-2">🌐</div>
+              <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/25 flex items-center justify-center text-purple-400 mb-3">
+                <Globe className="h-5 w-5" aria-hidden="true" />
+              </div>
               <div className="font-sans font-medium text-base text-white">
                 Web Project
               </div>
@@ -344,11 +363,17 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               </p>
             </button>
           </div>
-        </div>
+        </Card>
       ) : (
-        <div className="p-4 rounded-2xl bg-[#141416] border border-white/10 flex items-center justify-between">
+        <Card className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{isVideo ? "🎬" : "🌐"}</span>
+            <div className="w-10 h-10 rounded-xl bg-white/8 border border-white/10 flex items-center justify-center text-white">
+              {isVideo ? (
+                <Film className="h-5 w-5 text-sky-400" aria-hidden="true" />
+              ) : (
+                <Globe className="h-5 w-5 text-purple-400" aria-hidden="true" />
+              )}
+            </div>
             <div>
               <span className="font-sans text-sm font-medium text-white block">
                 {isVideo ? "Video Project" : "Web Project"}
@@ -363,7 +388,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               ID: {initialProject.id.slice(0, 8)}...
             </span>
           )}
-        </div>
+        </Card>
       )}
 
       {/* Error Banner */}
@@ -376,17 +401,18 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
       {/* Main Editor Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {isVideo ? (
-          <div className="p-6 rounded-2xl bg-[#141416] border border-white/10 space-y-5">
+          <Card className="p-6 space-y-5">
             <h3 className="font-mono-custom text-xs uppercase tracking-wider text-sky-400">
               Video Source &amp; Metadata
             </h3>
 
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-video-url" className="mb-2">
                 Video URL (YouTube, Vimeo, TikTok, MP4) *
-              </label>
+              </Label>
               <div className="flex gap-2">
-                <input
+                <Input
+                  id="project-video-url"
                   type="url"
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
@@ -395,20 +421,26 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                   }}
                   required
                   placeholder="https://www.youtube.com/watch?v=... or https://www.tiktok.com/@..."
-                  className="flex-1 px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
+                  className="flex-1"
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
                   onClick={() => handleResolveVideo()}
                   disabled={resolvingVideo || !videoUrl.trim()}
-                  className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono-custom text-xs border border-white/15 transition-colors disabled:opacity-40"
+                  className="h-auto px-4 py-3 shrink-0"
                 >
-                  {resolvingVideo
-                    ? "Resolving..."
-                    : isEdit
-                    ? "Re-Detect"
-                    : "Detect & Preview"}
-                </button>
+                  {resolvingVideo ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                      <span>Resolving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>{isEdit ? "Re-Detect" : "Detect & Preview"}</span>
+                    </>
+                  )}
+                </Button>
               </div>
               <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
                 Automatically resolves provider, aspect ratio, and public high-res thumbnail.
@@ -436,22 +468,21 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 </div>
                 <div className="space-y-1.5 text-center sm:text-left flex-1">
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    <span
-                      className={`font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full border ${
-                        resolutionStatus === "available"
-                          ? "bg-emerald-950/60 text-emerald-300 border-emerald-800/50"
-                          : "bg-sky-950/60 text-sky-300 border-sky-800/50"
-                      }`}
+                    <Badge
+                      variant={resolutionStatus === "available" ? "success" : "info"}
                     >
-                      {resolutionStatus === "available"
-                        ? "Direct Thumbnail ✓"
-                        : isEdit
-                        ? "Resolved Thumbnail ✓"
-                        : "Branded Preview Card ✓"}
-                    </span>
-                    <span className="font-mono-custom text-[10px] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">
+                      <Check className="h-3 w-3" aria-hidden="true" />
+                      <span>
+                        {resolutionStatus === "available"
+                          ? "Direct Thumbnail"
+                          : isEdit
+                          ? "Resolved Thumbnail"
+                          : "Branded Preview Card"}
+                      </span>
+                    </Badge>
+                    <Badge variant="default">
                       {videoProvider?.toUpperCase()}
-                    </span>
+                    </Badge>
                   </div>
 
                   <div className="font-mono-custom text-xs text-[#aaa]">
@@ -475,9 +506,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
             {/* 5-Option Aspect Ratio Selector */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
-                  Aspect Ratio Format *
-                </label>
+                <Label>Aspect Ratio Format *</Label>
                 <span className="font-mono-custom text-[11px] text-[#666]">
                   Active: <strong className="text-white">{aspectRatio}</strong>
                 </span>
@@ -499,7 +528,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                       key={opt.id}
                       type="button"
                       onClick={() => setAspectRatio(opt.id as AspectRatio)}
-                      className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${
+                      className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                         isSelected
                           ? "bg-white/15 border-white text-white shadow-sm ring-1 ring-white/20"
                           : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
@@ -528,24 +557,24 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 Source of truth for editorial works card display and player stage modal.
               </p>
             </div>
-          </div>
+          </Card>
         ) : (
-          <div className="p-6 rounded-2xl bg-[#141416] border border-white/10 space-y-5">
+          <Card className="p-6 space-y-5">
             <h3 className="font-mono-custom text-xs uppercase tracking-wider text-purple-400">
               Web Application Links, Preview Mode &amp; Screenshot
             </h3>
 
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-live-url" className="mb-2">
                 Live Website URL *
-              </label>
-              <input
+              </Label>
+              <Input
+                id="project-live-url"
                 type="url"
                 value={liveUrl}
                 onChange={(e) => setLiveUrl(e.target.value)}
                 required
                 placeholder="https://example.com"
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
               />
               <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
                 Clicking the project card opens the preview modal with direct links to this Live Website and GitHub.
@@ -553,24 +582,22 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
             </div>
 
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-github-url" className="mb-2">
                 GitHub Repository URL (Optional)
-              </label>
-              <input
+              </Label>
+              <Input
+                id="project-github-url"
                 type="url"
                 value={githubUrl}
                 onChange={(e) => setGithubUrl(e.target.value)}
                 placeholder="https://github.com/kamru1i/project"
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
               />
             </div>
 
             {/* Web Preview Mode Selector */}
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
-                <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
-                  Interactive Modal Preview Mode
-                </label>
+                <Label>Interactive Modal Preview Mode</Label>
                 <span className="font-mono-custom text-[11px] text-[#777]">
                   Active:{" "}
                   <strong className="text-white">
@@ -583,14 +610,15 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 <button
                   type="button"
                   onClick={() => setPreviewMode("iframe")}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                     previewMode === "iframe"
                       ? "bg-emerald-950/30 border-emerald-500/60 text-white"
                       : "bg-[#18181b] border-white/10 text-[#888] hover:border-white/25 hover:text-white"
                   }`}
                 >
-                  <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-emerald-300">
-                    🖥️ Live Interactive Iframe
+                  <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-emerald-300 flex items-center gap-2">
+                    <Monitor className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>Live Interactive Iframe</span>
                   </div>
                   <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
                     Embeds the live site directly inside the modal viewport with desktop/mobile switcher.
@@ -600,14 +628,15 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 <button
                   type="button"
                   onClick={() => setPreviewMode("fallback")}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                     previewMode === "fallback"
                       ? "bg-amber-950/30 border-amber-500/60 text-white"
                       : "bg-[#18181b] border-white/10 text-[#888] hover:border-white/25 hover:text-white"
                   }`}
                 >
-                  <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-amber-300">
-                    🛡️ Protected / Fallback Card
+                  <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-amber-300 flex items-center gap-2">
+                    <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>Protected / Fallback Card</span>
                   </div>
                   <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
                     Use when target site sets X-Frame-Options or CSP frame-ancestors; displays summary &amp; launch CTA cleanly.
@@ -619,13 +648,16 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
             {/* Homepage Screenshot Upload & Static Preview */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
-                <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
-                  Homepage Screenshot (Static Card View) *
-                </label>
-                <span className="font-mono-custom text-[11px] text-emerald-400">
-                  {webPreviewImageUrl
-                    ? "Screenshot Ready ✓"
-                    : "Upload PNG / JPG / WebP"}
+                <Label>Homepage Screenshot (Static Card View) *</Label>
+                <span className="font-mono-custom text-[11px] text-emerald-400 flex items-center gap-1">
+                  {webPreviewImageUrl ? (
+                    <>
+                      <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Screenshot Ready</span>
+                    </>
+                  ) : (
+                    <span>Upload PNG / JPG / WebP</span>
+                  )}
                 </span>
               </div>
 
@@ -642,11 +674,14 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 <label className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-2 shrink-0 shadow-sm">
                   {uploadingScreenshot ? (
                     <>
-                      <span className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                       <span>Uploading...</span>
                     </>
                   ) : (
-                    <span>📤 Upload Image</span>
+                    <>
+                      <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Upload Image</span>
+                    </>
                   )}
                   <input
                     type="file"
@@ -683,16 +718,17 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                   </div>
                   <div className="flex-1 min-w-0 space-y-2 w-full">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono-custom text-[11px] uppercase px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/50">
+                      <Badge variant="success">
                         Active Static Card Screenshot
-                      </span>
-                      <button
-                        type="button"
+                      </Badge>
+                      <Button
+                        variant="destructive"
+                        size="xs"
                         onClick={() => setWebPreviewImageUrl("")}
-                        className="font-mono-custom text-[11px] text-red-400 hover:text-red-300 transition-colors"
                       >
-                        Remove
-                      </button>
+                        <Trash2 className="h-3 w-3" aria-hidden="true" />
+                        <span>Remove</span>
+                      </Button>
                     </div>
                     <p className="font-mono-custom text-xs text-[#888] truncate">
                       {webPreviewImageUrl}
@@ -702,103 +738,107 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               )}
 
               <div>
-                <label className="block font-mono-custom text-[11px] text-[#777] mb-1.5 uppercase">
+                <Label htmlFor="project-screenshot-url" className="text-[11px] text-[#777] mb-1.5">
                   Or Paste Screenshot Image URL / Path Directly
-                </label>
-                <input
+                </Label>
+                <Input
+                  id="project-screenshot-url"
                   type="text"
                   value={webPreviewImageUrl}
                   onChange={(e) => setWebPreviewImageUrl(e.target.value)}
                   placeholder="/images/web-projects/web-project-3.png or https://..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-xs font-mono-custom focus:outline-none focus:border-white/30"
+                  className="py-2.5 text-xs font-mono-custom"
                 />
               </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Shared Project Details */}
-        <div className="p-6 rounded-2xl bg-[#141416] border border-white/10 space-y-5">
+        <Card className="p-6 space-y-5">
           <h3 className="font-mono-custom text-xs uppercase tracking-wider text-white/70">
             Project Information
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-title" className="mb-2">
                 Project Title *
-              </label>
-              <input
+              </Label>
+              <Input
+                id="project-title"
                 type="text"
                 value={title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 required
                 placeholder="e.g. Syston Autos Cinema"
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
               />
             </div>
 
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-slug" className="mb-2">
                 URL Slug *
-              </label>
-              <input
+              </Label>
+              <Input
+                id="project-slug"
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 required
                 placeholder="syston-autos-cinema"
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+                className="font-mono-custom"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-client" className="mb-2">
                 Client / Brand Name
-              </label>
-              <input
+              </Label>
+              <Input
+                id="project-client"
                 type="text"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="e.g. Independent Client Project"
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
               />
             </div>
 
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-year" className="mb-2">
                 Year
-              </label>
-              <input
+              </Label>
+              <Input
+                id="project-year"
                 type="text"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 placeholder="e.g. 2025"
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+                className="font-mono-custom"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+            <Label htmlFor="project-description" className="mb-2">
               Short Summary / Description
-            </label>
-            <textarea
+            </Label>
+            <Textarea
+              id="project-description"
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Concise summary displayed on project cards and the top of the case study page..."
-              className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
             />
           </div>
 
           <div>
-            <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+            <Label htmlFor="project-tags" className="mb-2">
               Tags / Technologies (comma separated)
-            </label>
-            <input
+            </Label>
+            <Input
+              id="project-tags"
               type="text"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
@@ -807,7 +847,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                   ? "e.g. Premiere Pro, DaVinci Resolve, Sound Design"
                   : "e.g. Next.js, TypeScript, Tailwind CSS, Supabase"
               }
-              className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+              className="font-mono-custom"
             />
           </div>
 
@@ -825,10 +865,11 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                <Label htmlFor="project-role" className="mb-2">
                   Your Role
-                </label>
-                <input
+                </Label>
+                <Input
+                  id="project-role"
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
@@ -837,15 +878,15 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                       ? "e.g. Video Editor & AI Content Creator"
                       : "e.g. Web Developer & UI Engineer"
                   }
-                  className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
                 />
               </div>
 
               <div>
-                <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+                <Label htmlFor="project-deliverables" className="mb-2">
                   Deliverables (comma separated)
-                </label>
-                <input
+                </Label>
+                <Input
+                  id="project-deliverables"
                   type="text"
                   value={deliverablesInput}
                   onChange={(e) => setDeliverablesInput(e.target.value)}
@@ -854,21 +895,21 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                       ? "e.g. Master Cut, Color Grading, Audio Mix"
                       : "e.g. Production Web App, Admin CMS, REST API"
                   }
-                  className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+                  className="font-mono-custom"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-mono-custom text-xs text-[#aaa] mb-2 uppercase">
+              <Label htmlFor="project-overview" className="mb-2">
                 Detailed Case Study Overview
-              </label>
-              <textarea
+              </Label>
+              <Textarea
+                id="project-overview"
                 rows={4}
                 value={overview}
                 onChange={(e) => setOverview(e.target.value)}
                 placeholder="In-depth breakdown of the architecture, editing workflow, challenges solved, and final delivery..."
-                className="w-full px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-sans focus:outline-none focus:border-white/30"
               />
             </div>
           </div>
@@ -876,9 +917,9 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
           {/* Manual Display Priority */}
           <div className="pt-4 border-t border-white/5">
             <div className="flex items-center justify-between mb-2">
-              <label className="block font-mono-custom text-xs text-[#aaa] uppercase">
+              <Label htmlFor="project-priority">
                 Manual Display Priority (Rank)
-              </label>
+              </Label>
               <span className="font-mono-custom text-[11px] text-amber-400">
                 {manualPriority
                   ? `Rank #${manualPriority}`
@@ -886,24 +927,25 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               </span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-              <input
+              <Input
+                id="project-priority"
                 type="number"
                 min="1"
                 step="1"
                 value={manualPriority}
                 onChange={(e) => setManualPriority(e.target.value)}
                 placeholder="e.g. 1 (Top priority), 2, 3..."
-                className="w-full sm:w-56 px-4 py-3 rounded-xl bg-[#18181b] border border-white/10 text-white placeholder-white/20 text-sm font-mono-custom focus:outline-none focus:border-white/30"
+                className="w-full sm:w-56 font-mono-custom"
               />
               <p className="font-mono-custom text-[11px] text-[#777] leading-relaxed">
                 Optional positive integer. Ranked projects (1, 2, 3...) display first on the public website within their tab, followed by unranked projects by newest publication date.
               </p>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Publish State Controls */}
-        <div className="p-6 rounded-2xl bg-[#141416] border border-white/10 flex items-center justify-between">
+        <Card className="p-6 flex items-center justify-between">
           <div>
             <span className="font-sans font-medium text-sm text-white block">
               Publishing Status
@@ -915,41 +957,42 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
             </span>
           </div>
 
-          <button
-            type="button"
+          <Button
+            variant={isPublished ? "success" : "warning"}
             onClick={() => setIsPublished(!isPublished)}
-            className={`px-4 py-2 rounded-xl font-mono-custom text-xs uppercase tracking-wider border transition-all ${
-              isPublished
-                ? "bg-emerald-950/40 border-emerald-800/40 text-emerald-300"
-                : "bg-amber-950/40 border-amber-800/40 text-amber-300"
-            }`}
+            className="uppercase tracking-wider"
           >
-            {isPublished ? "● Published" : "○ Draft"}
-          </button>
-        </div>
+            <span
+              className={`h-2 w-2 rounded-full ${
+                isPublished ? "bg-emerald-400" : "bg-amber-400"
+              }`}
+            />
+            <span>{isPublished ? "Published" : "Draft"}</span>
+          </Button>
+        </Card>
 
         {/* Submit Controls */}
         <div className="flex items-center justify-end gap-3 pt-4">
           <Link
             href="/admin"
-            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
+            className={buttonVariants({ variant: "secondary", size: "default", className: "px-5 py-2.5 h-auto" })}
           >
             Cancel
           </Link>
-          <button
+          <Button
             type="submit"
             disabled={submitting}
-            className="px-6 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 shadow-sm"
+            className="px-6 py-2.5 h-auto"
           >
             {submitting ? (
               <>
-                <span className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                 <span>{isEdit ? "Saving Changes..." : "Saving Project..."}</span>
               </>
             ) : (
               <span>{isEdit ? "Save Changes" : "Save & Publish Project"}</span>
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

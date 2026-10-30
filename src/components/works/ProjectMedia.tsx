@@ -2,6 +2,8 @@
 
 import { motion, MotionValue } from "framer-motion";
 import Image from "next/image";
+import { Play, ArrowUpRight } from "lucide-react";
+import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { PortfolioProject } from "@/lib/portfolio-data";
 
 interface ProjectMediaProps {
@@ -59,8 +61,8 @@ export function ProjectMedia({
       {/* Video Hover Overlay with Sleek Play Button (always visible on mobile/touch, hover-revealed on desktop) */}
       {isVideo && (
         <div className="absolute inset-0 bg-black/20 md:bg-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/95 md:bg-white text-black flex items-center justify-center text-lg sm:text-2xl pl-1 shadow-2xl transition-transform duration-300 group-hover:scale-110">
-            ▶
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/95 md:bg-white text-black flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110">
+            <Play className="h-5 w-5 sm:h-6 sm:w-6 fill-current ml-0.5" aria-hidden="true" />
           </div>
         </div>
       )}
@@ -76,8 +78,9 @@ export function ProjectMedia({
               onClick={(e) => e.stopPropagation()}
               className="px-4 py-2 rounded-full bg-black/80 hover:bg-black text-white font-mono-custom text-xs border border-white/20 transition-all flex items-center gap-1.5 shadow-lg hover:scale-105"
             >
+              <GitHubBrandIcon className="h-3.5 w-3.5" aria-hidden="true" />
               <span>GitHub</span>
-              <span>↗</span>
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
           )}
 
@@ -88,10 +91,10 @@ export function ProjectMedia({
                 e.stopPropagation();
                 onLivePreviewClick?.();
               }}
-              className="px-4 py-2 rounded-full bg-white hover:bg-neutral-200 text-black font-sans text-xs font-medium transition-all flex items-center gap-1.5 shadow-lg hover:scale-105"
+              className="px-4 py-2 rounded-full bg-white hover:bg-neutral-200 text-black font-sans text-xs font-medium transition-all flex items-center gap-1.5 shadow-lg hover:scale-105 cursor-pointer"
             >
               <span>Live Website</span>
-              <span>↗</span>
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           )}
         </div>

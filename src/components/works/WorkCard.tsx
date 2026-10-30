@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { PortfolioProject, ProjectItem } from "@/lib/portfolio-data";
 import { ProjectMedia } from "./ProjectMedia";
 
@@ -90,9 +91,10 @@ export function WorkCard({
         <Link
           href={detailHref}
           onClick={(e) => e.stopPropagation()}
-          className="font-mono-custom text-[11px] uppercase tracking-wider text-white/55 hover:text-white shrink-0 transition-colors"
+          className="inline-flex items-center gap-1 font-mono-custom text-[11px] uppercase tracking-wider text-white/55 hover:text-white shrink-0 transition-colors"
         >
-          Case Study →
+          <span>Case Study</span>
+          <ArrowRight className="h-3 w-3" aria-hidden="true" />
         </Link>
       </div>
     </div>

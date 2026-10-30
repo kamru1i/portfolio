@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUpRight, Film, X } from "lucide-react";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { detectVideoProvider, resolvePlayableEmbedUrl } from "@/lib/video-metadata";
 import {
@@ -148,7 +149,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
                   title="Watch on original video platform"
                 >
                   <span>Watch</span>
-                  <span>↗</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
               )}
 
@@ -158,7 +159,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
                 aria-label="Close video player"
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors shrink-0 ml-0.5"
               >
-                ✕
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -188,8 +189,8 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
             ) : isSocialExternal ? (
               /* Social Video Fallback (TikTok / Instagram / Facebook) */
               <div className="flex flex-col items-center justify-center text-center p-6 max-w-sm mx-auto">
-                <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/10 flex items-center justify-center text-2xl mb-3">
-                  🎬
+                <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/10 flex items-center justify-center text-white/80 mb-3">
+                  <Film className="h-6 w-6" />
                 </div>
                 <h4 className="font-sans font-medium text-base text-white mb-1.5">
                   External Social Production
@@ -204,7 +205,7 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
                   className="px-5 py-2 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
                 >
                   <span>Watch on {provider.toUpperCase()}</span>
-                  <span>↗</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
                 </a>
               </div>
             ) : (
