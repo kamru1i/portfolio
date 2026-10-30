@@ -152,22 +152,6 @@ export default function AdminDashboardPage() {
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <Link
-            href="/admin/inquiries"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-all"
-          >
-            <span>📬</span>
-            <span>Client Inquiries</span>
-          </Link>
-
-          <Link
-            href="/admin/cv"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-all"
-          >
-            <span>📄</span>
-            <span>Manage CV / PDF</span>
-          </Link>
-
-          <Link
             href="/admin/projects/new"
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 active:scale-95 transition-all shadow-sm"
           >
@@ -226,7 +210,10 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Filter Tabs & Search Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
+      <div
+        id="projects-manager"
+        className="scroll-mt-20 flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2"
+      >
         {/* Filter Pills */}
         <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#141416] border border-white/10">
           {(
@@ -385,11 +372,11 @@ export default function AdminDashboardPage() {
                       )}
                     </div>
 
-                    <h3 className="font-sans font-medium text-base text-white truncate max-w-lg">
+                    <h3 className="font-sans font-medium text-base text-white truncate">
                       {project.title}
                     </h3>
 
-                    <p className="font-mono-custom text-xs text-[#777] truncate max-w-xl mt-0.5">
+                    <p className="font-mono-custom text-xs text-[#777] truncate mt-0.5">
                       {project.description}
                     </p>
                   </div>

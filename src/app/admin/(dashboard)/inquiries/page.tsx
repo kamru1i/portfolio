@@ -119,13 +119,6 @@ export default function AdminInquiriesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 font-mono-custom text-xs text-[#888] mb-2">
-            <Link href="/admin" className="hover:text-white transition-colors">
-              Dashboard
-            </Link>
-            <span>/</span>
-            <span className="text-white">Client Inquiries</span>
-          </div>
           <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal tracking-tight uppercase">
             Client Inquiries Inbox
           </h1>
@@ -138,7 +131,7 @@ export default function AdminInquiriesPage() {
           href="/admin"
           className="self-start sm:self-center px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono-custom text-xs border border-white/10 transition-colors"
         >
-          ← Back to Projects
+          ← Back to Overview
         </Link>
       </div>
 

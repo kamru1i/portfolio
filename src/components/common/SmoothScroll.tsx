@@ -1,12 +1,19 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/admin") ?? false;
 
   useEffect(() => {
+    if (isAdminRoute) {
+      return;
+    }
+
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotionQuery.matches) {
       return;
@@ -39,7 +46,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       delete (window as unknown as { lenis?: Lenis }).lenis;
       lenis.destroy();
     };
-  }, []);
+  }, [isAdminRoute]);
 
   return <>{children}</>;
 }

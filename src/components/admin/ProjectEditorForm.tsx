@@ -279,22 +279,18 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 select-none">
-      {/* Breadcrumb Header */}
+    <div className="w-full space-y-8 select-none">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2 font-mono-custom text-xs text-[#888] mb-2">
-            <Link href="/admin" className="hover:text-white transition-colors">
-              Dashboard
-            </Link>
-            <span>/</span>
-            <span className="text-white">
-              {isEdit ? "Edit Project" : "New Project"}
-            </span>
-          </div>
           <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal uppercase tracking-tight">
             {isEdit ? "Edit Project" : "Create Project"}
           </h1>
+          <p className="font-mono-custom text-xs text-[#888] mt-1">
+            {isEdit
+              ? "Update project metadata, media preview settings, and case study details."
+              : "Configure discipline, media source, and case study details for a new portfolio item."}
+          </p>
         </div>
 
         <Link
