@@ -166,22 +166,31 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-function resolveActiveNavId(pathname: string, currentHash: string): NavItemId {
+function resolveRouteNavId(
+  pathname: string,
+  isAllProjectsMode: boolean
+): NavItemId {
   if (pathname === "/admin/projects/new") return "new-project";
   if (pathname.startsWith("/admin/projects/")) return "all-projects";
   if (pathname.startsWith("/admin/inquiries")) return "inquiries";
   if (pathname.startsWith("/admin/cv")) return "cv";
-  if (pathname === "/admin" && currentHash === "#projects-manager") {
+  if (pathname === "/admin" && isAllProjectsMode) {
     return "all-projects";
   }
   return "dashboard";
 }
 
 function resolveBreadcrumbTitle(pathname: string, activeId: NavItemId): string {
-  if (pathname === "/admin/projects/new") return "New Project";
+  if (pathname === "/admin/projects/new" || activeId === "new-project") {
+    return "New Project";
+  }
   if (pathname.startsWith("/admin/projects/")) return "Edit Project";
-  if (pathname.startsWith("/admin/inquiries")) return "Client Inquiries";
-  if (pathname.startsWith("/admin/cv")) return "CV / Resume";
+  if (pathname.startsWith("/admin/inquiries") || activeId === "inquiries") {
+    return "Client Inquiries";
+  }
+  if (pathname.startsWith("/admin/cv") || activeId === "cv") {
+    return "CV / Resume";
+  }
   if (activeId === "all-projects") return "Manage Projects";
   return "Project Overview";
 }
@@ -192,16 +201,37 @@ export function AdminSidebarShell({
 }: AdminSidebarShellProps) {
   const pathname = usePathname() || "/admin";
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [currentHash, setCurrentHash] = useState("");
+
+  // Tracks whether the "/admin" route is currently in "All Projects" sub-view mode
+  const [isAllProjectsMode, setIsAllProjectsMode] = useState(false);
+
+  // Holds the clicked item ID while Next.js asynchronously transitions from `fromPathname` to the new route,
+  // preventing the selector from momentarily falling back to "dashboard" mid-navigation.
+  const [navOverride, setNavOverride] = useState<{
+    fromPathname: string;
+    targetId: NavItemId;
+  } | null>(null);
 
   useEffect(() => {
-    const syncHash = () => {
-      setCurrentHash(window.location.hash || "");
+    const syncFromHash = () => {
+      if (window.location.hash === "#projects-manager") {
+        setIsAllProjectsMode(true);
+      }
     };
-    syncHash();
-    window.addEventListener("hashchange", syncHash);
-    return () => window.removeEventListener("hashchange", syncHash);
-  }, [pathname]);
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, []);
+
+  // When arriving on /admin in All Projects mode, ensure #projects-manager is scrolled into view
+  useEffect(() => {
+    if (pathname === "/admin" && isAllProjectsMode) {
+      const el = document.getElementById("projects-manager");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [pathname, isAllProjectsMode]);
 
   // Close mobile drawer on Escape key and lock background body scroll while open
   useEffect(() => {
@@ -223,28 +253,46 @@ export function AdminSidebarShell({
     };
   }, [mobileDrawerOpen]);
 
-  const activeNavId = resolveActiveNavId(pathname, currentHash);
+  const activeNavId: NavItemId =
+    navOverride && navOverride.fromPathname === pathname
+      ? navOverride.targetId
+      : resolveRouteNavId(pathname, isAllProjectsMode);
+
   const breadcrumbTitle = resolveBreadcrumbTitle(pathname, activeNavId);
 
   const handleNavClick = (item: NavItem) => {
     setMobileDrawerOpen(false);
+
     if (item.id === "all-projects") {
-      setCurrentHash("#projects-manager");
+      setIsAllProjectsMode(true);
       if (pathname === "/admin") {
+        setNavOverride(null);
         const el = document.getElementById("projects-manager");
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
+      } else {
+        setNavOverride({ fromPathname: pathname, targetId: "all-projects" });
       }
-    } else if (item.id === "dashboard") {
-      setCurrentHash("");
+      return;
+    }
+
+    if (item.id === "dashboard") {
+      setIsAllProjectsMode(false);
       if (pathname === "/admin") {
+        setNavOverride(null);
         window.history.replaceState(null, "", "/admin");
         window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setNavOverride({ fromPathname: pathname, targetId: "dashboard" });
       }
-    } else {
-      setCurrentHash("");
+      return;
     }
+
+    // Navigating to a dedicated route (/admin/projects/new, /admin/inquiries, /admin/cv):
+    // Keep the clicked item active immediately while pathname transitions away from /admin.
+    setIsAllProjectsMode(false);
+    setNavOverride({ fromPathname: pathname, targetId: item.id });
   };
 
   const renderSidebarContent = () => (
@@ -255,7 +303,14 @@ export function AdminSidebarShell({
           href="/admin"
           onClick={() => {
             setMobileDrawerOpen(false);
-            setCurrentHash("");
+            setIsAllProjectsMode(false);
+            if (pathname === "/admin") {
+              setNavOverride(null);
+              window.history.replaceState(null, "", "/admin");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+              setNavOverride({ fromPathname: pathname, targetId: "dashboard" });
+            }
           }}
           className="flex items-center gap-2.5 text-white hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-lg"
           aria-label="Kamrul Islam CMS Dashboard"
@@ -432,7 +487,16 @@ export function AdminSidebarShell({
             <div className="flex items-center gap-2 font-mono-custom text-xs text-[#888] truncate">
               <Link
                 href="/admin"
-                onClick={() => setCurrentHash("")}
+                onClick={() => {
+                  setIsAllProjectsMode(false);
+                  if (pathname === "/admin") {
+                    setNavOverride(null);
+                    window.history.replaceState(null, "", "/admin");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  } else {
+                    setNavOverride({ fromPathname: pathname, targetId: "dashboard" });
+                  }
+                }}
                 className="hover:text-white transition-colors"
               >
                 Admin CMS
