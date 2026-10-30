@@ -17,6 +17,7 @@
 | `node scratch/verify-all.mjs` | Custom automated security, URL/embed resolution, JSON-LD XSS escaping, and 83-file source-tree CV/privacy invariant suite | **4 / 4 test suites passed** across all `83` source files in `src/` | `0` |
 | Read-only Live Supabase REST Probe | Verified live `public.projects` (13 published rows), `public.cv_documents` (1 active row), and `anon` `SELECT` on `public.contact_inquiries` | Confirmed `anon` receives `200 []` on `contact_inquiries` (RLS blocks public read) and reconciled all 13 live project slugs/modes | `0` |
 | Live Canonical HTTP `HEAD` Check | Verified `https://www.kamrulislam.me/` vs `https://kamrulislam.me/` redirect chain | Confirmed `301 Moved Permanently` → `https://kamrulislam.me/` (`200 OK`) | `0` |
+| `npx supabase db push` | Applied `20261031000000_harden_rls_and_functions.sql` to remote Supabase DB & verified with `--dry-run` | `Finished supabase db push.` → `Remote database is up to date.` (`upToDate: true`) | `0` |
 
 ---
 
@@ -45,5 +46,4 @@
 
 To remain strictly honest about runtime boundaries not executed in this session:
 1. **`next build` Production Bundle Build:** Skipped intentionally during this session to avoid overwriting `.next` artifacts if a local dev server is active; run `pnpm build` prior to production deploy.
-2. **Supabase Hardening Migration (`20261031000000_harden_rls_and_functions.sql`):** Authored and syntax-verified locally; apply manually in the Supabase SQL Editor to activate `search_path` pinning and `contact_inquiries` `CHECK` constraints in production PostgreSQL.
-3. **Public-Safe `01112026T1223` CV PDF Upload:** Upload a redacted PDF export (without the private *Personal Information* table) via `/admin/cv` to replace `Kamrul-Islam-Master-CV-01102026T2059.pdf` in Supabase Storage.
+2. **Public-Safe `01112026T1223` CV PDF Upload:** Upload a redacted PDF export (without the private *Personal Information* table) via `/admin/cv` to replace `Kamrul-Islam-Master-CV-01102026T2059.pdf` in Supabase Storage.

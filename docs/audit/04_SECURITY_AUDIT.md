@@ -10,7 +10,7 @@
 | Severity | Found | Remediated in Code | Pending Manual DB / Infra Action |
 | :--- | :---: | :---: | :---: |
 | **High** | 3 | 3 | 0 |
-| **Medium** | 5 | 4 | 1 (Apply non-destructive SQL migration `20261031000000` in Supabase SQL Editor) |
+| **Medium** | 5 | 5 | 0 |
 | **Low / Defense-in-Depth** | 3 | 2 | 1 (Distributed rate-limiter store if scaling multi-region serverless) |
 
 `pnpm audit` status after remediation: **`No known vulnerabilities found` (Exit code `0`)**.
@@ -63,7 +63,7 @@
   1. Pins `SET search_path = public, pg_temp` on `public.is_admin()` and `public.handle_updated_at()`.
   2. Adds `NOT VALID` length `CHECK` constraints on `public.contact_inquiries` (preserving all existing rows while validating new inserts).
   3. Replaces `"Public can submit contact inquiries"` `WITH CHECK` to require `status = 'unread'` and bounded non-empty fields.
-- **Manual Step Required:** Run `supabase/migrations/20261031000000_harden_rls_and_functions.sql` in the Supabase SQL Editor.
+- **Live Deployment Verified:** Applied directly to remote Supabase PostgreSQL via `npx supabase db push` (`20261031000000_harden_rls_and_functions.sql`), followed by `--dry-run` verification confirming `Remote database is up to date.` (`upToDate: true`).
 
 ---
 
