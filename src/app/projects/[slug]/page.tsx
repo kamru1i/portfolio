@@ -13,9 +13,10 @@ export default async function ProjectSlugPage({ params }: ProjectRedirectProps) 
     notFound();
   }
 
+  const canonicalSlug = encodeURIComponent(project.slug || project.id);
   if (project.type === "video") {
-    redirect(`/projects/video/${slug}`);
+    redirect(`/projects/video/${canonicalSlug}`);
   } else {
-    redirect(`/projects/web/${slug}`);
+    redirect(`/projects/web/${canonicalSlug}`);
   }
 }

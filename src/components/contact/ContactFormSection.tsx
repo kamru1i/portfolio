@@ -24,14 +24,25 @@ interface FormErrorsState {
 }
 
 const SERVICE_OPTIONS = [
-  "Video Editing & Post-Production",
-  "Audio Enhancement & Sound Design",
+  "Video Editing & Post-Production (incl. Audio Cleanup)",
   "AI-Assisted Video & Content Creation",
-  "Front-End Web Development (React / Next.js)",
-  "WordPress & CMS Engineering",
-  "IT Support & Cloud Infrastructure",
-  "Other / Mixed Project",
+  "Web Development (React / Next.js / MERN)",
+  "WordPress & Elementor Development",
+  "IT Support & Website Infrastructure",
+  "Other / Multi-Disciplinary Brief",
 ];
+
+function resolveInitialServiceOption(serviceParam?: string): string {
+  if (!serviceParam) return SERVICE_OPTIONS[0];
+  const normalized = serviceParam.trim().toLowerCase();
+  if (SERVICE_OPTIONS.includes(serviceParam)) return serviceParam;
+  if (normalized.includes("video")) return SERVICE_OPTIONS[0];
+  if (normalized.includes("ai")) return SERVICE_OPTIONS[1];
+  if (normalized.includes("wordpress")) return SERVICE_OPTIONS[3];
+  if (normalized.includes("web")) return SERVICE_OPTIONS[2];
+  if (normalized.includes("it")) return SERVICE_OPTIONS[4];
+  return SERVICE_OPTIONS[0];
+}
 
 const BUDGET_OPTIONS = [
   "Under $1,000",
@@ -55,7 +66,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
     name: "",
     email: "",
     company: "",
-    projectType: initialService || SERVICE_OPTIONS[0],
+    projectType: resolveInitialServiceOption(initialService),
     budgetRange: BUDGET_OPTIONS[1],
     timeline: TIMELINE_OPTIONS[1],
     details: "",
@@ -191,10 +202,10 @@ export function ContactFormSection({ initialService }: { initialService?: string
 
               <div>
                 <h3 className="font-sans text-2xl sm:text-3xl font-medium text-white mb-2">
-                  Enquiry Delivered Successfully
+                  Enquiry Received
                 </h3>
                 <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed max-w-lg">
-                  Thank you, <strong className="text-white">{formData.name}</strong>. Your enquiry has been delivered directly to <strong className="text-white">hello@kamrulislam.me</strong>. I review client submissions daily and will respond to{" "}
+                  Thank you, <strong className="text-white">{formData.name}</strong>. Your enquiry has been recorded and forwarded for review at <strong className="text-white">hello@kamrulislam.me</strong>. I review client briefs regularly and will respond to{" "}
                   <strong className="text-white">{formData.email}</strong> within 24–48 hours.
                 </p>
               </div>

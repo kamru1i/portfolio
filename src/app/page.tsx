@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPublishedProjects } from "@/lib/projects-service";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { HomePageClient } from "@/components/home/HomePageClient";
 
 export const metadata: Metadata = {
@@ -80,7 +81,7 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(homePageJsonLd).replace(/</g, "\\u003c"),
+          __html: serializeJsonLd(homePageJsonLd),
         }}
       />
       <HomePageClient initialProjects={initialProjects} />

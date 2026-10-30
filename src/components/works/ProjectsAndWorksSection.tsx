@@ -21,16 +21,19 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
   const [activeWebProject, setActiveWebProject] = useState<PortfolioProject | null>(null);
 
   const [projects, setProjects] = useState<PortfolioProject[]>(
-    initialProjects || PORTFOLIO_DATA.showcaseProjects || []
+    initialProjects !== undefined
+      ? initialProjects
+      : PORTFOLIO_DATA.showcaseProjects || []
   );
 
-  // Fetch updated published projects from database
+  // Only fetch client-side if initialProjects was not supplied by a Server Component
   useEffect(() => {
+    if (initialProjects !== undefined) return;
     let isMounted = true;
     fetch("/api/projects")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (isMounted && data?.projects && data.projects.length > 0) {
+        if (isMounted && Array.isArray(data?.projects) && data.projects.length > 0) {
           setProjects(data.projects);
         }
       })
@@ -41,7 +44,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialProjects]);
 
   // Filter dynamically by type, sort by priority/recency, and enforce strict homepage overview limits (max 5 videos, max 8 web)
   const videoProjects = [...projects.filter((p) => p.type === "video")]

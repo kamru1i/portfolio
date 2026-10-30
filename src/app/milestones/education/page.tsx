@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import { PORTFOLIO_DATA, MilestoneItem } from "@/lib/portfolio-data";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
 
 export const metadata: Metadata = {
-  title: "Academic Qualifications — BSc in Computer Science & Engineering",
+  title: "Academic Qualifications — Computer Science & Engineering",
   description:
-    "Comprehensive academic records, degrees, and educational qualifications of Kamrul Islam, including BSc in Computer Science & Engineering, Higher Secondary Certificate (HSC), and Secondary School Certificate (SSC).",
+    "Academic records and educational qualifications of Kamrul Islam, including Bachelor of Science (BSc) studies in Computer Science & Engineering (Major in Web Development), Higher Secondary Certificate (HSC), and Secondary School Certificate (SSC).",
   alternates: {
     canonical: "https://kamrulislam.me/milestones/education",
   },
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     siteName: "Kamrul Islam",
     title: "Kamrul Islam — Academic Qualifications",
     description:
-      "Comprehensive academic background, curriculum coursework, and certified degrees of Kamrul Islam.",
+      "Academic background, curriculum coursework, and educational qualifications of Kamrul Islam.",
     url: "https://kamrulislam.me/milestones/education",
     type: "article",
   },
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Kamrul Islam — Academic Qualifications",
     description:
-      "Comprehensive academic background, curriculum coursework, and certified degrees of Kamrul Islam.",
+      "Academic background, curriculum coursework, and educational qualifications of Kamrul Islam.",
   },
 };
 
@@ -58,7 +59,7 @@ export default function EducationQualificationsPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
@@ -90,7 +91,7 @@ export default function EducationQualificationsPage() {
 
               {/* Total Records Badge */}
               <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[#aaa] text-xs font-mono uppercase tracking-wider">
-                {educationItems.length} Certified Records
+                {educationItems.length} Academic Qualifications
               </div>
 
               {/* Location Badge */}
@@ -106,7 +107,7 @@ export default function EducationQualificationsPage() {
 
             {/* Subtitle Statement */}
             <p className="font-mono-custom text-base sm:text-lg text-[#a1a1a1] max-w-3xl leading-relaxed">
-              Official academic history, certified qualifications, curriculum coursework, and disciplinary grounding in computer science, natural sciences, and web engineering.
+              Academic history, educational qualifications, curriculum focus, and disciplinary grounding in computer science, natural sciences, and web development.
             </p>
           </header>
 
@@ -134,6 +135,7 @@ export default function EducationQualificationsPage() {
                     : item.slug === "ssc"
                     ? "SSC (Science)"
                     : item.role;
+                const d = item.details || {};
 
                 return (
                   <a
@@ -142,9 +144,11 @@ export default function EducationQualificationsPage() {
                     className="px-3 sm:px-4 py-1.5 rounded-full bg-white/4 hover:bg-white text-white/70 hover:text-black font-mono-custom text-xs uppercase tracking-wider border border-white/10 hover:border-white transition-all flex items-center gap-1.5"
                   >
                     <span>{navLabel}</span>
-                    <span className="text-[#555] group-hover:text-black/60 font-mono text-[10px]">
-                      @{item.year}
-                    </span>
+                    {d.passingYear && (
+                      <span className="text-[#555] group-hover:text-black/60 font-mono text-[10px]">
+                        @{d.passingYear}
+                      </span>
+                    )}
                   </a>
                 );
               })}
@@ -159,9 +163,7 @@ export default function EducationQualificationsPage() {
               const d = item.details || {};
               const sectionId = item.slug;
               const institution = d.institution || item.organization;
-              const authority = d.board || d.authority || "Academic Authority";
-              const groupOrMajor = d.major || d.group || d.subject || "General";
-              const passingYear = d.passingYear || item.year;
+              const passingYear = d.passingYear;
               const resultGrade = d.gpa || d.result || d.grade;
 
               return (
@@ -181,7 +183,7 @@ export default function EducationQualificationsPage() {
                           INDEX 0{index + 1}
                         </span>
                         <span className="font-mono-custom text-xs px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
-                          YEAR {passingYear}
+                          {passingYear ? `YEAR ${passingYear}` : "UNIVERSITY STUDIES"}
                         </span>
                       </div>
 
@@ -205,51 +207,81 @@ export default function EducationQualificationsPage() {
 
                       {/* Structured Parameters Specification Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {/* Parameter 1: Institution */}
+                        {/* Parameter: Institution */}
                         <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
                           <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
-                            Institution
+                            Institute Name
                           </span>
                           <span className="font-sans text-sm sm:text-base text-white font-medium">
                             {institution}
                           </span>
                         </div>
 
-                        {/* Parameter 2: Board / Authority / University */}
-                        <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
-                          <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
-                            Board / Authority
-                          </span>
-                          <span className="font-sans text-sm sm:text-base text-white font-medium">
-                            {authority}
-                          </span>
-                        </div>
+                        {/* Parameter: Department (when present, e.g., BSc) */}
+                        {d.department && (
+                          <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
+                            <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
+                              Department
+                            </span>
+                            <span className="font-sans text-sm sm:text-base text-white font-medium">
+                              {d.department}
+                            </span>
+                          </div>
+                        )}
 
-                        {/* Parameter 3: Academic Group / Major */}
-                        <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
-                          <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
-                            Group / Major
-                          </span>
-                          <span className="font-sans text-sm sm:text-base text-emerald-400 font-medium">
-                            {groupOrMajor}
-                          </span>
-                        </div>
+                        {/* Parameter: Subject (when present, e.g., BSc) */}
+                        {d.subject && (
+                          <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
+                            <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
+                              Subject
+                            </span>
+                            <span className="font-sans text-sm sm:text-base text-white font-medium">
+                              {d.subject}
+                            </span>
+                          </div>
+                        )}
 
-                        {/* Parameter 4: Passing Year */}
-                        <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
-                          <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
-                            Passing Year
-                          </span>
-                          <span className="font-sans text-sm sm:text-base text-white font-medium">
-                            {passingYear}
-                          </span>
-                        </div>
+                        {/* Parameter: Board (when documented, e.g., HSC/SSC) */}
+                        {d.board && (
+                          <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
+                            <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
+                              Board
+                            </span>
+                            <span className="font-sans text-sm sm:text-base text-white font-medium">
+                              {d.board}
+                            </span>
+                          </div>
+                        )}
 
-                        {/* Parameter 5: Result / GPA (rendered when documented) */}
+                        {/* Parameter: Major or Group */}
+                        {(d.major || d.group) && (
+                          <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
+                            <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
+                              {d.major ? "Major" : "Group"}
+                            </span>
+                            <span className="font-sans text-sm sm:text-base text-emerald-400 font-medium">
+                              {d.major || d.group}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Parameter: Passing Year (only when documented in CV) */}
+                        {passingYear && (
+                          <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-white/10 flex flex-col">
+                            <span className="font-mono-custom text-[11px] text-[#777] uppercase tracking-wider mb-1">
+                              Passing Year
+                            </span>
+                            <span className="font-sans text-sm sm:text-base text-white font-medium">
+                              {passingYear}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Parameter: Result / GPA (only when documented in CV) */}
                         {resultGrade && (
                           <div className="p-4 sm:p-5 rounded-xl bg-white/3 border border-emerald-500/20 sm:col-span-2 flex flex-col">
                             <span className="font-mono-custom text-[11px] text-emerald-400 uppercase tracking-wider mb-1">
-                              Result / Academic Performance
+                              GPA / Result
                             </span>
                             <span className="font-sans text-base sm:text-lg text-white font-medium">
                               {resultGrade}
@@ -260,12 +292,12 @@ export default function EducationQualificationsPage() {
                     </div>
                   </div>
 
-                  {/* Coursework & Verified Academic Achievements Block */}
+                  {/* Coursework & Academic Highlights Block */}
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start pt-6 border-t border-white/10">
                     {/* Coursework / Syllabus Focus */}
                     <div className="lg:col-span-6">
                       <span className="font-mono-custom text-xs text-[#888] uppercase tracking-wider block mb-4">
-                        Curriculum Focus &amp; Core Coursework
+                        Curriculum Focus &amp; Subject Areas
                       </span>
                       {d.coursework && d.coursework.length > 0 ? (
                         <div className="flex flex-wrap gap-2 sm:gap-2.5">
@@ -280,15 +312,15 @@ export default function EducationQualificationsPage() {
                         </div>
                       ) : (
                         <p className="font-mono-custom text-xs text-[#666]">
-                          Standard comprehensive syllabus under {authority}.
+                          Academic curriculum under {institution}.
                         </p>
                       )}
                     </div>
 
-                    {/* Verified Academic Achievements */}
+                    {/* Academic Highlights */}
                     <div className="lg:col-span-6">
                       <span className="font-mono-custom text-xs text-[#888] uppercase tracking-wider block mb-4">
-                        Verified Milestones &amp; Academic Honors
+                        Documented Record Summary
                       </span>
                       {d.achievements && d.achievements.length > 0 ? (
                         <div className="flex flex-col space-y-3">
@@ -308,7 +340,7 @@ export default function EducationQualificationsPage() {
                         </div>
                       ) : (
                         <p className="font-mono-custom text-xs text-[#666]">
-                          Official academic completion verified against institution records.
+                          Documented in official CV records.
                         </p>
                       )}
                     </div>

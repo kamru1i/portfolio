@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Metadata } from "next";
-import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -139,7 +138,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(webProjectJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(webProjectJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
@@ -172,9 +171,11 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                 {project.client || "Client Project"}
               </div>
 
-              <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[#777] text-xs font-mono">
-                @{project.year || "2026"}
-              </div>
+              {project.year && (
+                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[#777] text-xs font-mono">
+                  @{project.year}
+                </div>
+              )}
             </div>
 
             {/* Giant Editorial Title */}

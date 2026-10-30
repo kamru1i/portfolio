@@ -2,13 +2,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
-import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
-import { extractYouTubeId, extractVimeoId } from "@/lib/video-metadata";
+import { resolvePlayableEmbedUrl } from "@/lib/video-metadata";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
-import { getAspectRatioMultiplier } from "@/components/works/modal-tokens";
 
 interface VideoProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -61,19 +60,6 @@ export async function generateMetadata({
   };
 }
 
-function resolveEmbedUrl(url?: string): string | null {
-  if (!url) return null;
-  const ytId = extractYouTubeId(url);
-  if (ytId) {
-    return `https://www.youtube.com/embed/${ytId}?autoplay=0&rel=0&modestbranding=1`;
-  }
-  const vimeoId = extractVimeoId(url);
-  if (vimeoId) {
-    return `https://player.vimeo.com/video/${vimeoId}?autoplay=0`;
-  }
-  return null;
-}
-
 function getVideoPlayerContainerClasses(format: string): string {
   switch (format) {
     case "9:16":
@@ -105,7 +91,10 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
   const nextProject =
     videoProjects[(currentIndex + 1) % videoProjects.length] || videoProjects[0];
 
-  const embedUrl = resolveEmbedUrl(project.videoUrl);
+  const embedUrl = resolvePlayableEmbedUrl(project.videoUrl, {
+    autoplay: false,
+    privacyEnhanced: true,
+  });
   const isDirectVideo =
     project.videoUrl &&
     (project.videoUrl.endsWith(".mp4") ||
@@ -171,7 +160,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoPageJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(videoPageJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
@@ -207,9 +196,11 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
               </div>
 
               {/* Year */}
-              <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[#777] text-xs font-mono">
-                @{project.year || "2026"}
-              </div>
+              {project.year && (
+                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[#777] text-xs font-mono">
+                  @{project.year}
+                </div>
+              )}
             </div>
 
             {/* Giant Editorial Title */}

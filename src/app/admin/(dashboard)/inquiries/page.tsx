@@ -306,7 +306,7 @@ export default function AdminInquiriesPage() {
                       }`}
                     >
                       {inquiry.email_delivered
-                        ? "Email Delivered ✓"
+                        ? "Provider Accepted ✓"
                         : "Saved in Inbox Backup"}
                     </span>
 

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { getPublishedProjects } from "@/lib/projects-service";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { ProjectsPageContent } from "@/components/works/ProjectsPageContent";
@@ -90,7 +91,7 @@ export default async function ProjectsArchivePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(projectsArchiveJsonLd).replace(/</g, "\\u003c"),
+          __html: serializeJsonLd(projectsArchiveJsonLd),
         }}
       />
       {/* Global Fixed Navigation */}

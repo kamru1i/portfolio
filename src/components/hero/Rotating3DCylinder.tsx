@@ -77,10 +77,16 @@ export function Rotating3DCylinder({
       : 0;
   const autoRotateSpeed = speed * 6; // 12 deg/sec clockwise
 
-  // Main RAF Physics & Render Loop matching exact reference implementation
+  // Main RAF Physics & Render Loop matching exact reference implementation,
+  // pausing offscreen or under prefers-reduced-motion while keeping manual drag responsive.
   useEffect(() => {
     const cylinder = cylinderRef.current;
+    const container = containerRef.current;
     if (!cylinder) return;
+
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let prefersReducedMotion = reducedMotionQuery.matches;
+    let isInViewport = true;
 
     const updateTransform = () => {
       if (!cylinder) return;
@@ -89,7 +95,19 @@ export function Rotating3DCylinder({
 
     updateTransform();
 
+    const shouldRunLoop = () => {
+      if (document.hidden || !isInViewport) return false;
+      if (!prefersReducedMotion) return true;
+      return dragStateRef.current.active || Math.abs(velocityRef.current) > 0.01;
+    };
+
     const loop = (time: number) => {
+      if (!shouldRunLoop()) {
+        animFrameRef.current = null;
+        lastTimeRef.current = 0;
+        return;
+      }
+
       const dt = lastTimeRef.current ? Math.min((time - lastTimeRef.current) / 1000, 0.1) : 0;
       lastTimeRef.current = time;
 
@@ -98,7 +116,7 @@ export function Rotating3DCylinder({
           // Physics momentum damping (exact 0.94 decay factor per frame)
           rotRef.current += velocityRef.current * dt;
           velocityRef.current *= 0.94;
-        } else {
+        } else if (!prefersReducedMotion) {
           // Continuous smooth auto-rotation
           rotRef.current += autoRotateSpeed * dt;
         }
@@ -108,12 +126,55 @@ export function Rotating3DCylinder({
       animFrameRef.current = requestAnimationFrame(loop);
     };
 
-    animFrameRef.current = requestAnimationFrame(loop);
+    const syncLoop = () => {
+      if (shouldRunLoop()) {
+        if (animFrameRef.current === null) {
+          lastTimeRef.current = 0;
+          animFrameRef.current = requestAnimationFrame(loop);
+        }
+      } else if (animFrameRef.current !== null) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
+        lastTimeRef.current = 0;
+      }
+    };
+
+    let observer: IntersectionObserver | null = null;
+    if (container && typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        (entries) => {
+          isInViewport = entries[0]?.isIntersecting ?? true;
+          syncLoop();
+        },
+        { threshold: 0 }
+      );
+      observer.observe(container);
+    }
+
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      prefersReducedMotion = e.matches;
+      syncLoop();
+    };
+
+    const handlePointerWake = () => {
+      syncLoop();
+    };
+
+    document.addEventListener("visibilitychange", syncLoop);
+    reducedMotionQuery.addEventListener("change", handleMotionChange);
+    container?.addEventListener("pointerdown", handlePointerWake, { passive: true });
+
+    syncLoop();
 
     return () => {
-      if (animFrameRef.current) {
+      if (animFrameRef.current !== null) {
         cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
       }
+      observer?.disconnect();
+      document.removeEventListener("visibilitychange", syncLoop);
+      reducedMotionQuery.removeEventListener("change", handleMotionChange);
+      container?.removeEventListener("pointerdown", handlePointerWake);
     };
   }, [radius, autoRotateSpeed]);
 

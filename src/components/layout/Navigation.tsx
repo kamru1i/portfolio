@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Link from "next/link";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { useDhakaClock } from "@/hooks/useDhakaClock";
 import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
 import { FullScreenMenu } from "./FullScreenMenu";
 
@@ -24,7 +25,7 @@ function getServerDesktopSnapshot() {
 }
 
 export function Navigation({ isRevealed = true }: NavigationProps) {
-  const [timeStr, setTimeStr] = useState<string>("7:00 PM (GMT +6)");
+  const timeStr = useDhakaClock("7:00 PM (GMT +6)");
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   const isDesktop = useSyncExternalStore(
@@ -32,28 +33,6 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
     getDesktopSnapshot,
     getServerDesktopSnapshot
   );
-
-  // Live Asia/Dhaka clock (UTC+6)
-  useEffect(() => {
-    function updateClock() {
-      try {
-        const now = new Date();
-        const formatted = now.toLocaleTimeString("en-US", {
-          timeZone: "Asia/Dhaka",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        });
-        setTimeStr(`${formatted} (GMT +6)`);
-      } catch {
-        setTimeStr("7:00 PM (GMT +6)");
-      }
-    }
-
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Continuous scroll interpolation
   const { scrollY } = useScroll();

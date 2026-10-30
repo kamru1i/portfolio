@@ -4,20 +4,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { PortfolioProject } from "@/lib/portfolio-data";
+import { getDisplayDomain } from "@/lib/url-utils";
 
 interface WebCaseStudyCardProps {
   project: PortfolioProject;
   onPreviewWeb: (project: PortfolioProject) => void;
-}
-
-function getDisplayDomain(url?: string): string {
-  if (!url) return "live-deployment.site";
-  try {
-    const parsed = new URL(url);
-    return parsed.hostname.replace(/^www\./, "");
-  } catch {
-    return url.replace(/^https?:\/\//, "").split("/")[0] || "live-deployment.site";
-  }
 }
 
 export function WebCaseStudyCard({
@@ -26,7 +17,7 @@ export function WebCaseStudyCard({
 }: WebCaseStudyCardProps) {
   const [imageError, setImageError] = useState(false);
 
-  const displayDomain = getDisplayDomain(project.liveUrl);
+  const displayDomain = getDisplayDomain(project.liveUrl, "live-deployment.site");
   const previewImage = project.previewImageUrl || project.thumbnail;
   const faviconUrl = `https://www.google.com/s2/favicons?domain=${displayDomain}&sz=64`;
   const hasValidScreenshot = Boolean(previewImage) && !imageError;
@@ -136,7 +127,7 @@ export function WebCaseStudyCard({
       {/* Default State: Bottom Metadata (@Year + Case Study Link + Preview Pill) */}
       <div className="relative z-10 p-5 sm:p-5 lg:p-5 xl:p-6 flex items-center justify-between gap-2 transition-transform duration-300 group-hover:translate-y-1">
         <span className="font-mono-custom text-xs sm:text-sm text-[#888]">
-          @{project.year || "2026"}
+          {project.year ? `@${project.year}` : ""}
         </span>
 
         <div className="flex items-center gap-2">

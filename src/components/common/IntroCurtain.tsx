@@ -24,6 +24,19 @@ export function IntroCurtain({
   });
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      const immediateTimer = setTimeout(() => {
+        onRevealRef.current?.();
+        setStage("done");
+        onCompleteRef.current?.();
+      }, 0);
+      return () => clearTimeout(immediateTimer);
+    }
+
     // Stage 1: Brand text reveals via blurIn stagger, holds until 1650ms
     const timerExit = setTimeout(() => {
       setStage("exit");

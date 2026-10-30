@@ -3,18 +3,10 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { ProjectRecord } from "@/types/project";
+import { getDisplayDomain } from "@/lib/url-utils";
 import Image from "next/image";
 
 type FilterTab = "all" | "video" | "web" | "published" | "drafts";
-
-function getDisplayDomain(url?: string | null): string {
-  if (!url) return "site";
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return url.replace(/^https?:\/\//, "").split("/")[0] || "site";
-  }
-}
 
 export default function AdminDashboardPage() {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);

@@ -113,6 +113,20 @@ function sanitizeProjectUrl(
   }
 
   if (allowInternalSvgDataUri && trimmed.startsWith("data:image/svg+xml;utf8,")) {
+    let decodedSvg = trimmed;
+    try {
+      decodedSvg = decodeURIComponent(trimmed.slice("data:image/svg+xml;utf8,".length));
+    } catch {
+      throw new Error(`Malformed SVG data URI provided for ${fieldName}.`);
+    }
+    if (
+      /<script\b/i.test(decodedSvg) ||
+      /javascript:/i.test(decodedSvg) ||
+      /<foreignobject\b/i.test(decodedSvg) ||
+      /\bon[a-z]+\s*=/i.test(decodedSvg)
+    ) {
+      throw new Error(`Unsafe SVG content rejected for ${fieldName}.`);
+    }
     return trimmed;
   }
 
@@ -233,6 +247,23 @@ export async function getAllProjectsForAdmin(
 }
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SAFE_SLUG_REGEX = /^[A-Za-z0-9-]+$/;
+
+function revalidateProjectRoutes(slug?: string | null) {
+  revalidatePath("/");
+  revalidatePath("/projects");
+  revalidatePath("/sitemap.xml");
+  if (slug && SAFE_SLUG_REGEX.test(slug)) {
+    revalidatePath(`/projects/${slug}`);
+    revalidatePath(`/projects/video/${slug}`);
+    revalidatePath(`/projects/web/${slug}`);
+  }
+  try {
+    revalidateTag("projects", "default");
+  } catch {
+    // tag revalidation fallback
+  }
+}
 
 function sanitizeTagsArray(rawTags: unknown, maxItemLen = 50, maxItems = 20): string[] {
   if (!Array.isArray(rawTags)) return [];
@@ -285,63 +316,70 @@ export async function getProjectById(id: string): Promise<ProjectRecord | null> 
 }
 
 /**
- * Retrieves a single published project by its slug, ID, or fallback title slug.
- * Checks remote database first, then falls back to static PORTFOLIO_DATA.showcaseProjects.
+ * Retrieves a single published project by its slug or UUID.
+ * Checks remote database first, falling back to static PORTFOLIO_DATA.showcaseProjects
+ * only when Supabase is unconfigured, unreachable, or has zero published rows.
  */
 export async function getProjectBySlugOrId(slugOrId: string): Promise<PortfolioProject | null> {
-  const normalizedKey = slugOrId.trim().toLowerCase();
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(normalizedKey);
+  const trimmedKey = slugOrId.trim();
+  const normalizedKey = trimmedKey.toLowerCase();
+  const isUuid = UUID_REGEX.test(trimmedKey);
+  const isSafeSlug = SAFE_SLUG_REGEX.test(trimmedKey);
+
+  if (!isUuid && !isSafeSlug) {
+    return null;
+  }
 
   // Find in local showcase projects (matches slug, id, or generated slug)
   const fallbackProject = PORTFOLIO_DATA.showcaseProjects.find((p) => {
     const pSlug = (p.slug || "").toLowerCase();
     const pId = p.id.toLowerCase();
     const generatedSlug = generateSlug(p.title);
-    return (
-      pSlug === normalizedKey ||
-      pId === normalizedKey ||
-      generatedSlug === normalizedKey ||
-      (normalizedKey.includes("audi-q5") && (pSlug.includes("audi-q5") || pId.includes("youtube-video-5"))) ||
-      (normalizedKey.includes("kamrul") && (pSlug.includes("kamrul") || pId.includes("kamrul")))
-    );
+    return pSlug === normalizedKey || pId === normalizedKey || generatedSlug === normalizedKey;
   });
 
   try {
     const supabase = await createClient();
     if (supabase) {
-      // 1. Query remote DB by either UUID or slug
+      // 1. Query remote DB by either UUID or case-insensitive slug (SAFE_SLUG_REGEX prevents %/_ wildcards)
       let query = supabase.from("projects").select("*").eq("is_published", true);
       if (isUuid) {
         query = query.eq("id", normalizedKey);
       } else {
-        query = query.ilike("slug", normalizedKey);
+        query = query.ilike("slug", trimmedKey);
       }
 
       const { data, error } = await query.maybeSingle();
 
       if (!error && data) {
         const mapped = mapProjectRecordToPortfolio(data as ProjectRecord);
-        // Enrich with local structured data if available
         if (fallbackProject) {
           return {
             ...fallbackProject,
             ...mapped,
             role: mapped.role || fallbackProject.role,
             tools: mapped.tools && mapped.tools.length > 0 ? mapped.tools : fallbackProject.tools,
-            deliverables: mapped.deliverables && mapped.deliverables.length > 0 ? mapped.deliverables : fallbackProject.deliverables,
+            deliverables:
+              mapped.deliverables && mapped.deliverables.length > 0
+                ? mapped.deliverables
+                : fallbackProject.deliverables,
             overview: mapped.overview || fallbackProject.overview,
           };
         }
         return mapped;
       }
 
-      // 2. If fallbackProject has a different slug or title in DB, try matching by fallbackProject.slug
-      if (fallbackProject?.slug && fallbackProject.slug.toLowerCase() !== normalizedKey) {
+      // 2. If fallbackProject has an alias slug in DB, check that published record as well
+      if (
+        fallbackProject?.slug &&
+        SAFE_SLUG_REGEX.test(fallbackProject.slug) &&
+        fallbackProject.slug.toLowerCase() !== normalizedKey
+      ) {
         const { data: slugMatch } = await supabase
           .from("projects")
           .select("*")
           .eq("is_published", true)
-          .ilike("slug", fallbackProject.slug.toLowerCase())
+          .ilike("slug", fallbackProject.slug)
           .maybeSingle();
 
         if (slugMatch) {
@@ -351,10 +389,24 @@ export async function getProjectBySlugOrId(slugOrId: string): Promise<PortfolioP
             ...mapped,
             role: mapped.role || fallbackProject.role,
             tools: mapped.tools && mapped.tools.length > 0 ? mapped.tools : fallbackProject.tools,
-            deliverables: mapped.deliverables && mapped.deliverables.length > 0 ? mapped.deliverables : fallbackProject.deliverables,
+            deliverables:
+              mapped.deliverables && mapped.deliverables.length > 0
+                ? mapped.deliverables
+                : fallbackProject.deliverables,
             overview: mapped.overview || fallbackProject.overview,
           };
         }
+      }
+
+      // 3. Do NOT fall back to static projects if Supabase is active and already holds published rows
+      // (prevents unpublished/deleted DB records from staying accessible via static fallback)
+      const { count, error: countError } = await supabase
+        .from("projects")
+        .select("id", { count: "exact", head: true })
+        .eq("is_published", true);
+
+      if (!countError && (count ?? 0) > 0) {
+        return null;
       }
     }
   } catch {
@@ -491,16 +543,9 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
     throw new Error(`Failed to create project: ${error.message}`);
   }
 
-  // Trigger immediate cache revalidation across public website routes
-  revalidatePath("/");
-  revalidatePath("/projects");
-  try {
-    revalidateTag("projects", "default");
-  } catch {
-    // tag revalidation fallback
-  }
-
-  return normalizeProjectRecord(data as ProjectRecord);
+  const normalizedCreated = normalizeProjectRecord(data as ProjectRecord);
+  revalidateProjectRoutes(normalizedCreated.slug);
+  return normalizedCreated;
 }
 
 /**
@@ -699,15 +744,9 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
     throw new Error(`Failed to update project: ${error.message}`);
   }
 
-  revalidatePath("/");
-  revalidatePath("/projects");
-  try {
-    revalidateTag("projects", "default");
-  } catch {
-    // fallback
-  }
-
-  return normalizeProjectRecord(data as ProjectRecord);
+  const normalizedUpdated = normalizeProjectRecord(data as ProjectRecord);
+  revalidateProjectRoutes(normalizedUpdated.slug);
+  return normalizedUpdated;
 }
 
 /**
@@ -722,19 +761,13 @@ export async function deleteProject(id: string): Promise<boolean> {
     throw new Error("Supabase is not configured.");
   }
 
+  const existing = await getProjectById(id.trim());
   const { error } = await supabase.from("projects").delete().eq("id", id.trim());
   if (error) {
     throw new Error(`Failed to delete project: ${error.message}`);
   }
 
-  revalidatePath("/");
-  revalidatePath("/projects");
-  try {
-    revalidateTag("projects", "default");
-  } catch {
-    // fallback
-  }
-
+  revalidateProjectRoutes(existing?.slug);
   return true;
 }
 

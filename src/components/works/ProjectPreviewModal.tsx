@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PortfolioProject } from "@/lib/portfolio-data";
+import { getDisplayDomain } from "@/lib/url-utils";
 import {
   MODAL_BACKDROP_CLASSES,
   MODAL_OUTER_SHELL_CLASSES,
@@ -18,16 +19,6 @@ interface ProjectPreviewModalProps {
 type ViewportMode = "desktop" | "tablet" | "mobile";
 type ModalPreviewMode = "iframe" | "fallback";
 
-function getDisplayDomain(url?: string): string {
-  if (!url) return "production-live.app";
-  try {
-    const parsed = new URL(url);
-    return parsed.hostname.replace(/^www\./, "");
-  } catch {
-    return url.replace(/^https?:\/\//, "").split("/")[0] || "production-live.app";
-  }
-}
-
 export function ProjectPreviewModal({ project, onClose }: ProjectPreviewModalProps) {
   if (!project) return null;
   return <ProjectPreviewModalContent key={project.id} project={project} onClose={onClose} />;
@@ -40,11 +31,14 @@ function ProjectPreviewModalContent({
   project: PortfolioProject;
   onClose: () => void;
 }) {
+  const prefersIframe =
+    Boolean(project.liveUrl) &&
+    (project.previewMode ? project.previewMode === "iframe" : project.canEmbed !== false);
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
   const [viewportMode, setViewportMode] = useState<ViewportMode>("desktop");
   const [activeMode, setActiveMode] = useState<ModalPreviewMode>(
-    project.liveUrl ? "iframe" : "fallback"
+    prefersIframe ? "iframe" : "fallback"
   );
 
   // Handle ESC key to dismiss

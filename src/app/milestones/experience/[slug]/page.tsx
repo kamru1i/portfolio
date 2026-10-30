@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Metadata } from "next";
-import { PORTFOLIO_DATA, MilestoneItem } from "@/lib/portfolio-data";
+import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -94,7 +95,7 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />
@@ -121,7 +122,11 @@ export default async function ExperienceDetailPage({ params }: ExperiencePagePro
               {/* Category Pill Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/80 text-xs font-mono uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>CAREER ROLE // {milestone.year}</span>
+                <span>
+                  {milestone.year === "Current"
+                    ? "CURRENT CLIENT WORK"
+                    : `PREVIOUS EMPLOYMENT // ${milestone.year}`}
+                </span>
               </div>
 
               {/* Organization Badge */}

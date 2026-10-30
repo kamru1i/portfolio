@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
-import { PORTFOLIO_DATA, ServiceItem } from "@/lib/portfolio-data";
+import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -131,7 +132,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicePageJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(servicePageJsonLd) }}
       />
       {/* Global Fixed Navigation */}
       <Navigation isRevealed={true} />

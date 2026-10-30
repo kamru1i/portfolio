@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { getPublishedCvDocument } from "@/lib/cv-service";
+import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -10,7 +11,7 @@ import { CvPdfViewer } from "@/components/cv/CvPdfViewer";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Curriculum Vitae (CV) — Video Editor, AI Content Creator, Web Developer & IT Specialist",
+  title: "Curriculum Vitae (CV) — Video Editor, AI Content Creator, Web Developer & IT Professional",
   description:
     "Official Curriculum Vitae of Kamrul Islam (Kamrul I) — Creative-tech professional specializing in Video Editing & Post-Production, AI-Assisted Content Creation, Web Development, and IT Support & Digital Infrastructure.",
   alternates: {
@@ -47,14 +48,14 @@ const CORE_PILLARS = [
     title: "Video Editing & Post-Production",
     serviceSlug: "video-editing",
     summary:
-      "Commercial promos, talking-head narratives, YouTube documentaries, and high-retention short-form social reels across 16:9, 9:16, 1:1, 4:3, and 5:4 formats.",
+      "End-to-end video editing, storytelling, pacing, noise reduction and audio enhancement, color correction and grading, motion graphics, compositing, and multi-platform social optimization.",
     skills: [
       "Adobe Premiere Pro",
-      "After Effects",
+      "Adobe After Effects",
       "DaVinci Resolve",
-      "CapCut Pro",
-      "Motion Graphics & Kinetic Typography",
-      "Color Grading & Audio Mastering",
+      "CapCut & Final Cut Pro",
+      "Adobe Podcast & Audacity",
+      "Color Grading & Motion Graphics",
     ],
   },
   {
@@ -62,29 +63,29 @@ const CORE_PILLARS = [
     title: "AI-Assisted Content Creation",
     serviceSlug: "ai-assisted-content",
     summary:
-      "Modern AI-augmented visual production, script-to-screen storytelling, multi-platform content adaptation, and brand-consistent creative workflows.",
+      "Concept development, script writing, scene planning, prompt-based video/image/voiceover generation, and hybrid NLE timeline refinement for continuity and visual quality.",
     skills: [
-      "AI-Assisted Visual & Audio Workflows",
-      "Short-Form Hook & Retention Strategy",
-      "Script Structuring & Storyboarding",
-      "Multi-Platform Content Repurposing",
-      "Visual Branding & Thumbnail Design",
+      "Gemini Omni Flash & Google Veo",
+      "ChatGPT Sora & Kling 3.0",
+      "Google Nano Banana & ChatGPT Image 2",
+      "Higgsfield Soul & Kling 3",
+      "Script Writing & Scene Planning",
       "Adobe Photoshop & Illustrator",
     ],
   },
   {
     index: "03",
-    title: "Web Development",
+    title: "Web Development & WordPress",
     serviceSlug: "web-development",
     summary:
-      "Responsive, SEO-engineered portfolio websites, full-stack web applications, interactive UI systems, and custom CMS dashboards built with modern web technologies.",
+      "Responsive MERN and Next.js web applications, modular UI component systems, REST API & Supabase integration, Rust/Tauri v2 apps, and WordPress + Elementor Pro customization.",
     skills: [
-      "Next.js & React",
-      "TypeScript & JavaScript (ES6+)",
-      "Tailwind CSS & Responsive UI",
-      "Node.js & Express.js",
-      "Supabase & PostgreSQL",
-      "MongoDB & REST APIs",
+      "React.js, Next.js & TypeScript",
+      "HTML5, CSS3 & Tailwind CSS",
+      "DaisyUI, Shadcn/UI & Bootstrap",
+      "Node.js, Express.js & MongoDB",
+      "Supabase (PostgreSQL), Firebase & JWT",
+      "WordPress & Elementor Pro",
     ],
   },
   {
@@ -92,14 +93,72 @@ const CORE_PILLARS = [
     title: "IT Support & Digital Infrastructure",
     serviceSlug: "it-support",
     summary:
-      "Enterprise workstation administration, LAN/Wi-Fi network troubleshooting, ERP & cloud office operations, hardware diagnostics, and digital asset management.",
+      "Windows installation and troubleshooting, Microsoft Office & Outlook configuration, employee VPN access, LAN/Wi-Fi & printer support, cPanel/GoDaddy DNS & SSL management, and basic CCTV monitoring.",
     skills: [
-      "Windows & Linux Administration",
-      "LAN / Router / Network Diagnostics",
-      "Hardware Assembly & Troubleshooting",
-      "ERP & Corporate IT Operations",
-      "Microsoft 365 & Google Workspace",
-      "System Backup & Endpoint Security",
+      "Windows Setup & Troubleshooting",
+      "Microsoft Word, Excel, PowerPoint & Outlook",
+      "Internet, LAN, Wi-Fi & VPN Support",
+      "cPanel, GoDaddy, DNS & SSL",
+      "Website Security & Malware Cleanup",
+      "Basic CCTV Setup & Monitoring",
+    ],
+  },
+];
+
+const SKILL_PROFICIENCY_MATRIX = [
+  {
+    domain: "Video Editing & AI Content Creation",
+    expertise: [
+      "Video Editing & Post-Production",
+      "Storytelling & Narrative Flow",
+      "Video Pacing, Timing & Rhythm",
+      "Audio Editing & Sound Synchronization",
+      "Noise Cancellation & Voice Cleanup",
+      "Color Correction & Color Grading",
+      "Motion Graphics & Animated Text",
+      "Visual Effects & Compositing",
+      "Social Media Video Creation",
+    ],
+    comfortable: [
+      "AI Video, Image & Scene Generation",
+      "AI Voiceover & Audio Generation",
+      "Script Writing & Scene Planning",
+      "Prompt-Based Content Generation",
+      "AI Asset Integration & Editing",
+      "Video Thumbnail Creation",
+      "Multi-Platform Video Formatting",
+    ],
+    familiar: [
+      "Content Repurposing",
+      "Social Media Content Management",
+      "Video Scheduling & Publishing",
+      "Platform-Specific Optimization",
+    ],
+  },
+  {
+    domain: "Web Development & WordPress",
+    expertise: [
+      "HTML5 & CSS3",
+      "React.js",
+      "Tailwind CSS, DaisyUI & Bootstrap",
+      "Firebase",
+      "WordPress, Elementor & Elementor Pro",
+      "Website Customization",
+    ],
+    comfortable: [
+      "JavaScript (ES6) & TypeScript",
+      "Next.js & Shadcn/UI",
+      "Node.js, Express.js & MongoDB",
+      "Supabase (PostgreSQL) & JWT",
+      "Rust & Tauri v2",
+      "Plugin Management, Backups & Speed Optimization",
+    ],
+    familiar: [
+      "Redux & IndexedDB",
+      "Progressive Web Apps (PWA)",
+      "Web Push Notifications",
+      "PHP & Laravel",
+      "Basic Website Security & Malware Cleanup",
     ],
   },
 ];
@@ -171,7 +230,7 @@ export default async function CurriculumVitaePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <Navigation isRevealed={true} />
@@ -303,46 +362,88 @@ export default async function CurriculumVitaePage() {
                   </p>
                 </div>
 
-                <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {CORE_PILLARS.map((pillar) => (
-                    <article
-                      key={pillar.index}
-                      className="p-6 rounded-2xl bg-white/3 border border-white/10 flex flex-col justify-between space-y-5 hover:border-white/20 transition-colors"
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono-custom text-xs text-emerald-400">
-                            PILLAR {pillar.index}
-                          </span>
-                          <Link
-                            href={`/services/${pillar.serviceSlug}`}
-                            className="font-mono-custom text-[11px] uppercase tracking-wider text-[#aaa] hover:text-white transition-colors"
-                          >
-                            Service Spec →
-                          </Link>
+                <div className="lg:col-span-8 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {CORE_PILLARS.map((pillar) => (
+                      <article
+                        key={pillar.index}
+                        className="p-6 rounded-2xl bg-white/3 border border-white/10 flex flex-col justify-between space-y-5 hover:border-white/20 transition-colors"
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono-custom text-xs text-emerald-400">
+                              PILLAR {pillar.index}
+                            </span>
+                            <Link
+                              href={`/services/${pillar.serviceSlug}`}
+                              className="font-mono-custom text-[11px] uppercase tracking-wider text-[#aaa] hover:text-white transition-colors"
+                            >
+                              Service Spec →
+                            </Link>
+                          </div>
+
+                          <h3 className="font-gambarino text-2xl text-white tracking-tight">
+                            {pillar.title}
+                          </h3>
+
+                          <p className="font-mono-custom text-xs text-[#999] leading-relaxed">
+                            {pillar.summary}
+                          </p>
                         </div>
 
-                        <h3 className="font-gambarino text-2xl text-white tracking-tight">
-                          {pillar.title}
+                        <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/5">
+                          {pillar.skills.map((skill) => (
+                            <span
+                              key={skill}
+                              className="px-2.5 py-1 rounded-md bg-white/4 border border-white/10 font-mono-custom text-[11px] text-white/85"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+
+                  {/* Proficiency Tiers from Authoritative CVs */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {SKILL_PROFICIENCY_MATRIX.map((group) => (
+                      <div
+                        key={group.domain}
+                        className="p-6 rounded-2xl bg-white/2 border border-white/10 space-y-4"
+                      >
+                        <h3 className="font-gambarino text-xl text-white tracking-tight">
+                          {group.domain} — Proficiency Breakdown
                         </h3>
-
-                        <p className="font-mono-custom text-xs text-[#999] leading-relaxed">
-                          {pillar.summary}
-                        </p>
+                        <div className="space-y-3 font-mono-custom text-xs">
+                          <div>
+                            <span className="text-emerald-400 uppercase tracking-wider block mb-1">
+                              Expertise
+                            </span>
+                            <p className="text-[#bbb] leading-relaxed">
+                              {group.expertise.join(" • ")}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-white/80 uppercase tracking-wider block mb-1">
+                              Comfortable
+                            </span>
+                            <p className="text-[#999] leading-relaxed">
+                              {group.comfortable.join(" • ")}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-[#888] uppercase tracking-wider block mb-1">
+                              Familiar
+                            </span>
+                            <p className="text-[#777] leading-relaxed">
+                              {group.familiar.join(" • ")}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-
-                      <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/5">
-                        {pillar.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="px-2.5 py-1 rounded-md bg-white/4 border border-white/10 font-mono-custom text-[11px] text-white/85"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </article>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </section>
@@ -461,7 +562,7 @@ export default async function CurriculumVitaePage() {
                       >
                         <div className="space-y-2">
                           <span className="font-mono-custom text-xs text-emerald-400 block">
-                            Class of {d.passingYear || edu.year}
+                            {d.passingYear ? `Passing Year: ${d.passingYear}` : "University Studies"}
                           </span>
                           <h3 className="font-gambarino text-xl text-white tracking-tight leading-snug">
                             {edu.role}
@@ -472,9 +573,12 @@ export default async function CurriculumVitaePage() {
                         </div>
 
                         <div className="pt-3 border-t border-white/5 space-y-1 font-mono-custom text-[11px] text-[#888]">
+                          {d.department && <div>Department: {d.department}</div>}
+                          {d.subject && <div>Subject: {d.subject}</div>}
                           {d.major && <div>Major: {d.major}</div>}
                           {d.group && <div>Group: {d.group}</div>}
-                          {d.gpa && <div className="text-white/90">{d.gpa}</div>}
+                          {d.board && <div>Board: {d.board}</div>}
+                          {d.gpa && <div className="text-white/90">GPA: {d.gpa}</div>}
                         </div>
                       </article>
                     );
@@ -498,9 +602,9 @@ export default async function CurriculumVitaePage() {
                     Available for Video Production, Creative-Tech &amp; Web Projects
                   </h2>
                   <p className="font-mono-custom text-xs sm:text-sm text-[#999] leading-relaxed">
-                    Languages: <strong className="text-white font-normal">Bengali</strong> (Native),{" "}
-                    <strong className="text-white font-normal">English</strong> (Professional Working Proficiency),{" "}
-                    <strong className="text-white font-normal">Hindi</strong> (Conversational). Direct inquiries can be sent to{" "}
+                    Languages: <strong className="text-white font-normal">Bangla</strong> (Fluent — Reading, Writing, Speaking),{" "}
+                    <strong className="text-white font-normal">English</strong> (Good Command — Reading, Writing, Speaking),{" "}
+                    <strong className="text-white font-normal">Hindi</strong> (Conversational — Speaking, Listening). Direct inquiries can be sent to{" "}
                     <a
                       href="mailto:hello@kamrulislam.me"
                       className="text-white underline underline-offset-4 hover:text-emerald-400 transition-colors"

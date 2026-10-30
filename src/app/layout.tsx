@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { FilmGrain } from "@/components/common/FilmGrain";
 import { SmoothScroll } from "@/components/common/SmoothScroll";
+import { serializeJsonLd } from "@/lib/url-utils";
 
 export const viewport: Viewport = {
   themeColor: "#000000",
@@ -58,14 +59,14 @@ export const metadata: Metadata = {
     // Priority 2: AI Content Creation & Generative Media
     "AI Content Creator",
     "AI-Assisted Content Creator",
-    "Generative AI Specialist",
     "AI Video Production",
+    "Gemini Omni Flash",
     "Google Veo",
-    "OpenAI Sora",
-    "Kling AI",
-    "Runway Gen-3",
-    "Midjourney",
-    "Synthetic Media",
+    "ChatGPT Sora",
+    "Kling 3.0",
+    "Google Nano Banana",
+    "ChatGPT Image 2",
+    "Higgsfield Soul",
     "AI Visual Storytelling",
     "Prompt Engineering",
 
@@ -76,11 +77,12 @@ export const metadata: Metadata = {
     "Creative Developer",
     "Web Developer Bangladesh",
     "Next.js Developer",
-    "React",
+    "React.js",
     "TypeScript",
     "Tailwind CSS",
     "Node.js",
     "WordPress Developer",
+    "Elementor Pro",
     "Supabase",
     "PostgreSQL",
     "REST APIs",
@@ -89,14 +91,11 @@ export const metadata: Metadata = {
     // Priority 4: IT Operations & Infrastructure
     "IT Professional",
     "Assistant IT Manager",
-    "IT Operations Specialist",
-    "Enterprise IT Infrastructure",
+    "IT Support Specialist",
     "cPanel Webmail Administration",
     "DNS Management & Domain Routing",
-    "Network Administration",
-    "Hardware & Systems Engineering",
-    "BSc in Computer Science and Engineering",
-    "BSc in CSE",
+    "Network & VPN Troubleshooting",
+    "Computer Science and Engineering",
   ],
   creator: "Kamrul Islam",
   publisher: "Kamrul Islam",
@@ -180,11 +179,11 @@ const structuredData = {
     {
       "@type": "ImageObject",
       "@id": "https://kamrulislam.me/#portrait",
-      url: "https://kamrulislam.me/images/Kamrul%20I.png",
-      contentUrl: "https://kamrulislam.me/images/Kamrul%20I.png",
+      url: "https://kamrulislam.me/images/Kamrul-I.png",
+      contentUrl: "https://kamrulislam.me/images/Kamrul-I.png",
       name: "Kamrul Islam (Kamrul I) — Official Portrait",
       caption:
-        "Kamrul Islam (Kamrul I) — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist",
+        "Kamrul Islam (Kamrul I) — Video Editor, AI-Assisted Content Creator, Web Developer & IT Professional",
       creator: {
         "@type": "Person",
         "@id": "https://kamrulislam.me/#person",
@@ -264,10 +263,6 @@ const structuredData = {
         "https://www.tiktok.com/@kamru1i",
         "https://wa.me/8801839006867",
       ],
-      worksFor: {
-        "@type": "Organization",
-        name: "B&F Corporate",
-      },
       email: "mailto:hello@kamrulislam.me",
       telephone: "(+880) 1839 00 6867",
       contactPoint: {
@@ -276,33 +271,44 @@ const structuredData = {
         email: "hello@kamrulislam.me",
         contactType: "customer support",
         url: "https://wa.me/8801839006867",
-        availableLanguage: ["English", "Bengali", "Hindi"],
+        availableLanguage: ["Bangla", "English", "Hindi"],
       },
       alumniOf: {
         "@type": "EducationalOrganization",
-        name: "Port City International University (PCIU)",
+        name: "Port City International University",
       },
       nationality: {
         "@type": "Country",
         name: "Bangladesh",
       },
       knowsAbout: [
-        "Commercial Video Editing",
+        "Video Editing & Post-Production",
         "Color Grading",
-        "DaVinci Resolve Studio",
+        "DaVinci Resolve",
         "Adobe Premiere Pro",
         "Adobe After Effects",
-        "Generative AI Video",
+        "CapCut",
+        "Final Cut Pro",
+        "Adobe Podcast",
+        "AI-Assisted Content Creation",
+        "Gemini Omni Flash",
         "Google Veo",
-        "OpenAI Sora",
-        "Kling AI",
+        "ChatGPT Sora",
+        "Kling 3.0",
+        "Google Nano Banana",
+        "ChatGPT Image 2",
+        "Higgsfield Soul",
+        "React.js",
         "Next.js",
-        "React",
         "TypeScript",
         "Tailwind CSS",
-        "Enterprise IT Infrastructure",
-        "cPanel Webmail & Mail Servers",
-        "DNS Management",
+        "Node.js",
+        "MongoDB",
+        "Supabase",
+        "WordPress & Elementor Pro",
+        "IT Support & Digital Infrastructure",
+        "cPanel & GoDaddy Hosting Management",
+        "DNS & SSL Administration",
       ],
       address: {
         "@type": "PostalAddress",
@@ -367,7 +373,7 @@ const structuredData = {
           "@type": "SiteNavigationElement",
           position: 6,
           name: "Academic Qualifications",
-          description: "BSc in Computer Science & Engineering and academic credentials",
+          description: "Computer Science & Engineering studies and academic qualifications",
           url: "https://kamrulislam.me/milestones/education",
         },
         {
@@ -392,7 +398,7 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
         />
       </head>
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black min-h-screen">

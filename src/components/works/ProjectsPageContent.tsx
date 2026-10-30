@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { PortfolioProject, PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { compareProjectsByPriorityAndRecency } from "@/types/project";
 import { VideoPlayerModal } from "./VideoPlayerModal";
@@ -46,36 +46,22 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
   const [activeVideoModal, setActiveVideoModal] = useState<PortfolioProject | null>(null);
   const [activeWebModal, setActiveWebModal] = useState<PortfolioProject | null>(null);
 
-  // All published projects
+  // All published projects (server-provided initialProjects is authoritative when defined)
   const [allProjects, setAllProjects] = useState<PortfolioProject[]>(
-    initialProjects && initialProjects.length > 0
+    initialProjects !== undefined
       ? initialProjects
       : PORTFOLIO_DATA.showcaseProjects || []
   );
 
-  // Fetch complete published collection from API
+  // Only fetch client-side if initialProjects was not supplied by the Server Component
   useEffect(() => {
+    if (initialProjects !== undefined) return;
     let isMounted = true;
     fetch("/api/projects")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (isMounted && data?.projects && data.projects.length > 0) {
-          // Merge API database projects with static fallback projects to ensure full coverage
-          const apiProjects: PortfolioProject[] = data.projects;
-          const merged = [...apiProjects];
-          
-          for (const fallback of PORTFOLIO_DATA.showcaseProjects) {
-            const exists = merged.some(
-              (p) =>
-                p.id === fallback.id ||
-                (p.slug && fallback.slug && p.slug === fallback.slug) ||
-                p.title.toLowerCase() === fallback.title.toLowerCase()
-            );
-            if (!exists) {
-              merged.push(fallback);
-            }
-          }
-          setAllProjects(merged);
+        if (isMounted && Array.isArray(data?.projects) && data.projects.length > 0) {
+          setAllProjects(data.projects);
         }
       })
       .catch(() => {
@@ -85,7 +71,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialProjects]);
 
   const handleTabChange = (tab: "video" | "web") => {
     setTabOverride({ urlTab, active: tab });
@@ -316,7 +302,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                       {/* Bottom Duration / Platform Hint */}
                       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between font-mono-custom text-[11px] text-white/80 pointer-events-none">
                         <span className="truncate max-w-[200px]">{project.category || "Commercial Video"}</span>
-                        <span>@{project.year || "2026"}</span>
+                        {project.year && <span>@{project.year}</span>}
                       </div>
                     </div>
 

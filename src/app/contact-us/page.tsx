@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { ContactPageContent } from "@/components/contact/ContactPageContent";
+import { serializeJsonLd } from "@/lib/url-utils";
 
 export const metadata: Metadata = {
   title: "Contact — Hire for Video Editing, AI Content & Web Development",
@@ -67,7 +68,7 @@ export default function ContactUsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(contactPageJsonLd).replace(/</g, "\\u003c"),
+          __html: serializeJsonLd(contactPageJsonLd),
         }}
       />
       <ContactPageContent />

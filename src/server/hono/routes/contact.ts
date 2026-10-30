@@ -64,7 +64,22 @@ contactRoute.post("/", async (c) => {
       return c.json({ error: "Request payload is too large." }, 413);
     }
 
-    const body = await c.req.json();
+    const rawBody = await c.req.text();
+    if (rawBody.length > 32 * 1024) {
+      return c.json({ error: "Request payload is too large." }, 413);
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      const parsed = JSON.parse(rawBody);
+      if (!parsed || typeof parsed !== "object") {
+        return c.json({ error: "Invalid request payload." }, 400);
+      }
+      body = parsed as Record<string, unknown>;
+    } catch {
+      return c.json({ error: "Invalid JSON payload." }, 400);
+    }
+
     const { name, email, company, projectType, budgetRange, timeline, details, botCheck } = body;
 
     if (botCheck) {
@@ -236,7 +251,7 @@ hello@kamrulislam.me
 
 Best regards,
 Kamrul Islam
-Lead Video Editor, Web Developer & IT Specialist
+Video Editor, AI-Assisted Content Creator, Web Developer & IT Professional
 https://kamrulislam.me
 `.trim();
 
@@ -254,7 +269,7 @@ https://kamrulislam.me
         ● ENQUIRY RECEIVED
       </div>
       <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">Thank you, ${escapeHtml(cleanName)}.</h1>
-      <p style="margin: 8px 0 0 0; font-size: 14px; color: #a1a1a1; line-height: 1.5;">Your project enquiry has been delivered directly to Kamrul Islam.</p>
+      <p style="margin: 8px 0 0 0; font-size: 14px; color: #a1a1a1; line-height: 1.5;">Your project enquiry has been received by Kamrul Islam.</p>
     </div>
 
     <div style="padding: 24px 32px; background-color: #141414; border-bottom: 1px solid #222;">
@@ -312,7 +327,7 @@ https://kamrulislam.me
 
     <div style="padding: 20px 32px; border-top: 1px solid #222; background-color: #0d0d0d; font-size: 11px; color: #666; font-family: monospace; line-height: 1.6;">
       <div>Received: ${escapeHtml(submissionTimeDhaka)} (GMT+6)</div>
-      <div style="margin-top: 4px; color: #888;">Kamrul Islam · Lead Video Editor, Web Developer &amp; IT Specialist</div>
+      <div style="margin-top: 4px; color: #888;">Kamrul Islam · Video Editor, AI-Assisted Content Creator, Web Developer &amp; IT Professional</div>
       <div style="margin-top: 2px;"><a href="https://kamrulislam.me" style="color: #a1a1a1; text-decoration: none;">kamrulislam.me</a></div>
     </div>
   </div>
@@ -320,22 +335,16 @@ https://kamrulislam.me
 </html>
 `.trim();
 
-    let emailDelivered = false;
-    let deliveryId: string | null = null;
-    let autoReplyDeliveryId: string | null = null;
-    let autoReplyErrorMessage: string | null = null;
-    let resendErrorMessage: string | null = null;
+    let providerAccepted = false;
 
     if (!apiKey) {
       console.warn(
-        `[Contact API Notice]: RESEND_API_KEY environment variable is not configured. ` +
-          `Enquiry from "${cleanName}" <${cleanEmail}> will be stored in Admin Inquiries Inbox.`
+        "[Contact API Notice]: RESEND_API_KEY is not configured; persisting enquiry to Admin Inquiries Inbox."
       );
-      resendErrorMessage = "RESEND_API_KEY not configured";
     } else {
       try {
         const resend = new Resend(apiKey);
-        const { data, error } = await resend.emails.send({
+        const { error } = await resend.emails.send({
           from: sender,
           to: [recipient],
           replyTo: cleanEmail,
@@ -345,39 +354,24 @@ https://kamrulislam.me
         });
 
         if (error) {
-          console.error("[Resend Delivery Error]:", error);
-          resendErrorMessage = error.message || "Email provider could not initiate delivery.";
+          console.error("[Resend Provider Error]: Failed to dispatch primary notification.");
         } else {
-          emailDelivered = true;
-          deliveryId = data?.id || null;
+          providerAccepted = true;
 
           try {
-            const autoReplyResult = await resend.emails.send({
+            await resend.emails.send({
               from: autoReplySender,
               to: [cleanEmail],
               subject: `[Received] Thank you for your inquiry — Kamrul Islam`,
               text: autoReplyText,
               html: autoReplyHtml,
             });
-
-            if (autoReplyResult.error) {
-              autoReplyErrorMessage =
-                autoReplyResult.error.message ||
-                "Auto-reply awaiting verified domain at resend.com/domains";
-            } else {
-              autoReplyDeliveryId = autoReplyResult.data?.id || null;
-            }
-          } catch (autoReplyErr: unknown) {
-            autoReplyErrorMessage =
-              autoReplyErr instanceof Error
-                ? autoReplyErr.message
-                : "Auto-reply awaiting verified domain at resend.com/domains";
+          } catch {
+            // Non-fatal courtesy receipt failure; do not expose provider internals
           }
         }
-      } catch (resendException: unknown) {
-        console.error("[Resend Exception]:", resendException);
-        resendErrorMessage =
-          resendException instanceof Error ? resendException.message : "Email provider exception";
+      } catch {
+        console.error("[Resend Exception]: Failed to communicate with email provider.");
       }
     }
 
@@ -390,13 +384,13 @@ https://kamrulislam.me
       budget_range: cleanBudget === "Not specified" ? null : cleanBudget,
       timeline: cleanTimeline === "Not specified" ? null : cleanTimeline,
       details: cleanDetails,
-      email_delivered: emailDelivered,
+      email_delivered: providerAccepted,
     });
 
-    if (!emailDelivered && !backupResult.saved) {
+    if (!providerAccepted && !backupResult.saved) {
       return c.json(
         {
-          error: resendErrorMessage || "Unable to deliver or store inquiry at this time.",
+          error: "Unable to record your inquiry right now. Please use the direct email option.",
           code: "DELIVERY_FAILED",
         },
         502
@@ -405,13 +399,9 @@ https://kamrulislam.me
 
     return c.json({
       success: true,
-      message: emailDelivered
-        ? "Enquiry delivered successfully."
-        : "Enquiry received and saved to Admin Inbox.",
-      deliveryId,
-      autoReplyDeliveryId,
+      message: "Enquiry received.",
       savedToInbox: backupResult.saved,
-      ...(autoReplyErrorMessage ? { autoReplyNotice: autoReplyErrorMessage } : {}),
+      providerAccepted,
     });
   } catch (error: unknown) {
     console.error("[Contact API Internal Error]:", error);

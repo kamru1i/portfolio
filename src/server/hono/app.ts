@@ -138,22 +138,96 @@ app.get("/cv/pdf", async (c) => {
   }
 });
 
-// ============================================================================
-// ADMIN ROUTES & CENTRALIZED AUTHENTICATION MIDDLEWARE
-// ============================================================================
+const MAX_ADMIN_JSON_BYTES = 64 * 1024;
 
-// Admin Logout (does not require active admin check to sign out session cookies)
-app.post("/admin/auth/logout", async (c) => {
-  const supabase = await createClient();
-  if (supabase) {
-    await supabase.auth.signOut();
+function isTrustedAdminOrigin(originHeader: string | undefined, hostHeader: string | undefined): boolean {
+  if (!originHeader) return false;
+  let originUrl: URL;
+  try {
+    originUrl = new URL(originHeader);
+  } catch {
+    return false;
   }
-  return c.json({ success: true });
-});
 
-// Centralized Admin Auth Guard for all other /api/admin/* endpoints
+  const originHost = originUrl.host.toLowerCase();
+  const normalizedReqHost = (hostHeader || "").split(",")[0]?.trim().toLowerCase() || "";
+  if (normalizedReqHost && originHost === normalizedReqHost) {
+    return true;
+  }
+
+  const allowedOrigins = new Set<string>([
+    "https://kamrulislam.me",
+    "https://www.kamrulislam.me",
+  ]);
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configuredSiteUrl) {
+    try {
+      allowedOrigins.add(new URL(configuredSiteUrl).origin.toLowerCase());
+    } catch {
+      // ignore invalid NEXT_PUBLIC_SITE_URL
+    }
+  }
+
+  if (allowedOrigins.has(originUrl.origin.toLowerCase())) {
+    return true;
+  }
+
+  if (
+    process.env.NODE_ENV !== "production" &&
+    (originUrl.hostname === "localhost" || originUrl.hostname === "127.0.0.1")
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+async function readBoundedJson<T = Record<string, unknown>>(
+  req: Request,
+  maxBytes = MAX_ADMIN_JSON_BYTES
+): Promise<T> {
+  const raw = await req.text();
+  if (raw.length > maxBytes) {
+    throw new Error("Request JSON payload exceeds the 64 KB limit.");
+  }
+  if (!raw.trim()) {
+    return {} as T;
+  }
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    throw new Error("Malformed JSON request body.");
+  }
+}
+
+// ============================================================================
+// ADMIN ROUTES & CENTRALIZED AUTHENTICATION + CSRF MIDDLEWARE
+// ============================================================================
+
+// Centralized Cache-Control, CSRF Origin Guard & Admin Auth Guard for /api/admin/*
 app.use("/admin/*", async (c, next) => {
   c.header("Cache-Control", "no-store, no-cache, must-revalidate, private");
+
+  const method = c.req.method.toUpperCase();
+  if (method !== "GET" && method !== "HEAD" && method !== "OPTIONS") {
+    const origin = c.req.header("origin");
+    const referer = c.req.header("referer");
+    let candidateOrigin = origin;
+    if (!candidateOrigin && referer) {
+      try {
+        candidateOrigin = new URL(referer).origin;
+      } catch {
+        candidateOrigin = undefined;
+      }
+    }
+    const hostHeader = c.req.header("x-forwarded-host") || c.req.header("host");
+    if (!isTrustedAdminOrigin(candidateOrigin, hostHeader)) {
+      return c.json(
+        { error: "Forbidden: Untrusted or missing request origin." },
+        403
+      );
+    }
+  }
 
   if (c.req.path === "/api/admin/auth/logout") {
     return next();
@@ -169,6 +243,15 @@ app.use("/admin/*", async (c, next) => {
 
   c.set("adminUser", user);
   await next();
+});
+
+// Admin Logout (does not require active admin check to sign out session cookies, protected by CSRF guard above)
+app.post("/admin/auth/logout", async (c) => {
+  const supabase = await createClient();
+  if (supabase) {
+    await supabase.auth.signOut();
+  }
+  return c.json({ success: true });
 });
 
 // 4. GET & POST /api/admin/projects
@@ -207,8 +290,8 @@ app.get("/admin/projects", async (c) => {
 
 app.post("/admin/projects", async (c) => {
   try {
-    const body = await c.req.json();
-    const project = await createProject(body);
+    const body = await readBoundedJson(c.req.raw);
+    const project = await createProject(body as Parameters<typeof createProject>[0]);
     invalidatePublishedProjectsCache();
     return c.json({ project }, 201);
   } catch (err: unknown) {
@@ -235,8 +318,8 @@ app.get("/admin/projects/:id", async (c) => {
 app.put("/admin/projects/:id", async (c) => {
   const id = c.req.param("id");
   try {
-    const body = await c.req.json();
-    const updated = await updateProject(id, body);
+    const body = await readBoundedJson(c.req.raw);
+    const updated = await updateProject(id, body as Parameters<typeof updateProject>[1]);
     invalidatePublishedProjectsCache();
     return c.json({ project: updated });
   } catch (err: unknown) {
@@ -248,7 +331,7 @@ app.put("/admin/projects/:id", async (c) => {
 app.patch("/admin/projects/:id", async (c) => {
   const id = c.req.param("id");
   try {
-    const body = await c.req.json();
+    const body = await readBoundedJson<{ is_published?: boolean }>(c.req.raw);
     if (typeof body.is_published === "boolean") {
       const updated = await updateProject(id, {
         is_published: body.is_published,
@@ -286,7 +369,7 @@ app.delete("/admin/projects/:id", async (c) => {
 // 6. POST /api/admin/resolve-video
 app.post("/admin/resolve-video", async (c) => {
   try {
-    const { url, title } = await c.req.json();
+    const { url, title } = await readBoundedJson<{ url?: unknown; title?: unknown }>(c.req.raw);
 
     if (!url || typeof url !== "string") {
       return c.json({ error: "Valid video URL is required" }, 400);
@@ -296,11 +379,12 @@ app.post("/admin/resolve-video", async (c) => {
       return c.json({ error: "Invalid or restricted URL format" }, 400);
     }
 
-    const meta = await resolveVideoMetadata(url, title || "");
+    const safeTitle = typeof title === "string" ? title.slice(0, 200) : "";
+    const meta = await resolveVideoMetadata(url, safeTitle);
     return c.json({ meta });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to resolve video metadata";
-    return c.json({ error: message }, 500);
+    return c.json({ error: message }, 400);
   }
 });
 
@@ -351,7 +435,7 @@ app.post("/admin/cv", async (c) => {
 
 app.patch("/admin/cv", async (c) => {
   try {
-    const body = await c.req.json();
+    const body = await readBoundedJson<Record<string, unknown>>(c.req.raw);
     const id = typeof body.id === "string" ? body.id.trim() : "";
     if (!id) {
       return c.json({ error: "CV document ID is required." }, 400);
@@ -379,7 +463,7 @@ app.delete("/admin/cv", async (c) => {
 
     if (!id) {
       try {
-        const body = await c.req.json();
+        const body = await readBoundedJson<Record<string, unknown>>(c.req.raw);
         if (typeof body.id === "string") id = body.id.trim();
       } catch {
         // ignore empty body
@@ -412,7 +496,7 @@ app.get("/admin/inquiries", async (c) => {
 app.patch("/admin/inquiries/:id", async (c) => {
   const id = c.req.param("id");
   try {
-    const body = await c.req.json();
+    const body = await readBoundedJson<{ status?: InquiryStatus }>(c.req.raw);
     const status = body.status as InquiryStatus;
     const inquiry = await updateInquiryStatus(id, status);
     return c.json({ inquiry });

@@ -1,65 +1,38 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { useDhakaClock } from "@/hooks/useDhakaClock";
 import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
 
 export function CurtainFooter() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [timeStr, setTimeStr] = useState<string>("11:45 PM (GMT +6)");
-
-  // Live Asia/Dhaka clock
-  useEffect(() => {
-    function updateClock() {
-      try {
-        const now = new Date();
-        const formatted = now.toLocaleTimeString("en-US", {
-          timeZone: "Asia/Dhaka",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        });
-        setTimeStr(`${formatted} (GMT +6)`);
-      } catch {
-        setTimeStr("11:45 PM (GMT +6)");
-      }
-    }
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const timeStr = useDhakaClock("11:45 PM (GMT +6)");
 
   // Iridescent Liquid Chrome Wordmark Shader Canvas (cross-browser & iOS Safari WebKit safe)
+  // Pauses 60fps animation when occluded behind <main>, when tab is hidden, or under prefers-reduced-motion.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let animationFrameId: number | null = null;
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let prefersReducedMotion = reducedMotionQuery.matches;
+
     const getDpr = () => Math.min(window.devicePixelRatio || 1, 2);
     let width = (canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * getDpr())));
     let height = (canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * getDpr())));
 
-    const handleResize = () => {
-      if (!canvas) return;
-      const dpr = getDpr();
-      width = canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * dpr));
-      height = canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * dpr));
-    };
-    window.addEventListener("resize", handleResize);
-
-    if (typeof document !== "undefined" && "fonts" in document) {
-      document.fonts.ready.then(() => {
-        handleResize();
-      }).catch(() => {});
-    }
-
     let t = 0;
-    const render = () => {
-      t += 0.02;
+
+    const drawFrame = (advanceTime: boolean) => {
+      if (advanceTime) {
+        t += 0.02;
+      }
       const w = width;
       const h = height;
 
@@ -145,15 +118,78 @@ export function CurtainFooter() {
       ctx.lineWidth = Math.max(1, fontSize * 0.007);
       ctx.strokeText("KAMRUL ISLAM", w * 0.5, h * 0.52);
       ctx.restore();
-
-      animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    const isFooterRevealed = (): boolean => {
+      const mainEl = document.querySelector("main");
+      if (!mainEl) return true;
+      return mainEl.getBoundingClientRect().bottom < window.innerHeight + 60;
+    };
+
+    const shouldAnimate = (): boolean => {
+      return !prefersReducedMotion && !document.hidden && isFooterRevealed();
+    };
+
+    const loop = () => {
+      if (!shouldAnimate()) {
+        animationFrameId = null;
+        return;
+      }
+      drawFrame(true);
+      animationFrameId = requestAnimationFrame(loop);
+    };
+
+    const syncLoopState = () => {
+      if (shouldAnimate()) {
+        if (animationFrameId === null) {
+          animationFrameId = requestAnimationFrame(loop);
+        }
+      } else if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    };
+
+    const handleResize = () => {
+      if (!canvas) return;
+      const dpr = getDpr();
+      width = canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * dpr));
+      height = canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * dpr));
+      drawFrame(false);
+      syncLoopState();
+    };
+
+    const handleMotionPreferenceChange = (e: MediaQueryListEvent) => {
+      prefersReducedMotion = e.matches;
+      drawFrame(false);
+      syncLoopState();
+    };
+
+    // Always paint an initial crisp frame immediately so reveal has zero blank flash
+    drawFrame(false);
+    syncLoopState();
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", syncLoopState, { passive: true });
+    document.addEventListener("visibilitychange", syncLoopState);
+    reducedMotionQuery.addEventListener("change", handleMotionPreferenceChange);
+
+    if (typeof document !== "undefined" && "fonts" in document) {
+      document.fonts.ready
+        .then(() => {
+          handleResize();
+        })
+        .catch(() => {});
+    }
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", syncLoopState);
+      document.removeEventListener("visibilitychange", syncLoopState);
+      reducedMotionQuery.removeEventListener("change", handleMotionPreferenceChange);
     };
   }, []);
 

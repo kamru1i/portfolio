@@ -10,6 +10,8 @@ export const CV_BUCKET_NAME = "cv-documents";
 export const MAX_CV_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 export const PUBLIC_CV_DOWNLOAD_FILENAME = "Kamrul-Islam-CV.pdf";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * Sanitizes an uploaded PDF filename to prevent path traversal, control chars, or unsafe characters.
  */
@@ -139,13 +141,16 @@ export async function getAllCvDocumentsForAdmin(): Promise<CvDocumentRecord[]> {
  * Retrieves a single CV record by ID (used by admin routes or preview).
  */
 export async function getCvDocumentById(id: string): Promise<CvDocumentRecord | null> {
+  const cleanId = id.trim();
+  if (!UUID_REGEX.test(cleanId)) return null;
+
   const supabase = await createClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase
     .from("cv_documents")
     .select("*")
-    .eq("id", id)
+    .eq("id", cleanId)
     .maybeSingle();
 
   if (error || !data) return null;
@@ -156,6 +161,9 @@ export async function getCvDocumentById(id: string): Promise<CvDocumentRecord | 
  * Downloads the raw PDF Blob from the controlled cv-documents bucket for a given storage path.
  */
 export async function downloadCvStorageBlob(storagePath: string): Promise<Blob | null> {
+  if (!storagePath || storagePath.includes("..") || !storagePath.startsWith("cv/")) {
+    return null;
+  }
   const supabase = await createClient();
   if (!supabase) return null;
 
@@ -308,12 +316,16 @@ export async function updateCvDocumentState(
     version_label?: string | null;
   }
 ): Promise<CvDocumentRecord> {
+  const cleanId = id.trim();
+  if (!UUID_REGEX.test(cleanId)) {
+    throw new Error("Invalid CV document ID format.");
+  }
   const supabase = await createClient();
   if (!supabase) {
     throw new Error("Supabase is not configured.");
   }
 
-  const target = await getCvDocumentById(id);
+  const target = await getCvDocumentById(cleanId);
   if (!target) {
     throw new Error("CV document not found.");
   }
@@ -323,7 +335,7 @@ export async function updateCvDocumentState(
     await supabase
       .from("cv_documents")
       .update({ is_published: false })
-      .neq("id", id)
+      .neq("id", cleanId)
       .eq("is_published", true);
   }
 
@@ -344,7 +356,7 @@ export async function updateCvDocumentState(
   const { data, error } = await supabase
     .from("cv_documents")
     .update(updatePayload)
-    .eq("id", id)
+    .eq("id", cleanId)
     .select("*")
     .single();
 
@@ -362,12 +374,16 @@ export async function updateCvDocumentState(
  * Deletes a CV document and its underlying PDF file in Supabase Storage.
  */
 export async function deleteCvDocument(id: string): Promise<boolean> {
+  const cleanId = id.trim();
+  if (!UUID_REGEX.test(cleanId)) {
+    throw new Error("Invalid CV document ID format.");
+  }
   const supabase = await createClient();
   if (!supabase) {
     throw new Error("Supabase is not configured.");
   }
 
-  const target = await getCvDocumentById(id);
+  const target = await getCvDocumentById(cleanId);
   if (!target) {
     throw new Error("CV document not found.");
   }
@@ -376,7 +392,7 @@ export async function deleteCvDocument(id: string): Promise<boolean> {
     await supabase.storage.from(CV_BUCKET_NAME).remove([target.storage_path]);
   }
 
-  const { error } = await supabase.from("cv_documents").delete().eq("id", id);
+  const { error } = await supabase.from("cv_documents").delete().eq("id", cleanId);
   if (error) {
     throw new Error(`Failed to delete CV document: ${error.message}`);
   }

@@ -99,7 +99,11 @@ export function AwardsSection() {
                         {item.organization}
                       </span>
                       <span className="font-mono-custom text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/50 group-hover:text-white/80 transition-colors shrink-0">
-                        {item.type === "education" ? "Education" : "Career Role"}
+                        {item.type === "education"
+                          ? "Education"
+                          : item.year === "Current"
+                          ? "Current Client Work"
+                          : "Previous Employment"}
                       </span>
                     </div>
                     <h3 className="font-sans text-xl sm:text-2xl md:text-3xl text-white font-normal tracking-tight transition-colors group-hover:text-white flex items-center gap-2">

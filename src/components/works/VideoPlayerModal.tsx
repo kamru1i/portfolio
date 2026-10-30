@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PortfolioProject } from "@/lib/portfolio-data";
-import { extractYouTubeId, extractVimeoId, detectVideoProvider } from "@/lib/video-metadata";
+import { detectVideoProvider, resolvePlayableEmbedUrl } from "@/lib/video-metadata";
 import {
   MODAL_BACKDROP_CLASSES,
   getTruncatedModalTitle,
@@ -63,20 +63,10 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
 
   const url = project.videoUrl || "";
   const provider = detectVideoProvider(url);
-
-  // Check provider specifics
-  let embedUrl: string | null = null;
-  if (provider === "youtube") {
-    const { videoId } = extractYouTubeId(url);
-    if (videoId) {
-      embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
-    }
-  } else if (provider === "vimeo") {
-    const videoId = extractVimeoId(url);
-    if (videoId) {
-      embedUrl = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
-    }
-  }
+  const embedUrl = resolvePlayableEmbedUrl(url, {
+    autoplay: true,
+    privacyEnhanced: true,
+  });
 
   const isDirectVideo = provider === "local" || (!embedUrl && url.match(/\.(mp4|webm|ogg|mov)$/i));
   const isSocialExternal = !isDirectVideo && !embedUrl;
