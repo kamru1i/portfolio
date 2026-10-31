@@ -1091,9 +1091,9 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
             </div>
           </div>
 
-          {/* Line 2: Year + Your Role + Deliverables */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
+          {/* Line 2: Year + Your Role + Deliverables + Priority Rank + Publishing Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+            <div className="lg:col-span-2">
               <Label htmlFor="project-year" className="mb-1.5">
                 Year
               </Label>
@@ -1107,7 +1107,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               />
             </div>
 
-            <div>
+            <div className="lg:col-span-3">
               <Label htmlFor="project-role" className="mb-1.5">
                 Your Role
               </Label>
@@ -1118,14 +1118,14 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 onChange={(e) => setRole(e.target.value)}
                 placeholder={
                   isVideo
-                    ? "e.g. Video Editor & AI Content Creator"
+                    ? "e.g. Video Editor & AI Creator"
                     : "e.g. Web Developer & UI Engineer"
                 }
                 className="h-10 py-2"
               />
             </div>
 
-            <div>
+            <div className="lg:col-span-3">
               <Label htmlFor="project-deliverables" className="mb-1.5">
                 Deliverables (comma separated)
               </Label>
@@ -1136,11 +1136,52 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 onChange={(e) => setDeliverablesInput(e.target.value)}
                 placeholder={
                   isVideo
-                    ? "e.g. Master Cut, Color Grading, Audio Mix"
-                    : "e.g. Production Web App, Admin CMS, REST API"
+                    ? "e.g. Master Cut, Color, Audio"
+                    : "e.g. Web App, Admin CMS, API"
                 }
                 className="h-10 py-2 font-mono-custom"
               />
+            </div>
+
+            <div className="lg:col-span-2">
+              <div className="flex items-center justify-between mb-1.5">
+                <Label htmlFor="project-priority">Priority Rank</Label>
+                <span className="font-mono-custom text-[10px] text-amber-400">
+                  {manualPriority ? `#${manualPriority}` : "Auto"}
+                </span>
+              </div>
+              <Input
+                id="project-priority"
+                type="number"
+                min="1"
+                step="1"
+                value={manualPriority}
+                onChange={(e) => setManualPriority(e.target.value)}
+                placeholder="e.g. 1, 2..."
+                className="h-10 py-2 font-mono-custom"
+              />
+            </div>
+
+            <div className="lg:col-span-2">
+              <div className="flex items-center justify-between mb-1.5">
+                <Label>Status</Label>
+                <span className="font-mono-custom text-[10px] text-[#777]">
+                  {isPublished ? "Public" : "Hidden"}
+                </span>
+              </div>
+              <Button
+                type="button"
+                variant={isPublished ? "success" : "warning"}
+                onClick={() => setIsPublished(!isPublished)}
+                className="w-full h-10 uppercase tracking-wider text-xs justify-center"
+              >
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    isPublished ? "bg-emerald-400" : "bg-amber-400"
+                  }`}
+                />
+                <span>{isPublished ? "Published" : "Draft"}</span>
+              </Button>
             </div>
           </div>
 
@@ -1194,89 +1235,33 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
           </div>
         </Card>
 
-        {/* Bottom Single-Line Action Bar: Manual Display Priority + Publishing Status + Cancel & Submit */}
-        <Card className="p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            {/* Compact Manual Display Priority */}
-            <div className="flex items-center gap-2.5">
-              <div>
-                <Label htmlFor="project-priority" className="mb-0 text-xs">
-                  Priority Rank
-                </Label>
-                <span className="font-mono-custom text-[10px] text-amber-400 block">
-                  {manualPriority ? `Rank #${manualPriority}` : "Auto Recency"}
-                </span>
-              </div>
-              <Input
-                id="project-priority"
-                type="number"
-                min="1"
-                step="1"
-                value={manualPriority}
-                onChange={(e) => setManualPriority(e.target.value)}
-                placeholder="e.g. 1, 2..."
-                className="w-28 h-9 py-1.5 text-xs font-mono-custom"
-              />
-            </div>
-
-            <div className="hidden sm:block h-8 w-px bg-white/10" />
-
-            {/* Compact Publishing Status */}
-            <div className="flex items-center gap-3">
-              <div>
-                <span className="font-mono-custom text-xs uppercase tracking-wider text-white/90 block">
-                  Status
-                </span>
-                <span className="font-mono-custom text-[10px] text-[#777] block">
-                  {isPublished ? "Public on site" : "Hidden draft"}
-                </span>
-              </div>
-
-              <Button
-                type="button"
-                variant={isPublished ? "success" : "warning"}
-                size="sm"
-                onClick={() => setIsPublished(!isPublished)}
-                className="uppercase tracking-wider h-9 px-3.5"
-              >
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    isPublished ? "bg-emerald-400" : "bg-amber-400"
-                  }`}
-                />
-                <span>{isPublished ? "Published" : "Draft"}</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Cancel + Save & Publish Buttons on the Same Line */}
-          <div className="flex items-center justify-end gap-2.5 shrink-0">
-            <Link
-              href="/admin"
-              className={buttonVariants({
-                variant: "secondary",
-                size: "default",
-                className: "px-4 py-2 h-9 text-xs",
-              })}
-            >
-              Cancel
-            </Link>
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="px-5 py-2 h-9 text-xs"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                  <span>{isEdit ? "Saving..." : "Publishing..."}</span>
-                </>
-              ) : (
-                <span>{isEdit ? "Save Changes" : "Save & Publish Project"}</span>
-              )}
-            </Button>
-          </div>
-        </Card>
+        {/* Clean Bottom Submit Bar — Only Cancel & Save/Publish Project */}
+        <div className="flex items-center justify-end gap-3 pt-1">
+          <Link
+            href="/admin"
+            className={buttonVariants({
+              variant: "secondary",
+              size: "default",
+              className: "px-5 py-2.5 h-10 text-xs",
+            })}
+          >
+            Cancel
+          </Link>
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="px-6 py-2.5 h-10 text-xs"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                <span>{isEdit ? "Saving Changes..." : "Publishing Project..."}</span>
+              </>
+            ) : (
+              <span>{isEdit ? "Save Changes" : "Save & Publish Project"}</span>
+            )}
+          </Button>
+        </div>
       </form>
     </div>
   );
