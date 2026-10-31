@@ -80,11 +80,11 @@ export function VideoSelectedWorks({
               <div className="mt-10 sm:mt-16 md:mt-20 pt-1">
                 <Link
                   href="/projects?type=video"
-                  className="group inline-flex items-center gap-2 font-mono-custom text-[15px] sm:text-[16px] text-white hover:text-white/80 hover-underline-link tracking-normal transition-colors"
+                  className="group inline-flex items-center gap-2 whitespace-nowrap font-mono-custom text-[15px] sm:text-[16px] text-white hover:text-white/80 hover-underline-link tracking-normal transition-colors"
                   aria-label="Explore more video projects"
                 >
                   <span>Explore More</span>
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                  <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </Link>
               </div>
             </div>

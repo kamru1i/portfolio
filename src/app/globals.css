@@ -77,7 +77,8 @@ body {
 /* Elegant Underline Hover Effect */
 .hover-underline-link {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
 }
 

@@ -17,9 +17,9 @@ import { SectionBadge } from "@/components/common/SectionBadge";
 
 const VIDEO_FORMAT_OPTIONS = [
   { id: "all", label: "All Videos" },
-  { id: "16:9", label: "16:9 — Landscape" },
-  { id: "9:16", label: "9:16 — Portrait / Reels & Shorts" },
-  { id: "1:1", label: "1:1 — Square" },
+  { id: "16:9", label: "16:9" },
+  { id: "9:16", label: "9:16" },
+  { id: "1:1", label: "1:1" },
   { id: "4:3", label: "4:3" },
   { id: "5:4", label: "5:4" },
 ] as const;
@@ -97,15 +97,6 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
       .sort(compareProjectsByPriorityAndRecency);
   }, [allProjects]);
 
-  // Filter video projects by selected aspect ratio
-  const filteredVideos = useMemo(() => {
-    if (selectedFormat === "all") return allVideoProjects;
-    return allVideoProjects.filter((p) => {
-      const format = p.format || "16:9";
-      return format === selectedFormat;
-    });
-  }, [allVideoProjects, selectedFormat]);
-
   // Compute counts per aspect ratio format
   const formatCounts = useMemo(() => {
     const counts: Record<string, number> = { all: allVideoProjects.length };
@@ -118,6 +109,27 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
     }
     return counts;
   }, [allVideoProjects]);
+
+  const effectiveSelectedFormat =
+    selectedFormat !== "all" && (formatCounts[selectedFormat] ?? 0) === 0
+      ? "all"
+      : selectedFormat;
+
+  // Filter video projects by selected aspect ratio
+  const filteredVideos = useMemo(() => {
+    if (effectiveSelectedFormat === "all") return allVideoProjects;
+    return allVideoProjects.filter((p) => {
+      const format = p.format || "16:9";
+      return format === effectiveSelectedFormat;
+    });
+  }, [allVideoProjects, effectiveSelectedFormat]);
+
+  // Only show aspect ratio filter buttons that have at least 1 published video
+  const visibleFormatOptions = useMemo(() => {
+    return VIDEO_FORMAT_OPTIONS.filter(
+      (opt) => opt.id === "all" || (formatCounts[opt.id] ?? 0) > 0
+    );
+  }, [formatCounts]);
 
   return (
     <div className="mx-auto w-full max-w-[1536px] px-4 sm:px-6 md:px-10 lg:px-12 pt-28 sm:pt-32 md:pt-36 pb-24">
@@ -224,8 +236,8 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
             <span className="font-mono-custom text-xs text-[#777] uppercase tracking-wider mr-2 hidden sm:inline">
               Format:
             </span>
-            {VIDEO_FORMAT_OPTIONS.map((opt) => {
-              const isSelected = selectedFormat === opt.id;
+            {visibleFormatOptions.map((opt) => {
+              const isSelected = effectiveSelectedFormat === opt.id;
               const count = formatCounts[opt.id] ?? 0;
 
               return (
