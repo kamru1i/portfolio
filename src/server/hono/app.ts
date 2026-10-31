@@ -229,7 +229,10 @@ app.use("/admin/*", async (c, next) => {
     }
   }
 
-  if (c.req.path === "/api/admin/auth/logout") {
+  if (
+    c.req.path === "/api/admin/auth/logout" ||
+    c.req.path === "/api/admin/auth/login"
+  ) {
     return next();
   }
 
@@ -243,6 +246,61 @@ app.use("/admin/*", async (c, next) => {
 
   c.set("adminUser", user);
   await next();
+});
+
+// Admin Login (protected by CSRF origin guard above)
+app.post("/admin/auth/login", async (c) => {
+  try {
+    const supabase = await createClient();
+    if (!supabase) {
+      return c.json({ error: "Supabase is not configured." }, 500);
+    }
+
+    const body = await readBoundedJson<{ email?: unknown; password?: unknown }>(
+      c.req.raw
+    );
+    const email = typeof body.email === "string" ? body.email.trim() : "";
+    const password = typeof body.password === "string" ? body.password : "";
+
+    if (!email || !password) {
+      return c.json({ error: "Email and password are required." }, 400);
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error || !data?.user) {
+      return c.json(
+        { error: error?.message || "Invalid email or password." },
+        401
+      );
+    }
+
+    const { data: adminRecord, error: adminErr } = await supabase
+      .from("admin_users")
+      .select("id")
+      .eq("id", data.user.id)
+      .maybeSingle();
+
+    if (adminErr || !adminRecord) {
+      await supabase.auth.signOut();
+      return c.json(
+        {
+          error:
+            "Access Denied: Your account does not have administrator privileges.",
+        },
+        403
+      );
+    }
+
+    return c.json({ ok: true });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Authentication failed.";
+    return c.json({ error: message }, 400);
+  }
 });
 
 // Admin Logout (does not require active admin check to sign out session cookies, protected by CSRF guard above)

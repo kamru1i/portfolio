@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Lock, ShieldAlert } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,25 +34,31 @@ function LoginForm() {
     setErrorMessage(null);
 
     try {
-      const response = await fetch("/api/admin/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-        }),
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
       });
 
-      const payload = (await response.json().catch(() => null)) as {
-        error?: string;
-        ok?: boolean;
-      } | null;
-
-      if (!response.ok) {
+      if (error || !data?.user) {
         setErrorMessage(
-          payload?.error || "Authentication failed. Please check your credentials."
+          error?.message || "Authentication failed. Please check your credentials."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Verify that this user is in the admin_users allowlist
+      const { data: adminRecord, error: adminErr } = await supabase
+        .from("admin_users")
+        .select("id")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      if (adminErr || !adminRecord) {
+        await supabase.auth.signOut();
+        setErrorMessage(
+          "Access Denied: Your account does not have administrator privileges."
         );
         setLoading(false);
         return;
@@ -59,9 +66,11 @@ function LoginForm() {
 
       router.push("/admin");
       router.refresh();
-    } catch {
+    } catch (err: unknown) {
       setErrorMessage(
-        "Unable to reach authentication server. Please check your connection and try again."
+        err instanceof Error
+          ? err.message
+          : "Unable to reach authentication server. Please check your connection and try again."
       );
       setLoading(false);
     }
