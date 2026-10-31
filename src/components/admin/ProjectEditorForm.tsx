@@ -517,7 +517,7 @@ export function ProjectEditorForm({
       {/* Main Editor Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {isVideo ? (
-          <Card className="p-5 space-y-4">
+          <Card className="p-5 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-mono-custom text-xs uppercase tracking-wider text-sky-400">
                 Video Source, Aspect Ratio &amp; Thumbnail
@@ -527,9 +527,10 @@ export function ProjectEditorForm({
               </span>
             </div>
 
-            {/* Row 1: Video URL + Detect & Preview Button + Inline Compact Aspect Ratio Icons */}
-            <div className="flex flex-col xl:flex-row xl:items-end gap-4">
-              <div className="flex-1 min-w-0">
+            {/* Single Line: Video URL + Detect + Aspect Ratio + Video Thumbnail (Drag & Drop / Paste / Upload) */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-3.5 items-end">
+              {/* 1. Video URL + Detect Button */}
+              <div className="xl:col-span-5 min-w-0">
                 <Label htmlFor="project-video-url" className="mb-1.5">
                   Video URL (YouTube, Vimeo, TikTok, MP4, etc.) *
                 </Label>
@@ -543,15 +544,15 @@ export function ProjectEditorForm({
                       if (!isEdit) handleResolveVideo();
                     }}
                     required
-                    placeholder="https://www.youtube.com/watch?v=... or https://www.tiktok.com/@..."
-                    className="flex-1 h-10 py-2"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="flex-1 h-11 py-2"
                   />
                   <Button
                     type="button"
                     variant="secondary"
                     onClick={() => handleResolveVideo()}
                     disabled={resolvingVideo || !videoUrl.trim()}
-                    className="h-10 px-3.5 py-2 shrink-0 text-xs"
+                    className="h-11 px-3.5 py-2 shrink-0 text-xs"
                   >
                     {resolvingVideo ? (
                       <>
@@ -568,19 +569,17 @@ export function ProjectEditorForm({
                 </div>
               </div>
 
-              {/* Compact Boxless Aspect Ratio Selector right after Detect */}
-              <div className="shrink-0">
-                <span className="font-mono-custom text-[10px] uppercase tracking-wider text-[#777] block mb-1 xl:text-right">
-                  Aspect Ratio *
-                </span>
-                <div className="flex items-center gap-1 sm:gap-1.5 bg-black/30 px-2 py-1 rounded-xl border border-white/10">
+              {/* 2. Compact Aspect Ratio Selector */}
+              <div className="xl:col-span-3 shrink-0">
+                <Label className="mb-1.5">Aspect Ratio *</Label>
+                <div className="h-11 flex items-center justify-between gap-1 bg-black/30 px-2 py-1 rounded-xl border border-white/10">
                   {(
                     [
-                      { id: "16:9", label: "16:9", box: "w-6 h-3.5" },
-                      { id: "9:16", label: "9:16", box: "w-3 h-5" },
-                      { id: "1:1", label: "1:1", box: "w-4 h-4" },
-                      { id: "4:3", label: "4:3", box: "w-5 h-3.5" },
-                      { id: "5:4", label: "5:4", box: "w-4.5 h-3.5" },
+                      { id: "16:9", label: "16:9", box: "w-5 h-3" },
+                      { id: "9:16", label: "9:16", box: "w-2.5 h-4" },
+                      { id: "1:1", label: "1:1", box: "w-3.5 h-3.5" },
+                      { id: "4:3", label: "4:3", box: "w-4.5 h-3" },
+                      { id: "5:4", label: "5:4", box: "w-4 h-3" },
                     ] as const
                   ).map((opt) => {
                     const isSelected = aspectRatio === opt.id;
@@ -589,7 +588,7 @@ export function ProjectEditorForm({
                         key={opt.id}
                         type="button"
                         onClick={() => setAspectRatio(opt.id as AspectRatio)}
-                        className={`px-2.5 py-1 rounded-lg flex flex-col items-center justify-center gap-1 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                        className={`flex-1 h-full px-1.5 rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                           isSelected
                             ? "bg-white/15 text-white shadow-xs"
                             : "text-[#777] hover:text-white hover:bg-white/5"
@@ -598,7 +597,7 @@ export function ProjectEditorForm({
                         <span className="font-mono-custom text-[10px] font-semibold leading-none">
                           {opt.label}
                         </span>
-                        <div className="h-5 flex items-center justify-center">
+                        <div className="h-4 flex items-center justify-center">
                           <div
                             className={`${opt.box} border ${
                               isSelected
@@ -612,18 +611,21 @@ export function ProjectEditorForm({
                   })}
                 </div>
               </div>
-            </div>
 
-            {resolveError && (
-              <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-200 text-xs font-mono-custom">
-                {resolveError} — Upload, drag &amp; drop, or paste (`Ctrl+V`) a custom thumbnail below.
-              </div>
-            )}
+              {/* 3. Video Thumbnail (Drag & Drop / Paste / Upload) on the Same Line */}
+              <div className="xl:col-span-4 min-w-0">
+                <div className="flex items-center justify-between mb-1.5">
+                  <Label>Video Thumbnail</Label>
+                  {videoThumbnailUrl && (
+                    <Badge
+                      variant={isCustomVideoThumbnail ? "success" : "info"}
+                      className="text-[9px] px-1.5 py-0"
+                    >
+                      {isCustomVideoThumbnail ? "Custom" : "Auto"}
+                    </Badge>
+                  )}
+                </div>
 
-            {/* Row 2: Compact Video Thumbnail (Drag & Drop + Paste + Upload + Direct URL + Preview) */}
-            <div className="pt-2 border-t border-white/10 space-y-2.5">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
-                {/* Drag & Drop / Paste / Upload Box */}
                 <div
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -636,15 +638,15 @@ export function ProjectEditorForm({
                     setIsDraggingOver(false);
                   }}
                   onDrop={(e) => handleDropImage(e, "video")}
-                  className={`lg:col-span-7 p-3.5 rounded-xl border border-dashed transition-all flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                  className={`h-11 px-3 rounded-xl border border-dashed transition-all flex items-center justify-between gap-2 ${
                     isDraggingOver
                       ? "bg-sky-500/10 border-sky-400 ring-2 ring-sky-400/25"
                       : "bg-[#18181b] border-white/20 hover:border-white/40"
                   }`}
                 >
-                  <div className="flex items-center gap-3 text-center sm:text-left min-w-0">
-                    {(videoThumbnailUrl || fallbackSvgThumbnail) ? (
-                      <div className="relative w-16 h-11 rounded-md overflow-hidden bg-black shrink-0 border border-white/15">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {videoThumbnailUrl || fallbackSvgThumbnail ? (
+                      <div className="relative w-12 h-8 rounded overflow-hidden bg-black shrink-0 border border-white/15">
                         <Image
                           src={videoThumbnailUrl || fallbackSvgThumbnail || ""}
                           alt="Video thumbnail preview"
@@ -654,28 +656,15 @@ export function ProjectEditorForm({
                         />
                       </div>
                     ) : (
-                      <div className="hidden sm:flex w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 items-center justify-center text-sky-400 shrink-0">
-                        <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                      <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+                        <ImagePlus className="h-3.5 w-3.5" aria-hidden="true" />
                       </div>
                     )}
                     <div className="min-w-0">
-                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
-                        <p className="font-sans text-xs font-medium text-white truncate">
-                          {isDraggingOver
-                            ? "Drop Thumbnail Here"
-                            : "Video Thumbnail (Auto or Custom)"}
-                        </p>
-                        {videoThumbnailUrl && (
-                          <Badge
-                            variant={isCustomVideoThumbnail ? "success" : "info"}
-                            className="text-[9px] px-1.5 py-0"
-                          >
-                            {isCustomVideoThumbnail ? "Custom" : "Auto"}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="font-mono-custom text-[10px] text-[#888] truncate">
-                        Auto-detects from YouTube/Vimeo, or Drag &amp; Drop / Paste (`Ctrl+V`)
+                      <p className="font-mono-custom text-[10px] text-[#aaa] truncate">
+                        {isDraggingOver
+                          ? "Drop Image Here"
+                          : "Drop, Paste (Ctrl+V), or Upload"}
                       </p>
                     </div>
                   </div>
@@ -710,7 +699,7 @@ export function ProjectEditorForm({
                       <span>Paste</span>
                     </Button>
 
-                    <label className="px-3 py-1.5 rounded-lg bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-xs">
+                    <label className="px-2.5 py-1 rounded-lg bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-1 shrink-0 shadow-xs">
                       {uploadingScreenshot ? (
                         <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
                       ) : (
@@ -748,39 +737,20 @@ export function ProjectEditorForm({
                     )}
                   </div>
                 </div>
-
-                {/* Direct Thumbnail URL Input on the Same Row */}
-                <div className="lg:col-span-5 flex flex-col justify-center bg-[#18181b] p-3.5 rounded-xl border border-white/10">
-                  <Label
-                    htmlFor="project-video-thumbnail-url"
-                    className="text-[10px] text-[#777] mb-1"
-                  >
-                    Or Paste Thumbnail Image URL / Path Directly
-                  </Label>
-                  <Input
-                    id="project-video-thumbnail-url"
-                    type="text"
-                    value={videoThumbnailUrl}
-                    onChange={(e) => {
-                      const nextVal = e.target.value;
-                      setVideoThumbnailUrl(nextVal);
-                      setIsCustomVideoThumbnail(
-                        Boolean(nextVal.trim()) &&
-                          nextVal.trim() !== autoDetectedThumbnail
-                      );
-                    }}
-                    placeholder="https://i.ytimg.com/... or /images/..."
-                    className="h-8 py-1 text-xs font-mono-custom"
-                  />
-                </div>
               </div>
-
-              {screenshotError && (
-                <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
-                  {screenshotError}
-                </div>
-              )}
             </div>
+
+            {resolveError && (
+              <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-200 text-xs font-mono-custom">
+                {resolveError} — Upload, drag &amp; drop, or paste (`Ctrl+V`) a custom thumbnail.
+              </div>
+            )}
+
+            {screenshotError && (
+              <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
+                {screenshotError}
+              </div>
+            )}
           </Card>
         ) : (
           <Card className="p-5 space-y-4">
@@ -873,106 +843,94 @@ export function ProjectEditorForm({
                   setIsDraggingOver(false);
                 }}
                 onDrop={(e) => handleDropImage(e, "web")}
-                className={`lg:col-span-6 p-3.5 rounded-xl border border-dashed transition-all flex flex-col justify-between gap-2.5 ${
+                className={`lg:col-span-6 p-3.5 rounded-xl border border-dashed transition-all flex items-center justify-between gap-2.5 ${
                   isDraggingOver
                     ? "bg-purple-500/10 border-purple-400 ring-2 ring-purple-400/25"
                     : "bg-[#18181b] border-white/20 hover:border-white/40"
                 }`}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    {webPreviewImageUrl ? (
-                      <div className="relative w-14 h-9 rounded overflow-hidden bg-[#0e0e0e] border border-white/15 shrink-0">
-                        <Image
-                          src={webPreviewImageUrl}
-                          alt="Screenshot preview"
-                          fill
-                          unoptimized
-                          className="object-cover object-top"
-                        />
-                      </div>
-                    ) : (
-                      <div className="hidden sm:flex w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 items-center justify-center text-purple-400 shrink-0">
-                        <ImagePlus className="h-4 w-4" aria-hidden="true" />
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-sans text-xs font-medium text-white truncate">
-                          {isDraggingOver
-                            ? "Drop Screenshot Here"
-                            : "Homepage Screenshot *"}
-                        </span>
-                        {webPreviewImageUrl && (
-                          <Badge variant="success" className="text-[9px] px-1.5 py-0">
-                            Ready
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="font-mono-custom text-[10px] text-[#888] truncate">
-                        Drag &amp; Drop, Paste (`Ctrl+V` / `Win+V`), or Upload
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="xs"
-                      disabled={uploadingScreenshot}
-                      onClick={() => handleClipboardButtonPaste("web")}
-                      title="Paste copied screenshot from clipboard (Ctrl+V)"
-                    >
-                      <ClipboardPaste className="h-3 w-3" aria-hidden="true" />
-                      <span>Paste</span>
-                    </Button>
-
-                    <label className="px-3 py-1.5 rounded-lg bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-xs">
-                      {uploadingScreenshot ? (
-                        <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
-                      ) : (
-                        <Upload className="h-3 w-3" aria-hidden="true" />
-                      )}
-                      <span>{uploadingScreenshot ? "..." : "Upload"}</span>
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp,image/avif"
-                        disabled={uploadingScreenshot}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            void handleUploadImage(file, "web");
-                            e.target.value = "";
-                          }
-                        }}
-                        className="hidden"
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {webPreviewImageUrl ? (
+                    <div className="relative w-14 h-9 rounded overflow-hidden bg-[#0e0e0e] border border-white/15 shrink-0">
+                      <Image
+                        src={webPreviewImageUrl}
+                        alt="Screenshot preview"
+                        fill
+                        unoptimized
+                        className="object-cover object-top"
                       />
-                    </label>
-
-                    {webPreviewImageUrl && (
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="xs"
-                        onClick={() => setWebPreviewImageUrl("")}
-                        title="Remove Screenshot"
-                      >
-                        <Trash2 className="h-3 w-3" aria-hidden="true" />
-                      </Button>
-                    )}
+                    </div>
+                  ) : (
+                    <div className="hidden sm:flex w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 items-center justify-center text-purple-400 shrink-0">
+                      <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-sans text-xs font-medium text-white truncate">
+                        {isDraggingOver
+                          ? "Drop Screenshot Here"
+                          : "Homepage Screenshot *"}
+                      </span>
+                      {webPreviewImageUrl && (
+                        <Badge variant="success" className="text-[9px] px-1.5 py-0">
+                          Ready
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="font-mono-custom text-[10px] text-[#888] truncate">
+                      Drag &amp; Drop, Paste (`Ctrl+V` / `Win+V`), or Upload
+                    </p>
                   </div>
                 </div>
 
-                {/* Compact Direct URL Input inside the same card */}
-                <Input
-                  id="project-screenshot-url"
-                  type="text"
-                  value={webPreviewImageUrl}
-                  onChange={(e) => setWebPreviewImageUrl(e.target.value)}
-                  placeholder="Or paste screenshot URL / path (/images/web-projects/... or https://...)"
-                  className="h-7 py-1 px-2.5 text-[11px] font-mono-custom bg-black/40"
-                />
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="xs"
+                    disabled={uploadingScreenshot}
+                    onClick={() => handleClipboardButtonPaste("web")}
+                    title="Paste copied screenshot from clipboard (Ctrl+V)"
+                  >
+                    <ClipboardPaste className="h-3 w-3" aria-hidden="true" />
+                    <span>Paste</span>
+                  </Button>
+
+                  <label className="px-3 py-1.5 rounded-lg bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-xs">
+                    {uploadingScreenshot ? (
+                      <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Upload className="h-3 w-3" aria-hidden="true" />
+                    )}
+                    <span>{uploadingScreenshot ? "..." : "Upload"}</span>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/avif"
+                      disabled={uploadingScreenshot}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          void handleUploadImage(file, "web");
+                          e.target.value = "";
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {webPreviewImageUrl && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="xs"
+                      onClick={() => setWebPreviewImageUrl("")}
+                      title="Remove Screenshot"
+                    >
+                      <Trash2 className="h-3 w-3" aria-hidden="true" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
 
