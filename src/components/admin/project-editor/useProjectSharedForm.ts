@@ -116,7 +116,9 @@ export function useProjectSharedForm({
     }
     return "";
   });
-  const [isPublished, setIsPublished] = useState(initialProject?.is_published ?? true);
+  const [isPublished, setIsPublished] = useState(
+    initialProject?.is_published ?? false
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

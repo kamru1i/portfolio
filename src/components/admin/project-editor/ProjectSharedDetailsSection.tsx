@@ -114,7 +114,7 @@ export function ProjectSharedDetailsSection({
           </div>
         </div>
 
-        {/* Line 2: Year + Your Role + Deliverables + Priority Rank + Publishing Status */}
+        {/* Line 2: Year + Your Role + Deliverables + Priority Rank */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
           <div className="lg:col-span-2">
             <Label htmlFor="project-year" className="mb-1.5">
@@ -130,7 +130,7 @@ export function ProjectSharedDetailsSection({
             />
           </div>
 
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
             <Label htmlFor="project-role" className="mb-1.5">
               Your Role
             </Label>
@@ -148,7 +148,7 @@ export function ProjectSharedDetailsSection({
             />
           </div>
 
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
             <Label htmlFor="project-deliverables" className="mb-1.5">
               Deliverables (comma separated)
             </Label>
@@ -183,28 +183,6 @@ export function ProjectSharedDetailsSection({
               placeholder="e.g. 1, 2..."
               className="h-10 py-2 font-mono-custom"
             />
-          </div>
-
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-1.5">
-              <Label>Status</Label>
-              <span className="font-mono-custom text-[10px] text-[#777]">
-                {isPublished ? "Public" : "Hidden"}
-              </span>
-            </div>
-            <Button
-              type="button"
-              variant={isPublished ? "success" : "warning"}
-              onClick={() => setIsPublished(!isPublished)}
-              className="w-full h-10 uppercase tracking-wider text-xs justify-center"
-            >
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  isPublished ? "bg-emerald-400" : "bg-amber-400"
-                }`}
-              />
-              <span>{isPublished ? "Published" : "Draft"}</span>
-            </Button>
           </div>
         </div>
 
@@ -258,8 +236,42 @@ export function ProjectSharedDetailsSection({
         </div>
       </Card>
 
-      {/* Clean Bottom Submit Bar — Only Cancel & Save/Publish Project */}
-      <div className="flex items-center justify-end gap-3 pt-1">
+      {/* Clean Bottom Submit Bar — Publish/Draft Toggle + Cancel + Save Action */}
+      <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+        {/* Publish / Draft Toggle Switch */}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isPublished}
+          aria-label={isPublished ? "Status: Publish" : "Status: Draft"}
+          onClick={() => setIsPublished(!isPublished)}
+          className={`group inline-flex items-center gap-3 px-4 h-10 rounded-xl border font-mono-custom text-xs uppercase tracking-wider transition-all cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+            isPublished
+              ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-300 hover:border-emerald-400/60"
+              : "bg-white/4 border-white/12 text-amber-300/90 hover:border-white/25 hover:bg-white/6"
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border transition-colors duration-200 ${
+              isPublished
+                ? "bg-emerald-500 border-emerald-400"
+                : "bg-white/12 border-white/20"
+            }`}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 rounded-full transition-transform duration-200 ${
+                isPublished
+                  ? "translate-x-4 bg-black shadow-xs"
+                  : "translate-x-0.5 bg-amber-400"
+              }`}
+            />
+          </span>
+          <span className="min-w-[52px] text-left font-medium">
+            {isPublished ? "Publish" : "Draft"}
+          </span>
+        </button>
+
         <Link
           href={shared.returnUrl}
           onClick={(e) => {
@@ -285,10 +297,14 @@ export function ProjectSharedDetailsSection({
           {submitting ? (
             <>
               <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-              <span>{isEdit ? "Saving Changes..." : "Publishing Project..."}</span>
+              <span>
+                {isPublished ? "Publishing Project..." : "Saving as Draft..."}
+              </span>
             </>
           ) : (
-            <span>{isEdit ? "Save Changes" : "Save & Publish Project"}</span>
+            <span>
+              {isPublished ? "Save & Publish Project" : "Save & Draft Project"}
+            </span>
           )}
         </Button>
       </div>
