@@ -368,7 +368,7 @@ export function AdminExecutiveOverview({
                 </div>
                 <div className="min-w-0">
                   <h2 className="font-sans text-sm font-semibold text-white">
-                    CV / Resume Status
+                    Curriculum Vitae Status
                   </h2>
                   <p className="font-mono-custom text-[11px] text-[#777]">
                     Active Curriculum Vitae served on /cv

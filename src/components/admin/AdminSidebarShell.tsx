@@ -15,11 +15,15 @@ import {
   ChevronDown,
   Inbox,
   FileText,
+  FileCheck2,
+  Briefcase,
+  FileSignature,
   Menu,
   X,
   type LucideIcon,
 } from "lucide-react";
 import type { ProjectType } from "@/types/project";
+import type { DocumentCategory } from "@/lib/cv-service";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 import { AdminNavLogout } from "@/app/admin/(dashboard)/AdminNavLogout";
 import { Badge } from "@/components/ui/badge";
@@ -34,16 +38,30 @@ export type AdminProjectSubTab =
   | "drafts";
 
 export const ADMIN_VIEW_EVENT = "admin-cms-view-change";
+export const ADMIN_DOC_EVENT = "admin-cms-doc-change";
 
 export interface AdminViewEventDetail {
   mode: "dashboard" | "projects";
   tab?: AdminProjectSubTab;
 }
 
+export interface AdminDocEventDetail {
+  category: DocumentCategory;
+}
+
 export function dispatchAdminViewChange(detail: AdminViewEventDetail) {
   if (typeof window === "undefined") return;
   window.dispatchEvent(
     new CustomEvent<AdminViewEventDetail>(ADMIN_VIEW_EVENT, { detail })
+  );
+}
+
+export function dispatchAdminDocChange(category: DocumentCategory) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent<AdminDocEventDetail>(ADMIN_DOC_EVENT, {
+      detail: { category },
+    })
   );
 }
 
@@ -59,6 +77,17 @@ function isValidProjectSubTab(
   );
 }
 
+function isValidDocumentCategory(
+  value: string | null | undefined
+): value is DocumentCategory {
+  return (
+    value === "cv" ||
+    value === "resume" ||
+    value === "portfolio" ||
+    value === "cover-letter"
+  );
+}
+
 interface AdminSidebarShellProps {
   userEmail: string;
   children: React.ReactNode;
@@ -69,7 +98,10 @@ type NavItemId =
   | "all-projects"
   | "new-project"
   | "inquiries"
-  | "cv";
+  | "cv"
+  | "resume"
+  | "portfolio"
+  | "cover-letter";
 
 interface NavItem {
   id: NavItemId;
@@ -128,9 +160,27 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       {
         id: "cv",
-        label: "CV / Resume",
-        href: "/admin/cv",
+        label: "Curriculum Vitae",
+        href: "/admin/cv?type=cv",
         icon: FileText,
+      },
+      {
+        id: "resume",
+        label: "Resume",
+        href: "/admin/cv?type=resume",
+        icon: FileCheck2,
+      },
+      {
+        id: "portfolio",
+        label: "Portfolio",
+        href: "/admin/cv?type=portfolio",
+        icon: Briefcase,
+      },
+      {
+        id: "cover-letter",
+        label: "Cover Letter",
+        href: "/admin/cv?type=cover-letter",
+        icon: FileSignature,
       },
     ],
   },
@@ -191,12 +241,13 @@ const PROJECT_SUB_ITEMS: {
 
 function resolveRouteNavId(
   pathname: string,
-  isAllProjectsMode: boolean
+  isAllProjectsMode: boolean,
+  activeDocCategory: DocumentCategory
 ): NavItemId {
   if (pathname === "/admin/projects/new") return "new-project";
   if (pathname.startsWith("/admin/projects/")) return "all-projects";
   if (pathname.startsWith("/admin/inquiries")) return "inquiries";
-  if (pathname.startsWith("/admin/cv")) return "cv";
+  if (pathname.startsWith("/admin/cv")) return activeDocCategory;
   if (pathname === "/admin" && isAllProjectsMode) {
     return "all-projects";
   }
@@ -218,8 +269,11 @@ function resolveBreadcrumbTitle(
   if (pathname.startsWith("/admin/inquiries") || activeId === "inquiries") {
     return "Client Inquiries";
   }
+  if (activeId === "resume") return "Resume";
+  if (activeId === "portfolio") return "Portfolio";
+  if (activeId === "cover-letter") return "Cover Letter";
   if (pathname.startsWith("/admin/cv") || activeId === "cv") {
-    return "CV / Resume";
+    return "Curriculum Vitae";
   }
   if (activeId === "all-projects") {
     if (activeProjectsSubTab === "video") return "Video Projects";
@@ -244,6 +298,8 @@ export function AdminSidebarShell({
   const [allProjectsExpanded, setAllProjectsExpanded] = useState(false);
   const [activeProjectsSubTab, setActiveProjectsSubTab] =
     useState<AdminProjectSubTab>("all");
+  const [activeDocCategory, setActiveDocCategory] =
+    useState<DocumentCategory>("cv");
 
   // Collapsible state for "New Project" submenu ("Video Project" / "Web Project")
   const [newProjectExpanded, setNewProjectExpanded] = useState<boolean>(
@@ -299,6 +355,9 @@ export function AdminSidebarShell({
       if (t === "web" || t === "video") {
         setNewProjectDiscipline(t);
       }
+      if (pathname.startsWith("/admin/cv")) {
+        setActiveDocCategory(isValidDocumentCategory(t) ? t : "cv");
+      }
       if (pathname === "/admin/projects/new") {
         setNewProjectExpanded(true);
       }
@@ -318,21 +377,30 @@ export function AdminSidebarShell({
       }
     };
 
+    const handleCustomDocEvent = (e: Event) => {
+      const custom = e as CustomEvent<AdminDocEventDetail>;
+      if (custom.detail?.category) {
+        setActiveDocCategory(custom.detail.category);
+      }
+    };
+
     syncLocationState();
     window.addEventListener("hashchange", syncLocationState);
     window.addEventListener("popstate", syncLocationState);
     window.addEventListener(ADMIN_VIEW_EVENT, handleCustomViewEvent);
+    window.addEventListener(ADMIN_DOC_EVENT, handleCustomDocEvent);
     return () => {
       window.removeEventListener("hashchange", syncLocationState);
       window.removeEventListener("popstate", syncLocationState);
       window.removeEventListener(ADMIN_VIEW_EVENT, handleCustomViewEvent);
+      window.removeEventListener(ADMIN_DOC_EVENT, handleCustomDocEvent);
     };
   }, [pathname]);
 
   const activeNavId: NavItemId =
     navOverride && navOverride.fromPathname === pathname
       ? navOverride.targetId
-      : resolveRouteNavId(pathname, isAllProjectsMode);
+      : resolveRouteNavId(pathname, isAllProjectsMode, activeDocCategory);
 
   const isNewProjectMenuOpen = newProjectExpanded;
   const isAllProjectsMenuOpen = allProjectsExpanded;
@@ -361,7 +429,7 @@ export function AdminSidebarShell({
     }
   };
 
-  const handleNavClick = (item: NavItem) => {
+  const handleNavClick = (item: NavItem, e?: React.MouseEvent) => {
     setMobileDrawerOpen(false);
 
     if (item.id === "dashboard") {
@@ -384,7 +452,28 @@ export function AdminSidebarShell({
       return;
     }
 
-    // Navigating to a dedicated route (/admin/inquiries, /admin/cv):
+    if (
+      item.id === "cv" ||
+      item.id === "resume" ||
+      item.id === "portfolio" ||
+      item.id === "cover-letter"
+    ) {
+      setIsAllProjectsMode(false);
+      setNewProjectExpanded(false);
+      setActiveDocCategory(item.id);
+      if (pathname.startsWith("/admin/cv")) {
+        e?.preventDefault();
+        setNavOverride(null);
+        window.history.replaceState(null, "", `/admin/cv?type=${item.id}`);
+        dispatchAdminDocChange(item.id);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setNavOverride({ fromPathname: pathname, targetId: item.id });
+      }
+      return;
+    }
+
+    // Navigating to a dedicated route (/admin/inquiries):
     setIsAllProjectsMode(false);
     setNewProjectExpanded(false);
     setNavOverride({ fromPathname: pathname, targetId: item.id });
@@ -666,7 +755,7 @@ export function AdminSidebarShell({
                   <Link
                     key={item.id}
                     href={item.href}
-                    onClick={() => handleNavClick(item)}
+                    onClick={(e) => handleNavClick(item, e)}
                     aria-current={isActive ? "page" : undefined}
                     className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-mono-custom text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                       isActive

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -14,7 +14,17 @@ import {
   AlertTriangle,
   Loader2,
 } from "lucide-react";
-import { CvDocumentRecord } from "@/lib/cv-service";
+import {
+  CvDocumentRecord,
+  DOCUMENT_CATEGORIES,
+  DocumentCategory,
+  getDocumentCategory,
+  normalizeDocumentCategory,
+} from "@/lib/cv-service";
+import {
+  ADMIN_DOC_EVENT,
+  AdminDocEventDetail,
+} from "@/components/admin/AdminSidebarShell";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -54,14 +64,16 @@ function formatDateTime(iso: string | null | undefined): string {
 }
 
 export default function AdminCvManagementPage() {
+  const [activeCategory, setActiveCategory] = useState<DocumentCategory>("cv");
   const [documents, setDocuments] = useState<CvDocumentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [fileWarning, setFileWarning] = useState<string | null>(null);
 
-  // Upload form state
+  // Upload form state (Title starts empty as requested so admin types it on upload)
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [title, setTitle] = useState("Kamrul Islam — Curriculum Vitae");
+  const [title, setTitle] = useState("");
   const [versionLabel, setVersionLabel] = useState("");
   const [publishImmediately, setPublishImmediately] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -73,20 +85,53 @@ export default function AdminCvManagementPage() {
   const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<CvDocumentRecord | null>(null);
   const [previewDoc, setPreviewDoc] = useState<CvDocumentRecord | null>(null);
 
+  const categoryMeta = DOCUMENT_CATEGORIES[activeCategory];
+
   const loadDocuments = async () => {
     try {
       const res = await fetch("/api/admin/cv", { cache: "no-store" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || "Failed to load CV documents");
+        throw new Error(data.error || "Failed to load documents");
       }
       setDocuments(data.documents || []);
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Unable to load CV documents");
+      setErrorMsg(err instanceof Error ? err.message : "Unable to load documents");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const syncFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const nextCat = normalizeDocumentCategory(params.get("type"));
+      setActiveCategory(nextCat);
+      setErrorMsg(null);
+      setSuccessMsg(null);
+      setFileWarning(null);
+      setPreviewDoc(null);
+    };
+
+    const handleDocEvent = (e: Event) => {
+      const custom = e as CustomEvent<AdminDocEventDetail>;
+      if (custom.detail?.category) {
+        setActiveCategory(custom.detail.category);
+        setErrorMsg(null);
+        setSuccessMsg(null);
+        setFileWarning(null);
+        setPreviewDoc(null);
+      }
+    };
+
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    window.addEventListener(ADMIN_DOC_EVENT, handleDocEvent);
+    return () => {
+      window.removeEventListener("popstate", syncFromUrl);
+      window.removeEventListener(ADMIN_DOC_EVENT, handleDocEvent);
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -95,14 +140,14 @@ export default function AdminCvManagementPage() {
         const res = await fetch("/api/admin/cv", { cache: "no-store" });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          throw new Error(data.error || "Failed to load CV documents");
+          throw new Error(data.error || "Failed to load documents");
         }
         if (isMounted) {
           setDocuments(data.documents || []);
         }
       } catch (err: unknown) {
         if (isMounted) {
-          setErrorMsg(err instanceof Error ? err.message : "Unable to load CV documents");
+          setErrorMsg(err instanceof Error ? err.message : "Unable to load documents");
         }
       } finally {
         if (isMounted) {
@@ -115,11 +160,20 @@ export default function AdminCvManagementPage() {
     };
   }, []);
 
-  const activeDocument = documents.find((d) => d.is_published) || null;
+  const categoryDocuments = useMemo(
+    () => documents.filter((d) => getDocumentCategory(d) === activeCategory),
+    [documents, activeCategory]
+  );
+
+  const activeDocument = useMemo(
+    () => categoryDocuments.find((d) => d.is_published) || null,
+    [categoryDocuments]
+  );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMsg(null);
     setSuccessMsg(null);
+    setFileWarning(null);
     const file = e.target.files?.[0] || null;
     if (!file) {
       setSelectedFile(null);
@@ -127,14 +181,16 @@ export default function AdminCvManagementPage() {
     }
 
     if (!file.name.toLowerCase().endsWith(".pdf") || file.type !== "application/pdf") {
-      setErrorMsg("Only PDF files (.pdf, application/pdf) are allowed.");
+      setFileWarning(
+        "Only valid PDF files (.pdf, application/pdf) are allowed."
+      );
       e.target.value = "";
       setSelectedFile(null);
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setErrorMsg("File exceeds the 10 MB maximum size limit.");
+      setFileWarning("File exceeds the 10 MB maximum size limit.");
       e.target.value = "";
       setSelectedFile(null);
       return;
@@ -146,7 +202,7 @@ export default function AdminCvManagementPage() {
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) {
-      setErrorMsg("Please choose a PDF file to upload.");
+      setFileWarning("Please attach a PDF file (max 10 MB) before uploading.");
       return;
     }
 
@@ -154,10 +210,12 @@ export default function AdminCvManagementPage() {
       setUploading(true);
       setErrorMsg(null);
       setSuccessMsg(null);
+      setFileWarning(null);
 
       const formData = new FormData();
       formData.append("file", selectedFile);
-      formData.append("title", title.trim() || "Kamrul Islam — Curriculum Vitae");
+      formData.append("category", activeCategory);
+      formData.append("title", title.trim() || categoryMeta.defaultTitle);
       if (versionLabel.trim()) {
         formData.append("versionLabel", versionLabel.trim());
       }
@@ -170,10 +228,11 @@ export default function AdminCvManagementPage() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || "Failed to upload CV PDF");
+        throw new Error(data.error || `Failed to upload ${categoryMeta.shortLabel} PDF`);
       }
 
       setSelectedFile(null);
+      setTitle("");
       setVersionLabel("");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -181,12 +240,12 @@ export default function AdminCvManagementPage() {
 
       setSuccessMsg(
         publishImmediately
-          ? "CV PDF uploaded and published live on /cv."
-          : "CV PDF uploaded as a draft version."
+          ? `${categoryMeta.label} PDF uploaded and published.`
+          : `${categoryMeta.label} PDF uploaded as a draft version.`
       );
       await loadDocuments();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to upload CV");
+      setErrorMsg(err instanceof Error ? err.message : "Failed to upload document");
     } finally {
       setUploading(false);
     }
@@ -214,12 +273,12 @@ export default function AdminCvManagementPage() {
 
       setSuccessMsg(
         !doc.is_published
-          ? `"${doc.file_name}" is now published as the active CV on /cv.`
-          : `"${doc.file_name}" has been unpublished from /cv.`
+          ? `"${doc.file_name}" is now published as the active ${categoryMeta.label}.`
+          : `"${doc.file_name}" has been unpublished.`
       );
       await loadDocuments();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to update CV status");
+      setErrorMsg(err instanceof Error ? err.message : "Failed to update status");
     } finally {
       setUpdatingId(null);
     }
@@ -238,21 +297,24 @@ export default function AdminCvManagementPage() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || "Failed to delete CV document");
+        throw new Error(data.error || "Failed to delete document");
       }
 
       if (previewDoc?.id === confirmDeleteDoc.id) {
         setPreviewDoc(null);
       }
       setConfirmDeleteDoc(null);
-      setSuccessMsg("CV document and storage file deleted permanently.");
+      setSuccessMsg(`${categoryMeta.label} document deleted permanently.`);
       await loadDocuments();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to delete CV");
+      setErrorMsg(err instanceof Error ? err.message : "Failed to delete document");
     } finally {
       setDeletingId(null);
     }
   };
+
+  const publicPreviewHref =
+    activeCategory === "cv" ? "/cv" : `/cv?doc=${activeCategory}`;
 
   return (
     <div className="space-y-8 select-none">
@@ -260,21 +322,21 @@ export default function AdminCvManagementPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal tracking-tight uppercase">
-            Curriculum Vitae (PDF)
+            {categoryMeta.heading}
           </h1>
           <p className="font-mono-custom text-xs text-[#888] mt-1">
-            Upload, replace, preview, or unpublish the official PDF Curriculum Vitae served on <code className="text-white/90">/cv</code>.
+            Upload, replace, preview, or unpublish your official {categoryMeta.label} PDF.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <Link
-            href="/cv"
+            href={publicPreviewHref}
             target="_blank"
             rel="noopener noreferrer"
             className={buttonVariants({ variant: "secondary", size: "default" })}
           >
-            <span>View Public /cv Page</span>
+            <span>View Public Page</span>
             <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
         </div>
@@ -297,22 +359,22 @@ export default function AdminCvManagementPage() {
 
       {/* Main Grid: Active Status + Upload Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left 7 cols: Active Published CV Status */}
+        {/* Left 7 cols: Active Published Document Status */}
         <Card className="lg:col-span-7 p-4 sm:p-6 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-mono-custom text-xs uppercase tracking-wider text-[#888]">
-                Active Public CV Status
+                Active {categoryMeta.label} Status
               </span>
               {activeDocument ? (
                 <Badge variant="success" className="px-2.5 py-1 text-[11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>Published on /cv</span>
+                  <span>Published</span>
                 </Badge>
               ) : (
                 <Badge variant="warning" className="px-2.5 py-1 text-[11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  <span>No Active PDF (HTML Summary Mode)</span>
+                  <span>No Active PDF</span>
                 </Badge>
               )}
             </div>
@@ -320,7 +382,7 @@ export default function AdminCvManagementPage() {
             {loading ? (
               <div className="py-12 text-center">
                 <Loader2 className="w-7 h-7 text-white animate-spin mx-auto mb-3" aria-hidden="true" />
-                <p className="font-mono-custom text-xs text-[#888]">Checking CV status...</p>
+                <p className="font-mono-custom text-xs text-[#888]">Checking document status...</p>
               </div>
             ) : activeDocument ? (
               <div className="space-y-4 pt-2">
@@ -358,7 +420,7 @@ export default function AdminCvManagementPage() {
                       Download Filename
                     </span>
                     <span className="font-mono-custom text-xs text-emerald-300 mt-0.5 block truncate">
-                      Kamrul-Islam-CV.pdf
+                      {categoryMeta.downloadFilename}
                     </span>
                   </div>
                   <div className="p-3 rounded-xl bg-black/40 border border-white/5 col-span-2 sm:col-span-1">
@@ -372,12 +434,12 @@ export default function AdminCvManagementPage() {
                 </div>
               </div>
             ) : (
-              <div className="p-5 rounded-xl bg-black/40 border border-white/5 space-y-2">
+              <div className="p-5 rounded-xl bg-black/40 border border-white/5 space-y-1.5">
                 <p className="font-sans text-sm text-white/90">
-                  No PDF file is currently published.
+                  No {categoryMeta.label} PDF is currently published.
                 </p>
-                <p className="font-mono-custom text-xs text-[#888] leading-relaxed">
-                  Visitors on <code className="text-white/80">/cv</code> currently see the structured HTML Curriculum Vitae overview and direct contact options without a broken embed. Upload a sanitized PDF on the right to enable inline PDF viewing and one-click download.
+                <p className="font-mono-custom text-xs text-[#888]">
+                  Attach and upload a PDF on the right to publish it.
                 </p>
               </div>
             )}
@@ -394,8 +456,8 @@ export default function AdminCvManagementPage() {
                 <span>Preview Active PDF</span>
               </Button>
               <a
-                href="/api/cv/pdf?download=1"
-                download="Kamrul-Islam-CV.pdf"
+                href={`/api/cv/pdf?type=${activeCategory}&download=1`}
+                download={categoryMeta.downloadFilename}
                 className={buttonVariants({
                   variant: "secondary",
                   size: "default",
@@ -417,17 +479,23 @@ export default function AdminCvManagementPage() {
           )}
         </Card>
 
-        {/* Right 5 cols: Upload / Replace Form */}
+        {/* Right 5 cols: Clean Upload / Replace Form */}
         <Card className="lg:col-span-5 p-4 sm:p-6">
           <form onSubmit={handleUploadSubmit} className="space-y-5">
             <div>
               <h2 className="font-sans text-lg font-medium text-white">
-                {activeDocument ? "Replace or Upload New CV PDF" : "Upload Official CV PDF"}
+                {activeDocument
+                  ? `Replace or Upload New ${categoryMeta.shortLabel} PDF`
+                  : `Upload Official ${categoryMeta.shortLabel} PDF`}
               </h2>
-              <p className="font-mono-custom text-xs text-[#888] mt-1">
-                Strict PDF validation: <code className="text-white/80">.pdf</code> extension, <code className="text-white/80">application/pdf</code> MIME, <code className="text-white/80">%PDF-</code> binary signature, max 10 MB.
-              </p>
             </div>
+
+            {fileWarning && (
+              <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-700/40 text-amber-200 text-xs font-mono-custom flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+                <span>{fileWarning}</span>
+              </div>
+            )}
 
             <div className="space-y-4">
               <div>
@@ -458,7 +526,7 @@ export default function AdminCvManagementPage() {
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Kamrul Islam — Curriculum Vitae"
+                  placeholder={`e.g. ${categoryMeta.defaultTitle}`}
                   className="px-3.5 py-2 h-9 bg-black/40 text-xs font-mono-custom"
                 />
               </div>
@@ -479,16 +547,15 @@ export default function AdminCvManagementPage() {
 
               <label
                 htmlFor="cv-publish-immediately"
-                className="flex items-start gap-2.5 cursor-pointer pt-1"
+                className="flex items-center gap-2.5 cursor-pointer pt-1"
               >
                 <Checkbox
                   id="cv-publish-immediately"
                   checked={publishImmediately}
                   onCheckedChange={setPublishImmediately}
-                  className="mt-0.5"
                 />
-                <span className="font-mono-custom text-xs text-[#ccc] leading-relaxed">
-                  Publish immediately as active CV (cleanly supersedes any currently published PDF)
+                <span className="font-mono-custom text-xs text-[#ccc]">
+                  Publish immediately as active {categoryMeta.shortLabel}
                 </span>
               </label>
             </div>
@@ -501,14 +568,14 @@ export default function AdminCvManagementPage() {
               {uploading ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                  <span>Validating &amp; Uploading PDF...</span>
+                  <span>Uploading PDF...</span>
                 </>
               ) : (
                 <>
                   <Upload className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>
                     {publishImmediately
-                      ? "Upload & Publish CV PDF"
+                      ? `Upload & Publish ${categoryMeta.shortLabel} PDF`
                       : "Upload as Draft Version"}
                   </span>
                 </>
@@ -569,16 +636,13 @@ export default function AdminCvManagementPage() {
         </Card>
       )}
 
-      {/* Version History & All Uploaded CV Records */}
+      {/* Version History & All Uploaded Records for Active Category */}
       <Card className="overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
           <div>
             <h2 className="font-sans text-base font-medium text-white">
-              Uploaded CV Versions ({documents.length})
+              Uploaded {categoryMeta.shortLabel} Versions ({categoryDocuments.length})
             </h2>
-            <p className="font-mono-custom text-xs text-[#888] mt-0.5">
-              Only one CV version can be published at a time. Older inactive versions are automatically pruned beyond the 3 most recent backups.
-            </p>
           </div>
         </div>
 
@@ -586,13 +650,13 @@ export default function AdminCvManagementPage() {
           <div className="p-10 text-center font-mono-custom text-xs text-[#888]">
             Loading versions...
           </div>
-        ) : documents.length === 0 ? (
+        ) : categoryDocuments.length === 0 ? (
           <div className="p-10 text-center font-mono-custom text-xs text-[#888]">
-            No CV PDF files have been uploaded yet.
+            No {categoryMeta.label} PDF files have been uploaded yet.
           </div>
         ) : (
           <div className="divide-y divide-white/5">
-            {documents.map((doc) => (
+            {categoryDocuments.map((doc) => (
               <div
                 key={doc.id}
                 className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/2 transition-colors"
@@ -669,15 +733,10 @@ export default function AdminCvManagementPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete CV PDF?</DialogTitle>
+            <DialogTitle>Delete {categoryMeta.shortLabel} PDF?</DialogTitle>
             <DialogDescription>
               Are you sure you want to permanently delete{" "}
               <strong className="text-white">{confirmDeleteDoc?.file_name}</strong>?
-              {confirmDeleteDoc?.is_published && (
-                <span className="block mt-2 text-amber-300">
-                  Warning: This is currently the active published CV on /cv. Deleting it will revert /cv to the HTML summary state until another PDF is published.
-                </span>
-              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

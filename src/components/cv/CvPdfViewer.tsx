@@ -2,7 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, Download, Loader2 } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Download, FileText, Loader2 } from "lucide-react";
+
+export type ViewerDocumentCategory = "cv" | "resume" | "portfolio" | "cover-letter";
+
+export interface PublishedDocumentItem {
+  category: ViewerDocumentCategory;
+  label: string;
+  shortLabel: string;
+  title: string;
+  fileName: string;
+  fileSize: number;
+  versionLabel: string | null;
+  updatedAtFormatted: string | null;
+  downloadFilename: string;
+  pdfUrl: string;
+}
 
 interface CvPdfViewerProps {
   hasPublishedPdf: boolean;
@@ -11,6 +26,8 @@ interface CvPdfViewerProps {
   fileSize?: number;
   versionLabel?: string | null;
   updatedAtFormatted?: string | null;
+  publishedDocuments?: PublishedDocumentItem[];
+  initialCategory?: ViewerDocumentCategory;
 }
 
 function formatFileSize(bytes?: number): string {
@@ -24,14 +41,54 @@ function formatFileSize(bytes?: number): string {
 export function CvPdfViewer({
   hasPublishedPdf,
   title = "Kamrul Islam — Curriculum Vitae",
+  fileName = "Kamrul-Islam-CV.pdf",
   fileSize,
   versionLabel,
   updatedAtFormatted,
+  publishedDocuments = [],
+  initialCategory = "cv",
 }: CvPdfViewerProps) {
+  const defaultSelectedCategory: ViewerDocumentCategory =
+    publishedDocuments.some((d) => d.category === initialCategory)
+      ? initialCategory
+      : publishedDocuments[0]?.category || "cv";
+
+  const [selectedCategory, setSelectedCategory] = useState<ViewerDocumentCategory>(
+    defaultSelectedCategory
+  );
   const [viewerLoaded, setViewerLoaded] = useState(false);
   const [viewerError, setViewerError] = useState(false);
 
-  if (!hasPublishedPdf) {
+  const activeDoc: PublishedDocumentItem | null =
+    publishedDocuments.find((d) => d.category === selectedCategory) ||
+    publishedDocuments[0] ||
+    (hasPublishedPdf
+      ? {
+          category: "cv",
+          label: "Curriculum Vitae",
+          shortLabel: "CV",
+          title,
+          fileName,
+          fileSize: fileSize || 0,
+          versionLabel: versionLabel || null,
+          updatedAtFormatted: updatedAtFormatted || null,
+          downloadFilename: "Kamrul-Islam-CV.pdf",
+          pdfUrl: "/api/cv/pdf?type=cv",
+        }
+      : null);
+
+  const handleSelectCategory = (category: ViewerDocumentCategory) => {
+    if (category === selectedCategory) return;
+    setSelectedCategory(category);
+    setViewerLoaded(false);
+    setViewerError(false);
+    if (typeof window !== "undefined") {
+      const nextUrl = category === "cv" ? "/cv" : `/cv?doc=${category}`;
+      window.history.replaceState(null, "", nextUrl);
+    }
+  };
+
+  if (!hasPublishedPdf || !activeDoc) {
     return (
       <div className="w-full rounded-2xl bg-[#0e0e10] border border-white/10 p-6 sm:p-10 md:p-12 shadow-2xl">
         <div className="max-w-3xl space-y-5">
@@ -77,36 +134,67 @@ export function CvPdfViewer({
     );
   }
 
+  const downloadUrl = `${activeDoc.pdfUrl}${activeDoc.pdfUrl.includes("?") ? "&" : "?"}download=1`;
+
   return (
     <div className="w-full rounded-2xl bg-[#0e0e10] border border-white/10 overflow-hidden shadow-2xl">
+      {/* Multi-Document Switcher Tabs (shown when more than 1 document category is published) */}
+      {publishedDocuments.length > 1 && (
+        <div className="px-4 sm:px-6 py-3 bg-[#101012] border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+          <span className="font-mono-custom text-[11px] uppercase tracking-widest text-[#777]">
+            Official Documents
+          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {publishedDocuments.map((docItem) => {
+              const isSelected = docItem.category === activeDoc.category;
+              return (
+                <button
+                  key={docItem.category}
+                  type="button"
+                  onClick={() => handleSelectCategory(docItem.category)}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-mono-custom text-xs transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-white text-black font-medium shadow-sm"
+                      : "bg-white/5 hover:bg-white/10 text-[#aaa] hover:text-white border border-white/10"
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>{docItem.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Top Viewer Toolbar */}
       <div className="px-4 sm:px-6 py-4 bg-[#141416] border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2.5 min-w-0">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono-custom text-[11px] uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            Official PDF
+            Official {activeDoc.shortLabel} PDF
           </span>
           <span className="font-mono-custom text-xs text-white font-medium truncate">
-            Kamrul-Islam-CV.pdf
+            {activeDoc.downloadFilename}
           </span>
           <span className="font-mono-custom text-xs text-[#777]">
-            • {formatFileSize(fileSize)}
+            • {formatFileSize(activeDoc.fileSize)}
           </span>
-          {versionLabel && (
+          {activeDoc.versionLabel && (
             <span className="font-mono-custom text-[11px] px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[#aaa]">
-              {versionLabel}
+              {activeDoc.versionLabel}
             </span>
           )}
-          {updatedAtFormatted && (
+          {activeDoc.updatedAtFormatted && (
             <span className="font-mono-custom text-xs text-[#777] hidden md:inline">
-              • Updated {updatedAtFormatted}
+              • Updated {activeDoc.updatedAtFormatted}
             </span>
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <a
-            href="/api/cv/pdf"
+            href={activeDoc.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
@@ -116,11 +204,11 @@ export function CvPdfViewer({
           </a>
 
           <a
-            href="/api/cv/pdf?download=1"
-            download="Kamrul-Islam-CV.pdf"
+            href={downloadUrl}
+            download={activeDoc.downloadFilename}
             className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
           >
-            <span>Download CV</span>
+            <span>Download {activeDoc.shortLabel}</span>
             <Download className="h-3.5 w-3.5" />
           </a>
         </div>
@@ -133,15 +221,15 @@ export function CvPdfViewer({
         </p>
         <div className="flex flex-wrap items-center gap-2.5">
           <a
-            href="/api/cv/pdf?download=1"
-            download="Kamrul-Islam-CV.pdf"
+            href={downloadUrl}
+            download={activeDoc.downloadFilename}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-black font-mono-custom text-xs uppercase tracking-wider font-medium"
           >
-            <span>Download CV (PDF)</span>
+            <span>Download {activeDoc.shortLabel} (PDF)</span>
             <Download className="h-3.5 w-3.5" />
           </a>
           <a
-            href="/api/cv/pdf"
+            href={activeDoc.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10"
@@ -163,15 +251,15 @@ export function CvPdfViewer({
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <a
-              href="/api/cv/pdf?download=1"
-              download="Kamrul-Islam-CV.pdf"
+              href={downloadUrl}
+              download={activeDoc.downloadFilename}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-mono-custom text-xs uppercase tracking-wider font-medium"
             >
-              <span>Download Kamrul-Islam-CV.pdf</span>
+              <span>Download {activeDoc.downloadFilename}</span>
               <Download className="h-3.5 w-3.5" />
             </a>
             <a
-              href="/api/cv/pdf"
+              href={activeDoc.pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white/10 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10"
@@ -187,14 +275,15 @@ export function CvPdfViewer({
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0b0b0d] z-10 pointer-events-none">
               <Loader2 className="w-8 h-8 text-white animate-spin" />
               <span className="font-mono-custom text-xs text-[#888] uppercase tracking-wider">
-                Loading {title}...
+                Loading {activeDoc.title}...
               </span>
             </div>
           )}
 
           <iframe
-            src="/api/cv/pdf#view=FitH"
-            title={title}
+            key={activeDoc.category}
+            src={`${activeDoc.pdfUrl}#view=FitH`}
+            title={activeDoc.title}
             onLoad={() => setViewerLoaded(true)}
             onError={() => setViewerError(true)}
             className="w-full h-full border-0"

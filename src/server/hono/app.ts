@@ -14,11 +14,13 @@ import {
 import { resolveVideoMetadata, isSafePublicUrl } from "@/lib/video-metadata";
 import {
   deleteCvDocument,
+  DOCUMENT_CATEGORIES,
   downloadCvStorageBlob,
   getAllCvDocumentsForAdmin,
   getCvDocumentById,
+  getDocumentCategory,
   getPublishedCvDocument,
-  PUBLIC_CV_DOWNLOAD_FILENAME,
+  normalizeDocumentCategory,
   updateCvDocumentState,
   uploadAndReplaceCvDocument,
 } from "@/lib/cv-service";
@@ -83,12 +85,13 @@ app.get("/projects", async (c) => {
 // 2. POST /api/contact — Contact enquiry & courtesy receipt delivery
 app.route("/contact", contactRoute);
 
-// 3. GET /api/cv/pdf — Public CV PDF streaming & download (with admin preview support)
+// 3. GET /api/cv/pdf — Public document PDF streaming & download (with admin preview & multi-category support)
 app.get("/cv/pdf", async (c) => {
   try {
     const isDownload = c.req.query("download") === "1" || c.req.query("download") === "true";
     const isPreview = c.req.query("preview") === "1";
     const requestedId = c.req.query("id")?.trim() || "";
+    const requestedCategory = normalizeDocumentCategory(c.req.query("type"));
 
     let targetDoc = null;
 
@@ -97,26 +100,31 @@ app.get("/cv/pdf", async (c) => {
       if (!user || !isAdmin) {
         c.header("Cache-Control", "no-store");
         return c.json(
-          { error: "Unauthorized: Admin session required to preview unpublished CV documents." },
+          { error: "Unauthorized: Admin session required to preview unpublished documents." },
           401
         );
       }
       targetDoc = await getCvDocumentById(requestedId);
     } else {
-      targetDoc = await getPublishedCvDocument();
+      targetDoc = await getPublishedCvDocument(requestedCategory);
     }
 
     if (!targetDoc) {
       c.header("Cache-Control", "no-store");
-      return c.json({ error: "No published Curriculum Vitae PDF is currently active." }, 404);
+      return c.json(
+        { error: `No published ${DOCUMENT_CATEGORIES[requestedCategory].label} PDF is currently active.` },
+        404
+      );
     }
 
     const blob = await downloadCvStorageBlob(targetDoc.storage_path);
     if (!blob) {
       c.header("Cache-Control", "no-store");
-      return c.json({ error: "CV PDF file could not be retrieved from storage." }, 404);
+      return c.json({ error: "PDF file could not be retrieved from storage." }, 404);
     }
 
+    const docCategory = getDocumentCategory(targetDoc);
+    const downloadFilename = DOCUMENT_CATEGORIES[docCategory].downloadFilename;
     const arrayBuffer = await blob.arrayBuffer();
     const dispositionType = isDownload ? "attachment" : "inline";
 
@@ -124,7 +132,7 @@ app.get("/cv/pdf", async (c) => {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `${dispositionType}; filename="${PUBLIC_CV_DOWNLOAD_FILENAME}"`,
+        "Content-Disposition": `${dispositionType}; filename="${downloadFilename}"`,
         "Content-Length": String(arrayBuffer.byteLength),
         "Cache-Control": isPreview
           ? "private, no-store"
@@ -134,7 +142,7 @@ app.get("/cv/pdf", async (c) => {
     });
   } catch {
     c.header("Cache-Control", "no-store");
-    return c.json({ error: "Unable to serve CV PDF at this time." }, 500);
+    return c.json({ error: "Unable to serve PDF document at this time." }, 500);
   }
 });
 
@@ -452,11 +460,17 @@ app.route("/admin/upload-screenshot", uploadScreenshotRoute);
 // 8. GET, POST, PATCH, DELETE /api/admin/cv
 app.get("/admin/cv", async (c) => {
   try {
-    const documents = await getAllCvDocumentsForAdmin();
-    const activeDocument = documents.find((doc) => doc.is_published) || null;
+    const rawType = c.req.query("type");
+    const categoryFilter = rawType ? normalizeDocumentCategory(rawType) : undefined;
+    const documents = await getAllCvDocumentsForAdmin(categoryFilter);
+    const activeCategory = categoryFilter || "cv";
+    const activeDocument =
+      documents.find(
+        (doc) => getDocumentCategory(doc) === activeCategory && doc.is_published
+      ) || null;
     return c.json({ documents, activeDocument });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to load CV documents";
+    const message = err instanceof Error ? err.message : "Failed to load documents";
     return c.json({ error: message }, 500);
   }
 });
@@ -471,13 +485,16 @@ app.post("/admin/cv", async (c) => {
       return c.json({ error: "Please select a valid PDF file to upload." }, 400);
     }
 
-    const title = formData.get("title")?.toString() || "Kamrul Islam — Curriculum Vitae";
+    const category = normalizeDocumentCategory(formData.get("category")?.toString());
+    const categoryMeta = DOCUMENT_CATEGORIES[category];
+    const title = formData.get("title")?.toString()?.trim() || categoryMeta.defaultTitle;
     const versionLabel = formData.get("versionLabel")?.toString() || null;
     const publishParam = formData.get("publishImmediately")?.toString();
     const publishImmediately = publishParam !== "false";
 
     const document = await uploadAndReplaceCvDocument({
       file: fileEntry,
+      category,
       title,
       versionLabel,
       publishImmediately,
@@ -486,7 +503,7 @@ app.post("/admin/cv", async (c) => {
 
     return c.json({ document }, 201);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to upload CV document";
+    const message = err instanceof Error ? err.message : "Failed to upload document";
     return c.json({ error: message }, 400);
   }
 });

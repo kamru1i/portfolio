@@ -2,12 +2,17 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
-import { getPublishedCvDocument } from "@/lib/cv-service";
+import {
+  DOCUMENT_CATEGORIES,
+  DocumentCategory,
+  getPublishedDocumentsByCategory,
+  normalizeDocumentCategory,
+} from "@/lib/cv-service";
 import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
-import { CvPdfViewer } from "@/components/cv/CvPdfViewer";
+import { CvPdfViewer, PublishedDocumentItem } from "@/components/cv/CvPdfViewer";
 
 export const dynamic = "force-dynamic";
 
@@ -177,10 +182,62 @@ function formatCvUpdatedDate(iso: string | null | undefined): string | null {
   }
 }
 
-export default async function CurriculumVitaePage() {
-  const publishedCv = await getPublishedCvDocument();
+const ORDERED_DOCUMENT_CATEGORIES: DocumentCategory[] = [
+  "cv",
+  "resume",
+  "portfolio",
+  "cover-letter",
+];
+
+export default async function CurriculumVitaePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ doc?: string; type?: string }>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const requestedCategory = normalizeDocumentCategory(
+    resolvedSearchParams?.doc || resolvedSearchParams?.type
+  );
+
+  const publishedByCategory = await getPublishedDocumentsByCategory();
+
+  const publishedDocuments: PublishedDocumentItem[] = [];
+  for (const cat of ORDERED_DOCUMENT_CATEGORIES) {
+    const doc = publishedByCategory[cat];
+    if (!doc) continue;
+    const meta = DOCUMENT_CATEGORIES[cat];
+    publishedDocuments.push({
+      category: cat,
+      label: meta.label,
+      shortLabel: meta.shortLabel,
+      title: doc.title || meta.defaultTitle,
+      fileName: doc.file_name || meta.downloadFilename,
+      fileSize: doc.file_size,
+      versionLabel: doc.version_label,
+      updatedAtFormatted: formatCvUpdatedDate(doc.published_at || doc.updated_at),
+      downloadFilename: meta.downloadFilename,
+      pdfUrl: `/api/cv/pdf?type=${cat}`,
+    });
+  }
+
+  const publishedCv =
+    publishedByCategory[requestedCategory] ||
+    publishedByCategory.cv ||
+    publishedDocuments[0] ||
+    null;
+
+  const activeCategoryMeta =
+    publishedByCategory[requestedCategory]
+      ? DOCUMENT_CATEGORIES[requestedCategory]
+      : publishedByCategory.cv
+      ? DOCUMENT_CATEGORIES.cv
+      : publishedDocuments[0]
+      ? DOCUMENT_CATEGORIES[publishedDocuments[0].category]
+      : DOCUMENT_CATEGORIES.cv;
+
   const updatedAtFormatted = formatCvUpdatedDate(
-    publishedCv?.published_at || publishedCv?.updated_at
+    publishedByCategory[activeCategoryMeta.id]?.published_at ||
+      publishedByCategory[activeCategoryMeta.id]?.updated_at
   );
 
   const employmentItems = (PORTFOLIO_DATA.milestones || []).filter(
@@ -189,6 +246,8 @@ export default async function CurriculumVitaePage() {
   const educationItems = (PORTFOLIO_DATA.milestones || []).filter(
     (m) => m.type === "education"
   );
+
+  const primaryCvRecord = publishedByCategory[activeCategoryMeta.id];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -201,7 +260,7 @@ export default async function CurriculumVitaePage() {
         description:
           "Official Curriculum Vitae of Kamrul Islam covering Video Editing & Post-Production, AI-Assisted Content Creation, Web Development, and IT Support.",
         inLanguage: "en-US",
-         ...(publishedCv?.updated_at ? { dateModified: publishedCv.updated_at } : {}),
+         ...(primaryCvRecord?.updated_at ? { dateModified: primaryCvRecord.updated_at } : {}),
         mainEntity: {
           "@id": "https://kamrulislam.me/#person",
         },
@@ -291,15 +350,15 @@ export default async function CurriculumVitaePage() {
                 {publishedCv ? (
                   <>
                     <a
-                      href="/api/cv/pdf?download=1"
-                      download="Kamrul-Islam-CV.pdf"
+                      href={`/api/cv/pdf?type=${activeCategoryMeta.id}&download=1`}
+                      download={activeCategoryMeta.downloadFilename}
                       className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
                     >
-                      <span>Download CV (PDF)</span>
+                      <span>Download {activeCategoryMeta.shortLabel} (PDF)</span>
                       <Download className="h-3.5 w-3.5" />
                     </a>
                     <a
-                      href="/api/cv/pdf"
+                      href={`/api/cv/pdf?type=${activeCategoryMeta.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
@@ -331,12 +390,14 @@ export default async function CurriculumVitaePage() {
           {/* Interactive PDF Viewer / Controlled Fallback Section */}
           <section aria-label="Curriculum Vitae Document Viewer" className="mb-20 md:mb-28">
             <CvPdfViewer
-              hasPublishedPdf={Boolean(publishedCv)}
-              title={publishedCv?.title}
-              fileName={publishedCv?.file_name}
-              fileSize={publishedCv?.file_size}
-              versionLabel={publishedCv?.version_label}
+              hasPublishedPdf={publishedDocuments.length > 0}
+              title={primaryCvRecord?.title}
+              fileName={primaryCvRecord?.file_name}
+              fileSize={primaryCvRecord?.file_size}
+              versionLabel={primaryCvRecord?.version_label}
               updatedAtFormatted={updatedAtFormatted}
+              publishedDocuments={publishedDocuments}
+              initialCategory={activeCategoryMeta.id}
             />
           </section>
 
