@@ -175,13 +175,28 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <Link
-            href="/admin/projects/new"
-            className={buttonVariants({ variant: "default", size: "default", className: "px-5 py-2.5 h-auto" })}
+            href="/admin/projects/new?type=video"
+            className={buttonVariants({
+              variant: "secondary",
+              size: "sm",
+              className: "px-3.5 py-2 h-9",
+            })}
           >
-            <Plus className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
-            <span>Add New Project</span>
+            <Film className="h-3.5 w-3.5 text-sky-400" aria-hidden="true" />
+            <span>+ Video Project</span>
+          </Link>
+          <Link
+            href="/admin/projects/new?type=web"
+            className={buttonVariants({
+              variant: "default",
+              size: "sm",
+              className: "px-3.5 py-2 h-9",
+            })}
+          >
+            <Globe className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>+ Web Project</span>
           </Link>
         </div>
       </div>

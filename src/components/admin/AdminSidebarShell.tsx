@@ -7,6 +7,9 @@ import {
   LayoutDashboard,
   FolderKanban,
   FolderPlus,
+  Film,
+  Globe,
+  ChevronDown,
   Inbox,
   FileText,
   Menu,
@@ -14,6 +17,7 @@ import {
   ArrowUpRight,
   type LucideIcon,
 } from "lucide-react";
+import type { ProjectType } from "@/types/project";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 import { AdminNavLogout } from "@/app/admin/(dashboard)/AdminNavLogout";
 import { Badge } from "@/components/ui/badge";
@@ -111,9 +115,15 @@ function resolveRouteNavId(
   return "dashboard";
 }
 
-function resolveBreadcrumbTitle(pathname: string, activeId: NavItemId): string {
+function resolveBreadcrumbTitle(
+  pathname: string,
+  activeId: NavItemId,
+  newProjectDiscipline: ProjectType
+): string {
   if (pathname === "/admin/projects/new" || activeId === "new-project") {
-    return "New Project";
+    return newProjectDiscipline === "web"
+      ? "New Web Project"
+      : "New Video Project";
   }
   if (pathname.startsWith("/admin/projects/")) return "Edit Project";
   if (pathname.startsWith("/admin/inquiries") || activeId === "inquiries") {
@@ -136,6 +146,13 @@ export function AdminSidebarShell({
   // Tracks whether the "/admin" route is currently in "All Projects" sub-view mode
   const [isAllProjectsMode, setIsAllProjectsMode] = useState(false);
 
+  // Collapsible state for "New Project" submenu ("Video Project" / "Web Project")
+  const [newProjectExpanded, setNewProjectExpanded] = useState<boolean>(
+    pathname === "/admin/projects/new"
+  );
+  const [newProjectDiscipline, setNewProjectDiscipline] =
+    useState<ProjectType>("video");
+
   // Holds the clicked item ID while Next.js asynchronously transitions from `fromPathname` to the new route,
   // preventing the selector from momentarily falling back to "dashboard" mid-navigation.
   const [navOverride, setNavOverride] = useState<{
@@ -144,15 +161,27 @@ export function AdminSidebarShell({
   } | null>(null);
 
   useEffect(() => {
-    const syncFromHash = () => {
+    const syncLocationState = () => {
       if (window.location.hash === "#projects-manager") {
         setIsAllProjectsMode(true);
       }
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("type");
+      if (t === "web" || t === "video") {
+        setNewProjectDiscipline(t);
+      }
+      if (pathname === "/admin/projects/new") {
+        setNewProjectExpanded(true);
+      }
     };
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => window.removeEventListener("hashchange", syncFromHash);
-  }, []);
+    syncLocationState();
+    window.addEventListener("hashchange", syncLocationState);
+    window.addEventListener("popstate", syncLocationState);
+    return () => {
+      window.removeEventListener("hashchange", syncLocationState);
+      window.removeEventListener("popstate", syncLocationState);
+    };
+  }, [pathname]);
 
   // When arriving on /admin in All Projects mode, ensure #projects-manager is scrolled into view
   useEffect(() => {
@@ -169,13 +198,20 @@ export function AdminSidebarShell({
       ? navOverride.targetId
       : resolveRouteNavId(pathname, isAllProjectsMode);
 
-  const breadcrumbTitle = resolveBreadcrumbTitle(pathname, activeNavId);
+  const isNewProjectMenuOpen = newProjectExpanded;
+
+  const breadcrumbTitle = resolveBreadcrumbTitle(
+    pathname,
+    activeNavId,
+    newProjectDiscipline
+  );
 
   const handleNavClick = (item: NavItem) => {
     setMobileDrawerOpen(false);
 
     if (item.id === "all-projects") {
       setIsAllProjectsMode(true);
+      setNewProjectExpanded(false);
       if (pathname === "/admin") {
         setNavOverride(null);
         const el = document.getElementById("projects-manager");
@@ -190,6 +226,7 @@ export function AdminSidebarShell({
 
     if (item.id === "dashboard") {
       setIsAllProjectsMode(false);
+      setNewProjectExpanded(false);
       if (pathname === "/admin") {
         setNavOverride(null);
         window.history.replaceState(null, "", "/admin");
@@ -200,10 +237,23 @@ export function AdminSidebarShell({
       return;
     }
 
-    // Navigating to a dedicated route (/admin/projects/new, /admin/inquiries, /admin/cv):
+    // Navigating to a dedicated route (/admin/inquiries, /admin/cv):
     // Keep the clicked item active immediately while pathname transitions away from /admin.
     setIsAllProjectsMode(false);
+    setNewProjectExpanded(false);
     setNavOverride({ fromPathname: pathname, targetId: item.id });
+  };
+
+  const handleSelectNewProjectDiscipline = (discipline: ProjectType) => {
+    setMobileDrawerOpen(false);
+    setIsAllProjectsMode(false);
+    setNewProjectExpanded(true);
+    setNewProjectDiscipline(discipline);
+    if (pathname !== "/admin/projects/new") {
+      setNavOverride({ fromPathname: pathname, targetId: "new-project" });
+    } else {
+      setNavOverride(null);
+    }
   };
 
   const renderSidebarContent = () => (
@@ -260,6 +310,102 @@ export function AdminSidebarShell({
               {group.items.map((item) => {
                 const isActive = activeNavId === item.id;
                 const Icon = item.icon;
+
+                if (item.id === "new-project") {
+                  return (
+                    <div key={item.id} className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => setNewProjectExpanded((prev) => !prev)}
+                        aria-expanded={isNewProjectMenuOpen}
+                        className={`w-full group relative flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl font-mono-custom text-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                          isActive
+                            ? "bg-white/12 text-white font-medium border border-white/15 shadow-xs"
+                            : "text-[#9ca3af] hover:text-white hover:bg-white/5 border border-transparent"
+                        }`}
+                      >
+                        {isActive && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-white"
+                          />
+                        )}
+                        <span className="flex items-center gap-3 min-w-0">
+                          <Icon
+                            aria-hidden="true"
+                            className={`h-4 w-4 shrink-0 transition-colors ${
+                              isActive
+                                ? "text-white"
+                                : "text-[#7c7c86] group-hover:text-white"
+                            }`}
+                          />
+                          <span className="truncate">{item.label}</span>
+                        </span>
+                        <ChevronDown
+                          aria-hidden="true"
+                          className={`h-3.5 w-3.5 shrink-0 text-[#7c7c86] group-hover:text-white transition-transform duration-200 ${
+                            isNewProjectMenuOpen ? "rotate-180 text-white" : ""
+                          }`}
+                        />
+                      </button>
+
+                      {isNewProjectMenuOpen && (
+                        <div className="ml-5 pl-2.5 border-l border-white/10 space-y-1 pt-0.5">
+                          <Link
+                            href="/admin/projects/new?type=video"
+                            onClick={() => handleSelectNewProjectDiscipline("video")}
+                            aria-current={
+                              isActive && newProjectDiscipline === "video"
+                                ? "page"
+                                : undefined
+                            }
+                            className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg font-mono-custom text-[11px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                              isActive && newProjectDiscipline === "video"
+                                ? "bg-sky-500/15 text-sky-300 font-medium border border-sky-500/30"
+                                : "text-[#8e8e98] hover:text-white hover:bg-white/5 border border-transparent"
+                            }`}
+                          >
+                            <Film
+                              aria-hidden="true"
+                              className={`h-3.5 w-3.5 shrink-0 ${
+                                isActive && newProjectDiscipline === "video"
+                                  ? "text-sky-400"
+                                  : "text-[#7c7c86] group-hover:text-sky-400"
+                              }`}
+                            />
+                            <span className="truncate">Video Project</span>
+                          </Link>
+
+                          <Link
+                            href="/admin/projects/new?type=web"
+                            onClick={() => handleSelectNewProjectDiscipline("web")}
+                            aria-current={
+                              isActive && newProjectDiscipline === "web"
+                                ? "page"
+                                : undefined
+                            }
+                            className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg font-mono-custom text-[11px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                              isActive && newProjectDiscipline === "web"
+                                ? "bg-purple-500/15 text-purple-300 font-medium border border-purple-500/30"
+                                : "text-[#8e8e98] hover:text-white hover:bg-white/5 border border-transparent"
+                            }`}
+                          >
+                            <Globe
+                              aria-hidden="true"
+                              className={`h-3.5 w-3.5 shrink-0 ${
+                                isActive && newProjectDiscipline === "web"
+                                  ? "text-purple-400"
+                                  : "text-[#7c7c86] group-hover:text-purple-400"
+                              }`}
+                            />
+                            <span className="truncate">Web Project</span>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={item.id}

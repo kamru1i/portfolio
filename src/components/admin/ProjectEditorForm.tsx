@@ -35,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 interface ProjectEditorFormProps {
   mode: "create" | "edit";
   initialProject?: ProjectRecord;
+  initialDiscipline?: ProjectType;
 }
 
 const SLUG_PATTERN = /^[A-Za-z0-9-]+$/;
@@ -48,14 +49,16 @@ function toUrlSlug(value: string): string {
     .replace(/-+/g, "-");
 }
 
-export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormProps) {
+export function ProjectEditorForm({
+  mode,
+  initialProject,
+  initialDiscipline = "video",
+}: ProjectEditorFormProps) {
   const router = useRouter();
   const isEdit = mode === "edit" && Boolean(initialProject);
 
-  // Discipline ('video' | 'web') — selectable on create, fixed on edit
-  const [projectType, setProjectType] = useState<ProjectType>(
-    initialProject?.type ?? "video"
-  );
+  // Discipline ('video' | 'web') — selected from sidebar submenu on create, fixed on edit
+  const projectType: ProjectType = initialProject?.type ?? initialDiscipline;
   const isVideo = projectType === "video";
 
   // Shared Project Fields
@@ -454,18 +457,46 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
   };
 
   return (
-    <div className="w-full space-y-5 select-none">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-gambarino text-2xl sm:text-3xl text-white font-normal uppercase tracking-tight">
-            {isEdit ? "Edit Project" : "Create Project"}
-          </h1>
-          <p className="font-mono-custom text-xs text-[#888] mt-0.5">
-            {isEdit
-              ? "Update project metadata, media preview settings, and case study details."
-              : "Configure discipline, media source, and case study details for a new portfolio item."}
-          </p>
+    <div className="w-full space-y-4 select-none">
+      {/* Page Header with Active Discipline Badge */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+              isVideo
+                ? "bg-sky-500/15 border-sky-500/25 text-sky-400"
+                : "bg-purple-500/15 border-purple-500/25 text-purple-400"
+            }`}
+          >
+            {isVideo ? (
+              <Film className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Globe className="h-5 w-5" aria-hidden="true" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="font-gambarino text-2xl sm:text-3xl text-white font-normal uppercase tracking-tight">
+                {isEdit
+                  ? isVideo
+                    ? "Edit Video Project"
+                    : "Edit Web Project"
+                  : isVideo
+                  ? "Create Video Project"
+                  : "Create Web Project"}
+              </h1>
+              {initialProject && (
+                <span className="font-mono-custom text-[11px] text-[#666]">
+                  ID: {initialProject.id.slice(0, 8)}...
+                </span>
+              )}
+            </div>
+            <p className="font-mono-custom text-xs text-[#888] mt-0.5 truncate">
+              {isVideo
+                ? "Editorial video showcase layout, aspect ratio, thumbnail & case study details."
+                : "Web application links, interactive preview mode, static screenshot & case study details."}
+            </p>
+          </div>
         </div>
 
         <Link
@@ -475,83 +506,6 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
           Cancel
         </Link>
       </div>
-
-      {/* Discipline Selection (Create) or Fixed Discipline Indicator (Edit) */}
-      {!isEdit ? (
-        <Card className="p-4 space-y-2.5">
-          <Label>1. Select Project Discipline</Label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setProjectType("video")}
-              className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                isVideo
-                  ? "bg-white/10 border-white text-white shadow-md ring-1 ring-white/20"
-                  : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
-              }`}
-            >
-              <div className="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-sky-400 shrink-0">
-                <Film className="h-4.5 w-4.5" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <div className="font-sans font-medium text-sm text-white">
-                  Video Project
-                </div>
-                <p className="font-mono-custom text-[11px] text-[#888] truncate">
-                  Editorial video showcase, 16:9 or 9:16, YouTube/TikTok auto-metadata.
-                </p>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setProjectType("web")}
-              className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                !isVideo
-                  ? "bg-white/10 border-white text-white shadow-md ring-1 ring-white/20"
-                  : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
-              }`}
-            >
-              <div className="w-9 h-9 rounded-lg bg-purple-500/15 border border-purple-500/25 flex items-center justify-center text-purple-400 shrink-0">
-                <Globe className="h-4.5 w-4.5" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <div className="font-sans font-medium text-sm text-white">
-                  Web Project
-                </div>
-                <p className="font-mono-custom text-[11px] text-[#888] truncate">
-                  4-column web case study cards, live preview modal, GitHub integration.
-                </p>
-              </div>
-            </button>
-          </div>
-        </Card>
-      ) : (
-        <Card className="p-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center text-white">
-              {isVideo ? (
-                <Film className="h-4.5 w-4.5 text-sky-400" aria-hidden="true" />
-              ) : (
-                <Globe className="h-4.5 w-4.5 text-purple-400" aria-hidden="true" />
-              )}
-            </div>
-            <div>
-              <span className="font-sans text-sm font-medium text-white block">
-                {isVideo ? "Video Project" : "Web Project"}
-              </span>
-              <span className="font-mono-custom text-xs text-[#888]">
-                Discipline is fixed to preserve editorial consistency.
-              </span>
-            </div>
-          </div>
-          {initialProject && (
-            <span className="font-mono-custom text-xs text-[#666]">
-              ID: {initialProject.id.slice(0, 8)}...
-            </span>
-          )}
-        </Card>
-      )}
 
       {/* Error Banner */}
       {errorMessage && (
