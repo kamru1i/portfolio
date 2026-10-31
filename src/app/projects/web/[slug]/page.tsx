@@ -76,9 +76,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
   const nextProject =
     webProjects[(currentIndex + 1) % webProjects.length] || webProjects[0];
 
-  const isEmbeddable =
-    (project.previewMode ? project.previewMode === "iframe" : project.canEmbed !== false) &&
-    Boolean(project.liveUrl);
+  const heroScreenshot = project.previewImageUrl || project.thumbnail;
   const canonicalSlug = project.slug || project.id;
   const canonicalUrl = `https://kamrulislam.me/projects/web/${canonicalSlug}`;
   const rawThumb = project.previewImageUrl || project.thumbnail || "/opengraph-image.jpg";
@@ -220,31 +218,42 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
           </section>
 
           {/* ============================================================ */}
-          {/* MEDIA SECTION: Interactive Iframe Viewport or Shielded Canvas */}
+          {/* MEDIA SECTION: Optimized Hero Section Screenshot Showcase     */}
           {/* ============================================================ */}
           <section className="w-full mb-20 md:mb-28">
-            <div className="w-full h-[420px] sm:h-[580px] md:h-[700px] rounded-2xl overflow-hidden border border-white/15 bg-[#0e0e0e] shadow-[0_30px_70px_rgba(0,0,0,0.85)] flex flex-col">
+            <div className="w-full h-[380px] sm:h-[540px] md:h-[680px] rounded-2xl overflow-hidden border border-white/15 bg-[#0e0e0e] shadow-[0_30px_70px_rgba(0,0,0,0.85)] flex flex-col">
               {/* Header preview bar */}
               <div className="px-4 py-2.5 bg-[#181818] border-b border-white/10 flex items-center justify-between gap-2 text-xs font-mono-custom text-[#888]">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block shrink-0" />
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block shrink-0" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block shrink-0" />
-                  <span className="ml-2 text-white/70 truncate hidden sm:inline">{project.liveUrl || "Deployment View"}</span>
+                  <span className="ml-2 text-white/70 truncate hidden sm:inline">
+                    {project.liveUrl || "Web Application Preview"}
+                  </span>
                 </div>
-                <span className="text-[11px] text-emerald-400 shrink-0">
-                  {isEmbeddable ? "Interactive Live View" : "Security Shielded View"}
-                </span>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 shrink-0 transition-colors"
+                  >
+                    <span>Visit Live Site</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                )}
               </div>
 
               {/* Viewport Content */}
-              <div className="relative flex-1 w-full h-full bg-[#111] overflow-hidden">
-                {isEmbeddable && project.liveUrl ? (
-                  <iframe
-                    src={project.liveUrl}
-                    title={`${project.title} live preview`}
-                    className="w-full h-full border-0 bg-white"
-                    sandbox="allow-scripts allow-same-origin"
+              <div className="relative flex-1 w-full h-full bg-[#0a0b10] overflow-hidden">
+                {heroScreenshot ? (
+                  /* eslint-disable-next-line @next/next/no-img-element -- Renders local or external screenshot cleanly */
+                  <img
+                    src={heroScreenshot}
+                    alt={`${project.title} hero section screenshot`}
+                    decoding="async"
+                    className="w-full h-full object-cover object-top"
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-[#0a0b10]">
@@ -252,10 +261,10 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                       <Globe className="h-7 w-7" />
                     </div>
                     <h3 className="font-gambarino text-2xl text-white mb-2">
-                      External Web Application
+                      {project.title}
                     </h3>
                     <p className="font-mono-custom text-xs sm:text-sm text-[#888] max-w-md mx-auto mb-6 leading-relaxed">
-                      This production web application is hosted with strict cross-origin security headers or external domain authentication.
+                      {project.description}
                     </p>
                     {project.liveUrl && (
                       <a

@@ -8,8 +8,6 @@ import {
   Search,
   Film,
   Globe,
-  ShieldAlert,
-  Monitor,
   Pencil,
   Trash2,
   ArrowLeft,
@@ -338,7 +336,6 @@ export default function AdminDashboardPage() {
           {paginatedProjects.map((project) => {
             const isVideo = project.type === "video";
             const is916 = project.aspect_ratio === "9:16";
-            const isFallback = project.preview_mode === "fallback" || project.can_embed === false;
 
             return (
               <div
@@ -401,17 +398,6 @@ export default function AdminDashboardPage() {
                         )}
                         <span>{isVideo ? `Video • ${project.aspect_ratio}` : "Web Project"}</span>
                       </Badge>
-
-                      {!isVideo && (
-                        <Badge variant={isFallback ? "warning" : "success"}>
-                          {isFallback ? (
-                            <ShieldAlert className="h-3 w-3" aria-hidden="true" />
-                          ) : (
-                            <Monitor className="h-3 w-3" aria-hidden="true" />
-                          )}
-                          <span>{isFallback ? "Fallback" : "Live Iframe"}</span>
-                        </Badge>
-                      )}
 
                       {project.client_name && (
                         <span className="font-mono-custom text-[11px] text-[#888]">
