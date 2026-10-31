@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -289,7 +289,6 @@ export function AdminSidebarShell({
   userEmail,
   children,
 }: AdminSidebarShellProps) {
-  const router = useRouter();
   const pathname = usePathname() || "/admin";
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
@@ -302,9 +301,7 @@ export function AdminSidebarShell({
     useState<DocumentCategory>("cv");
 
   // Collapsible state for "New Project" submenu ("Video Project" / "Web Project")
-  const [newProjectExpanded, setNewProjectExpanded] = useState<boolean>(
-    pathname === "/admin/projects/new"
-  );
+  const [newProjectExpanded, setNewProjectExpanded] = useState<boolean>(false);
   const [newProjectDiscipline, setNewProjectDiscipline] =
     useState<ProjectType>("video");
 
@@ -319,36 +316,36 @@ export function AdminSidebarShell({
     const syncLocationState = () => {
       const params = new URLSearchParams(window.location.search);
       const urlTab = params.get("tab");
-      if (isValidProjectSubTab(urlTab)) {
-        setIsAllProjectsMode(true);
-        setAllProjectsExpanded(true);
-        setActiveProjectsSubTab(urlTab);
-      } else if (window.location.hash === "#projects-manager") {
-        setIsAllProjectsMode(true);
-        setAllProjectsExpanded(true);
-      } else {
-        try {
-          const raw = window.sessionStorage.getItem("admin_projects_return_state");
-          if (raw) {
-            const parsed = JSON.parse(raw) as {
-              isAllProjectsMode?: boolean;
-              tab?: string;
-            };
-            if (parsed.isAllProjectsMode) {
-              setIsAllProjectsMode(true);
-              setAllProjectsExpanded(true);
-              if (isValidProjectSubTab(parsed.tab)) {
-                setActiveProjectsSubTab(parsed.tab);
+
+      if (window.location.pathname === "/admin") {
+        if (isValidProjectSubTab(urlTab)) {
+          setIsAllProjectsMode(true);
+          setActiveProjectsSubTab(urlTab);
+        } else if (window.location.hash === "#projects-manager") {
+          setIsAllProjectsMode(true);
+        } else {
+          try {
+            const raw = window.sessionStorage.getItem(
+              "admin_projects_return_state"
+            );
+            if (raw) {
+              const parsed = JSON.parse(raw) as {
+                isAllProjectsMode?: boolean;
+                tab?: string;
+              };
+              if (parsed.isAllProjectsMode) {
+                setIsAllProjectsMode(true);
+                if (isValidProjectSubTab(parsed.tab)) {
+                  setActiveProjectsSubTab(parsed.tab);
+                }
               }
             }
+          } catch {
+            // Ignore storage read errors
           }
-        } catch {
-          // Ignore storage read errors
         }
-      }
-
-      if (pathname.startsWith("/admin/projects/") && pathname !== "/admin/projects/new") {
-        setAllProjectsExpanded(true);
+      } else {
+        setIsAllProjectsMode(false);
       }
 
       const t = params.get("type");
@@ -357,9 +354,6 @@ export function AdminSidebarShell({
       }
       if (pathname.startsWith("/admin/cv")) {
         setActiveDocCategory(isValidDocumentCategory(t) ? t : "cv");
-      }
-      if (pathname === "/admin/projects/new") {
-        setNewProjectExpanded(true);
       }
     };
 
@@ -370,7 +364,6 @@ export function AdminSidebarShell({
         setIsAllProjectsMode(false);
       } else if (custom.detail.mode === "projects") {
         setIsAllProjectsMode(true);
-        setAllProjectsExpanded(true);
         if (custom.detail.tab) {
           setActiveProjectsSubTab(custom.detail.tab);
         }
@@ -412,11 +405,17 @@ export function AdminSidebarShell({
     activeProjectsSubTab
   );
 
+  const clearProjectsReturnState = () => {
+    try {
+      window.sessionStorage.removeItem("admin_projects_return_state");
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
   const handleSelectProjectSubTab = (subTab: AdminProjectSubTab) => {
     setMobileDrawerOpen(false);
     setIsAllProjectsMode(true);
-    setAllProjectsExpanded(true);
-    setNewProjectExpanded(false);
     setActiveProjectsSubTab(subTab);
 
     if (pathname === "/admin") {
@@ -431,16 +430,10 @@ export function AdminSidebarShell({
 
   const handleNavClick = (item: NavItem, e?: React.MouseEvent) => {
     setMobileDrawerOpen(false);
+    clearProjectsReturnState();
 
     if (item.id === "dashboard") {
       setIsAllProjectsMode(false);
-      setAllProjectsExpanded(false);
-      setNewProjectExpanded(false);
-      try {
-        window.sessionStorage.removeItem("admin_projects_return_state");
-      } catch {
-        // Ignore storage errors
-      }
       if (pathname === "/admin") {
         setNavOverride(null);
         window.history.replaceState(null, "", "/admin");
@@ -459,7 +452,6 @@ export function AdminSidebarShell({
       item.id === "cover-letter"
     ) {
       setIsAllProjectsMode(false);
-      setNewProjectExpanded(false);
       setActiveDocCategory(item.id);
       if (pathname.startsWith("/admin/cv")) {
         e?.preventDefault();
@@ -475,14 +467,13 @@ export function AdminSidebarShell({
 
     // Navigating to a dedicated route (/admin/inquiries):
     setIsAllProjectsMode(false);
-    setNewProjectExpanded(false);
     setNavOverride({ fromPathname: pathname, targetId: item.id });
   };
 
   const handleSelectNewProjectDiscipline = (discipline: ProjectType) => {
     setMobileDrawerOpen(false);
     setIsAllProjectsMode(false);
-    setNewProjectExpanded(true);
+    clearProjectsReturnState();
     setNewProjectDiscipline(discipline);
     if (pathname !== "/admin/projects/new") {
       setNavOverride({ fromPathname: pathname, targetId: "new-project" });
@@ -500,12 +491,7 @@ export function AdminSidebarShell({
           onClick={() => {
             setMobileDrawerOpen(false);
             setIsAllProjectsMode(false);
-            setAllProjectsExpanded(false);
-            try {
-              window.sessionStorage.removeItem("admin_projects_return_state");
-            } catch {
-              // Ignore storage errors
-            }
+            clearProjectsReturnState();
             if (pathname === "/admin") {
               setNavOverride(null);
               window.history.replaceState(null, "", "/admin");
@@ -558,31 +544,7 @@ export function AdminSidebarShell({
                     <div key={item.id} className="space-y-1">
                       <button
                         type="button"
-                        onClick={() => {
-                          if (!isActive) {
-                            setIsAllProjectsMode(true);
-                            setAllProjectsExpanded(true);
-                            setNewProjectExpanded(false);
-                            setActiveProjectsSubTab("all");
-                            if (pathname === "/admin") {
-                              setNavOverride(null);
-                              window.history.replaceState(null, "", "/admin?tab=all");
-                              dispatchAdminViewChange({
-                                mode: "projects",
-                                tab: "all",
-                              });
-                              window.scrollTo({ top: 0, behavior: "smooth" });
-                            } else {
-                              setNavOverride({
-                                fromPathname: pathname,
-                                targetId: "all-projects",
-                              });
-                              router.push("/admin?tab=all");
-                            }
-                          } else {
-                            setAllProjectsExpanded((prev) => !prev);
-                          }
-                        }}
+                        onClick={() => setAllProjectsExpanded((prev) => !prev)}
                         aria-expanded={isAllProjectsMenuOpen}
                         className={`w-full group relative flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl font-mono-custom text-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                           isActive
