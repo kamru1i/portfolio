@@ -213,7 +213,7 @@ export function ProjectThumbnailDropzone({
           setIsDraggingOver(false);
         }}
         onDrop={handleDropImage}
-        className={`h-11 px-3 rounded-xl border border-dashed transition-all flex items-center justify-between gap-2 ${
+        className={`min-h-11 h-auto py-2 sm:py-0 sm:h-11 px-3 rounded-xl border border-dashed transition-all flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 ${
           isDraggingOver
             ? isVideo
               ? "bg-sky-500/10 border-sky-400 ring-2 ring-sky-400/25"
@@ -381,12 +381,19 @@ export function ProjectThumbnailDropzone({
           </div>
 
           {/* Preview Modal Footer */}
-          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-t border-white/10 bg-[#161619]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 px-4 sm:px-5 py-3 border-t border-white/10 bg-[#161619]">
             <span className="font-mono-custom text-[11px] text-[#888]">
               Full 16:9 preview — Close this dialog when ready to save the project.
             </span>
             <DialogClose
-              render={<Button type="button" variant="default" size="sm" />}
+              render={
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
+                  className="w-full sm:w-auto justify-center"
+                />
+              }
             >
               Close Preview
             </DialogClose>

@@ -166,7 +166,7 @@ export default function AdminInquiriesPage() {
           </div>
           <p className="text-amber-200/80 leading-relaxed">
             Inquiries are currently being captured in server runtime memory. To enable permanent PostgreSQL storage across deployments, run the migration file{" "}
-            <code className="px-1.5 py-0.5 rounded bg-black/40 text-white">
+            <code className="px-1.5 py-0.5 rounded bg-black/40 text-white break-all">
               supabase/migrations/20261024000000_add_case_study_fields_and_inquiries.sql
             </code>{" "}
             in your Supabase SQL Editor.
@@ -214,11 +214,11 @@ export default function AdminInquiriesPage() {
       </div>
 
       {/* Filter Tabs & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div
           role="tablist"
           aria-label="Filter inquiries by status"
-          className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#141416] border border-white/10"
+          className="flex items-center gap-1 p-1 rounded-xl bg-[#141416] border border-white/10 overflow-x-auto max-w-full"
         >
           {(
             [
@@ -235,7 +235,7 @@ export default function AdminInquiriesPage() {
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+              className={`shrink-0 px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 activeTab === tab.id
                   ? "bg-white/15 text-white font-medium"
                   : "text-[#888] hover:text-white"
@@ -297,7 +297,7 @@ export default function AdminInquiriesPage() {
             return (
               <Card
                 key={inquiry.id}
-                className={`p-5 sm:p-6 transition-all space-y-4 ${
+                className={`p-4 sm:p-6 transition-all space-y-4 ${
                   isUnread
                     ? "bg-[#17171b] border-amber-500/30"
                     : "bg-[#141416] border-white/10"
@@ -342,7 +342,7 @@ export default function AdminInquiriesPage() {
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto pt-2.5 sm:pt-0 border-t border-white/5 sm:border-0">
                     <a
                       href={`mailto:${inquiry.email}?subject=${encodeURIComponent(
                         `Re: ${inquiry.project_type} Enquiry — Kamrul Islam`
@@ -355,7 +355,7 @@ export default function AdminInquiriesPage() {
                       className={buttonVariants({
                         variant: "default",
                         size: "sm",
-                        className: "font-mono-custom",
+                        className: "w-full sm:w-auto justify-center font-mono-custom",
                       })}
                     >
                       <Mail className="h-3.5 w-3.5" aria-hidden="true" />
@@ -369,6 +369,7 @@ export default function AdminInquiriesPage() {
                         size="sm"
                         disabled={updatingId === inquiry.id}
                         onClick={() => handleStatusChange(inquiry.id, "read")}
+                        className="flex-1 sm:flex-initial justify-center"
                       >
                         <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>Mark Read</span>
@@ -379,7 +380,7 @@ export default function AdminInquiriesPage() {
                         size="sm"
                         disabled={updatingId === inquiry.id}
                         onClick={() => handleStatusChange(inquiry.id, "unread")}
-                        className="text-[#aaa]"
+                        className="flex-1 sm:flex-initial justify-center text-[#aaa]"
                       >
                         <EyeOff className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>Mark Unread</span>
@@ -394,7 +395,7 @@ export default function AdminInquiriesPage() {
                         onClick={() =>
                           handleStatusChange(inquiry.id, "archived")
                         }
-                        className="text-[#aaa]"
+                        className="flex-1 sm:flex-initial justify-center text-[#aaa]"
                       >
                         <Archive className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>Archive</span>
@@ -406,6 +407,7 @@ export default function AdminInquiriesPage() {
                       size="sm"
                       disabled={deletingId === inquiry.id}
                       onClick={() => handleDelete(inquiry.id)}
+                      className="flex-1 sm:flex-initial justify-center"
                     >
                       <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>Delete</span>
@@ -414,7 +416,7 @@ export default function AdminInquiriesPage() {
                 </div>
 
                 {/* Client Details */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 border-t border-white/5 text-xs font-mono-custom">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-white/5 text-xs font-mono-custom">
                   <div>
                     <span className="text-[#666] block">Client Name</span>
                     <span className="text-white font-sans font-medium text-sm">

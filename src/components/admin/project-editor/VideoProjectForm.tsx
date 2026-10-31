@@ -175,8 +175,8 @@ export function VideoProjectForm({ mode, initialProject }: VideoProjectFormProps
         onKeyDown={shared.handleFormKeyDown}
         className="space-y-4"
       >
-        <Card className="p-5 space-y-3">
-          <div className="flex items-center justify-between">
+        <Card className="p-4 sm:p-5 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-1.5">
             <h3 className="font-mono-custom text-xs uppercase tracking-wider text-sky-400">
               Video Source, Aspect Ratio &amp; Thumbnail
             </h3>

@@ -225,14 +225,14 @@ export function AdminExecutiveOverview({
       {/* Section 2: Client Inquiries Overview (7 cols) + CV / Resume Overview (5 cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left: Client Inquiries Overview */}
-        <Card className="lg:col-span-7 p-5 sm:p-6 bg-[#121212]/90 flex flex-col justify-between gap-5">
+        <Card className="lg:col-span-7 p-4 sm:p-6 bg-[#121212]/90 flex flex-col justify-between gap-5">
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/12 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+            <div className="flex items-start sm:items-center justify-between gap-3">
+              <div className="flex items-start sm:items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/12 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 sm:mt-0">
                   <Inbox className="h-4 w-4" aria-hidden="true" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h2 className="font-sans text-sm font-semibold text-white">
                     Client Inquiries Overview
                   </h2>
@@ -247,6 +247,7 @@ export function AdminExecutiveOverview({
                 className={buttonVariants({
                   variant: "secondary",
                   size: "xs",
+                  className: "shrink-0",
                 })}
               >
                 <span>Open Inbox</span>
@@ -255,7 +256,7 @@ export function AdminExecutiveOverview({
             </div>
 
             {/* Mini Inquiry Stat Strip */}
-            <div className="grid grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <div className="px-3 py-2.5 rounded-xl bg-white/3 border border-white/8">
                 <span className="block font-mono-custom text-[10px] uppercase tracking-wider text-amber-400">
                   Unread
@@ -308,7 +309,7 @@ export function AdminExecutiveOverview({
                   <Link
                     key={inq.id}
                     href="/admin/inquiries"
-                    className="flex items-center justify-between gap-3 px-3.5 py-2.5 hover:bg-white/5 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 px-3.5 py-3 sm:py-2.5 hover:bg-white/5 transition-colors"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
@@ -333,7 +334,7 @@ export function AdminExecutiveOverview({
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-2 pl-4 sm:pl-0 shrink-0">
                       <span className="font-mono-custom text-[10px] text-[#666]">
                         {formatShortDate(inq.created_at)}
                       </span>
@@ -358,14 +359,14 @@ export function AdminExecutiveOverview({
         </Card>
 
         {/* Right: CV / Resume Overview */}
-        <Card className="lg:col-span-5 p-5 sm:p-6 bg-[#121212]/90 flex flex-col justify-between gap-5">
+        <Card className="lg:col-span-5 p-4 sm:p-6 bg-[#121212]/90 flex flex-col justify-between gap-5">
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-sky-500/12 border border-sky-500/25 flex items-center justify-center text-sky-400">
+            <div className="flex items-start sm:items-center justify-between gap-3">
+              <div className="flex items-start sm:items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-sky-500/12 border border-sky-500/25 flex items-center justify-center text-sky-400 shrink-0 mt-0.5 sm:mt-0">
                   <FileText className="h-4 w-4" aria-hidden="true" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h2 className="font-sans text-sm font-semibold text-white">
                     CV / Resume Status
                   </h2>
@@ -380,6 +381,7 @@ export function AdminExecutiveOverview({
                 className={buttonVariants({
                   variant: "secondary",
                   size: "xs",
+                  className: "shrink-0",
                 })}
               >
                 <span>Manage CV</span>
@@ -415,7 +417,7 @@ export function AdminExecutiveOverview({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/8 font-mono-custom text-[11px]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 border-t border-white/8 font-mono-custom text-[11px]">
                   <div>
                     <span className="block text-[10px] text-[#666] uppercase">
                       File Size
@@ -426,17 +428,17 @@ export function AdminExecutiveOverview({
                   </div>
                   <div>
                     <span className="block text-[10px] text-[#666] uppercase">
+                      Versions
+                    </span>
+                    <span className="text-[#ccc]">{cvDocuments.length} stored</span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1">
+                    <span className="block text-[10px] text-[#666] uppercase">
                       Updated
                     </span>
                     <span className="text-[#ccc]">
                       {formatShortDate(activeCvDocument.updated_at)}
                     </span>
-                  </div>
-                  <div>
-                    <span className="block text-[10px] text-[#666] uppercase">
-                      Versions
-                    </span>
-                    <span className="text-[#ccc]">{cvDocuments.length} stored</span>
                   </div>
                 </div>
               </div>
@@ -453,7 +455,7 @@ export function AdminExecutiveOverview({
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 pt-1">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 pt-1">
             {activeCvDocument && (
               <>
                 <a
@@ -465,7 +467,7 @@ export function AdminExecutiveOverview({
                   className={buttonVariants({
                     variant: "secondary",
                     size: "xs",
-                    className: "flex-1",
+                    className: "w-full sm:flex-1 justify-center",
                   })}
                 >
                   <ExternalLink className="h-3 w-3" aria-hidden="true" />
@@ -477,7 +479,7 @@ export function AdminExecutiveOverview({
                   className={buttonVariants({
                     variant: "secondary",
                     size: "xs",
-                    className: "flex-1",
+                    className: "w-full sm:flex-1 justify-center",
                   })}
                 >
                   <Download className="h-3 w-3" aria-hidden="true" />
@@ -490,7 +492,7 @@ export function AdminExecutiveOverview({
               className={buttonVariants({
                 variant: "default",
                 size: "xs",
-                className: "flex-1",
+                className: "col-span-2 sm:col-span-1 w-full sm:flex-1 justify-center",
               })}
             >
               <span>{activeCvDocument ? "Replace / Update CV" : "Upload CV"}</span>
@@ -502,18 +504,18 @@ export function AdminExecutiveOverview({
       {/* Section 3: Homepage Priority #1-#3 Featured Lineup (Video & Web) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Top 3 Video Lineup */}
-        <Card className="p-5 bg-[#121212]/90 space-y-4">
+        <Card className="p-4 sm:p-5 bg-[#121212]/90 space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-sky-400" aria-hidden="true" />
-              <h2 className="font-sans text-sm font-semibold text-white">
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="h-4 w-4 text-sky-400 shrink-0" aria-hidden="true" />
+              <h2 className="font-sans text-sm font-semibold text-white truncate">
                 Video Showcase Lineup (Top 3)
               </h2>
             </div>
             <button
               type="button"
               onClick={() => onSelectProjectsTab("video")}
-              className="inline-flex items-center gap-1 font-mono-custom text-xs text-sky-400 hover:text-sky-300 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 font-mono-custom text-xs text-sky-400 hover:text-sky-300 transition-colors cursor-pointer shrink-0"
             >
               <span>All Video ({videoProjects})</span>
               <ArrowRight className="h-3 w-3" aria-hidden="true" />
@@ -548,11 +550,12 @@ export function AdminExecutiveOverview({
                     </div>
                   </div>
                   <Link
-                    href={`/admin/projects/${project.id}`}
+                    href={`/admin/projects/${project.id}/edit`}
                     onClick={() => onSaveEditReturnState(project.id)}
                     className={buttonVariants({
                       variant: "secondary",
                       size: "xs",
+                      className: "shrink-0",
                     })}
                   >
                     <Pencil className="h-3 w-3" aria-hidden="true" />
@@ -565,18 +568,18 @@ export function AdminExecutiveOverview({
         </Card>
 
         {/* Top 3 Web Lineup */}
-        <Card className="p-5 bg-[#121212]/90 space-y-4">
+        <Card className="p-4 sm:p-5 bg-[#121212]/90 space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-purple-400" aria-hidden="true" />
-              <h2 className="font-sans text-sm font-semibold text-white">
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="h-4 w-4 text-purple-400 shrink-0" aria-hidden="true" />
+              <h2 className="font-sans text-sm font-semibold text-white truncate">
                 Web Case Studies Lineup (Top 3)
               </h2>
             </div>
             <button
               type="button"
               onClick={() => onSelectProjectsTab("web")}
-              className="inline-flex items-center gap-1 font-mono-custom text-xs text-purple-400 hover:text-purple-300 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 font-mono-custom text-xs text-purple-400 hover:text-purple-300 transition-colors cursor-pointer shrink-0"
             >
               <span>All Web ({webProjects})</span>
               <ArrowRight className="h-3 w-3" aria-hidden="true" />
@@ -614,11 +617,12 @@ export function AdminExecutiveOverview({
                     </div>
                   </div>
                   <Link
-                    href={`/admin/projects/${project.id}`}
+                    href={`/admin/projects/${project.id}/edit`}
                     onClick={() => onSaveEditReturnState(project.id)}
                     className={buttonVariants({
                       variant: "secondary",
                       size: "xs",
+                      className: "shrink-0",
                     })}
                   >
                     <Pencil className="h-3 w-3" aria-hidden="true" />
@@ -632,8 +636,8 @@ export function AdminExecutiveOverview({
       </div>
 
       {/* Section 4: Recently Added / Updated Projects Quick Access */}
-      <Card className="p-5 sm:p-6 bg-[#121212]/90 space-y-4">
-        <div className="flex items-center justify-between gap-3">
+      <Card className="p-4 sm:p-6 bg-[#121212]/90 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="font-sans text-sm font-semibold text-white">
               Recently Updated Works
@@ -648,6 +652,7 @@ export function AdminExecutiveOverview({
             className={buttonVariants({
               variant: "secondary",
               size: "xs",
+              className: "self-start sm:self-auto shrink-0",
             })}
           >
             <span>View All {totalProjects} Projects</span>
@@ -667,7 +672,7 @@ export function AdminExecutiveOverview({
                 <div
                   key={project.id}
                   id={`admin-project-row-${project.id}`}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 hover:bg-white/4 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-3.5 sm:px-4 py-3 hover:bg-white/4 transition-colors"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div className="relative w-16 h-10 rounded-lg overflow-hidden bg-black border border-white/10 shrink-0">
@@ -687,7 +692,7 @@ export function AdminExecutiveOverview({
                       )}
                     </div>
 
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
                         <Badge
                           variant={isVideo ? "info" : "purple"}
@@ -710,12 +715,13 @@ export function AdminExecutiveOverview({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto pt-2.5 sm:pt-0 border-t border-white/5 sm:border-0 shrink-0">
                     <Button
                       variant={project.is_published ? "success" : "warning"}
                       size="xs"
                       onClick={() => onTogglePublish(project)}
                       disabled={togglingId === project.id}
+                      className="w-full sm:w-auto justify-center"
                     >
                       {togglingId === project.id ? (
                         <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
@@ -727,11 +733,12 @@ export function AdminExecutiveOverview({
                     </Button>
 
                     <Link
-                      href={`/admin/projects/${project.id}`}
+                      href={`/admin/projects/${project.id}/edit`}
                       onClick={() => onSaveEditReturnState(project.id)}
                       className={buttonVariants({
                         variant: "secondary",
                         size: "xs",
+                        className: "w-full sm:w-auto justify-center",
                       })}
                     >
                       <Pencil className="h-3 w-3" aria-hidden="true" />

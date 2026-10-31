@@ -57,12 +57,12 @@ export function ProjectSharedDetailsSection({
 
   return (
     <>
-      <Card className="p-5 space-y-4">
-        <div className="flex items-center justify-between">
+      <Card className="p-4 sm:p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
           <h3 className="font-mono-custom text-xs uppercase tracking-wider text-white/70">
             Project Information &amp; Case Study Details
           </h3>
-          <span className="font-mono-custom text-[11px] text-[#666]">
+          <span className="font-mono-custom text-[11px] text-[#666] truncate max-w-full">
             /projects/{discipline}/{slug || projectId || "[slug]"}
           </span>
         </div>
@@ -272,7 +272,7 @@ export function ProjectSharedDetailsSection({
           className={buttonVariants({
             variant: "secondary",
             size: "default",
-            className: "px-5 py-2.5 h-10 text-xs",
+            className: "flex-1 sm:flex-initial justify-center px-5 py-2.5 h-10 text-xs",
           })}
         >
           Cancel
@@ -280,7 +280,7 @@ export function ProjectSharedDetailsSection({
         <Button
           type="submit"
           disabled={submitting}
-          className="px-6 py-2.5 h-10 text-xs"
+          className="flex-1 sm:flex-initial justify-center px-6 py-2.5 h-10 text-xs"
         >
           {submitting ? (
             <>

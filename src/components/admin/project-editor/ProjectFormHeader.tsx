@@ -26,10 +26,10 @@ export function ProjectFormHeader({
   const cancelHref = `/admin?tab=${discipline}`;
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3.5 min-w-0">
+    <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4">
+      <div className="flex items-start sm:items-center gap-3.5 min-w-0">
         <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border mt-0.5 sm:mt-0 ${
             isVideo
               ? "bg-sky-500/15 border-sky-500/25 text-sky-400"
               : "bg-purple-500/15 border-purple-500/25 text-purple-400"
@@ -42,7 +42,7 @@ export function ProjectFormHeader({
           )}
         </div>
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <h1 className="font-gambarino text-2xl sm:text-3xl text-white font-normal uppercase tracking-tight">
               {isEdit
                 ? isVideo
@@ -58,7 +58,7 @@ export function ProjectFormHeader({
               </span>
             )}
           </div>
-          <p className="font-mono-custom text-xs text-[#888] mt-0.5 truncate">
+          <p className="font-mono-custom text-xs text-[#888] mt-0.5 line-clamp-2 sm:truncate">
             {isVideo
               ? "Editorial video showcase layout, aspect ratio, thumbnail & case study details."
               : "Web application links, optimized hero screenshot & case study details."}
@@ -75,7 +75,11 @@ export function ProjectFormHeader({
             router.push(getSavedAdminReturnUrl(discipline));
           }
         }}
-        className={buttonVariants({ variant: "secondary", size: "sm" })}
+        className={buttonVariants({
+          variant: "secondary",
+          size: "sm",
+          className: "shrink-0",
+        })}
       >
         Cancel
       </Link>

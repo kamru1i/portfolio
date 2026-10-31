@@ -298,9 +298,9 @@ export default function AdminCvManagementPage() {
       {/* Main Grid: Active Status + Upload Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left 7 cols: Active Published CV Status */}
-        <Card className="lg:col-span-7 p-6 flex flex-col justify-between space-y-6">
+        <Card className="lg:col-span-7 p-4 sm:p-6 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-mono-custom text-xs uppercase tracking-wider text-[#888]">
                 Active Public CV Status
               </span>
@@ -325,14 +325,23 @@ export default function AdminCvManagementPage() {
             ) : activeDocument ? (
               <div className="space-y-4 pt-2">
                 <div>
-                  <h2 className="font-sans text-xl font-medium text-white flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-emerald-400 shrink-0" aria-hidden="true" />
-                    <span>{activeDocument.title}</span>
+                  <h2 className="font-sans text-lg sm:text-xl font-medium text-white flex items-start sm:items-center gap-2">
+                    <FileText className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5 sm:mt-0" aria-hidden="true" />
+                    <span className="min-w-0 break-words">{activeDocument.title}</span>
                   </h2>
-                  <p className="font-mono-custom text-xs text-[#888] mt-1 break-all">
-                    File: <span className="text-white/90">{activeDocument.file_name}</span>
-                    {activeDocument.version_label ? ` • Version: ${activeDocument.version_label}` : ""}
-                  </p>
+                  <div className="font-mono-custom text-xs text-[#888] mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="break-all">
+                      File: <span className="text-white/90">{activeDocument.file_name}</span>
+                    </span>
+                    {activeDocument.version_label && (
+                      <span className="inline-flex items-center gap-1.5 text-[#999]">
+                        <span aria-hidden="true">•</span>
+                        <span>
+                          Version: <span className="text-white/85">{activeDocument.version_label}</span>
+                        </span>
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
@@ -346,18 +355,18 @@ export default function AdminCvManagementPage() {
                   </div>
                   <div className="p-3 rounded-xl bg-black/40 border border-white/5">
                     <span className="font-mono-custom text-[10px] uppercase text-[#777] block">
-                      Last Updated
-                    </span>
-                    <span className="font-mono-custom text-xs text-white mt-0.5 block">
-                      {formatDateTime(activeDocument.updated_at)}
-                    </span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 col-span-2 sm:col-span-1">
-                    <span className="font-mono-custom text-[10px] uppercase text-[#777] block">
                       Download Filename
                     </span>
                     <span className="font-mono-custom text-xs text-emerald-300 mt-0.5 block truncate">
                       Kamrul-Islam-CV.pdf
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 col-span-2 sm:col-span-1">
+                    <span className="font-mono-custom text-[10px] uppercase text-[#777] block">
+                      Last Updated
+                    </span>
+                    <span className="font-mono-custom text-xs text-white mt-0.5 block">
+                      {formatDateTime(activeDocument.updated_at)}
                     </span>
                   </div>
                 </div>
@@ -375,10 +384,11 @@ export default function AdminCvManagementPage() {
           </div>
 
           {activeDocument && (
-            <div className="flex flex-wrap items-center gap-2.5 pt-4 border-t border-white/10">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 pt-4 border-t border-white/10">
               <Button
                 variant="default"
                 onClick={() => setPreviewDoc(activeDocument)}
+                className="col-span-2 sm:col-span-1 w-full sm:w-auto justify-center"
               >
                 <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Preview Active PDF</span>
@@ -386,7 +396,11 @@ export default function AdminCvManagementPage() {
               <a
                 href="/api/cv/pdf?download=1"
                 download="Kamrul-Islam-CV.pdf"
-                className={buttonVariants({ variant: "secondary", size: "default" })}
+                className={buttonVariants({
+                  variant: "secondary",
+                  size: "default",
+                  className: "w-full sm:w-auto justify-center",
+                })}
               >
                 <Download className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Download PDF</span>
@@ -395,6 +409,7 @@ export default function AdminCvManagementPage() {
                 variant="warning"
                 onClick={() => handleTogglePublish(activeDocument)}
                 disabled={updatingId === activeDocument.id}
+                className="w-full sm:w-auto justify-center"
               >
                 {updatingId === activeDocument.id ? "Updating..." : "Unpublish"}
               </Button>
@@ -403,7 +418,7 @@ export default function AdminCvManagementPage() {
         </Card>
 
         {/* Right 5 cols: Upload / Replace Form */}
-        <Card className="lg:col-span-5 p-6">
+        <Card className="lg:col-span-5 p-4 sm:p-6">
           <form onSubmit={handleUploadSubmit} className="space-y-5">
             <div>
               <h2 className="font-sans text-lg font-medium text-white">
@@ -428,7 +443,7 @@ export default function AdminCvManagementPage() {
                   className="w-full text-xs font-mono-custom text-[#aaa] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-mono-custom file:bg-white/10 file:text-white hover:file:bg-white/15 cursor-pointer bg-black/40 border border-white/10 rounded-xl p-2"
                 />
                 {selectedFile && (
-                  <p className="font-mono-custom text-[11px] text-emerald-400 mt-1.5">
+                  <p className="font-mono-custom text-[11px] text-emerald-400 mt-1.5 break-all">
                     Selected: {selectedFile.name} ({formatFileSize(selectedFile.size)})
                   </p>
                 )}
@@ -505,22 +520,29 @@ export default function AdminCvManagementPage() {
 
       {/* Inline Admin PDF Preview Panel */}
       {previewDoc && (
-        <Card className="p-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
+        <Card className="p-4 sm:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="min-w-0">
               <span className="font-mono-custom text-[10px] uppercase tracking-wider text-emerald-400 block">
                 Admin PDF Preview
               </span>
-              <h3 className="font-sans text-base font-medium text-white">
-                {previewDoc.title} ({previewDoc.file_name})
+              <h3 className="font-sans text-base font-medium text-white break-words">
+                {previewDoc.title}{" "}
+                <span className="text-white/60 text-xs font-mono-custom break-all">
+                  ({previewDoc.file_name})
+                </span>
               </h3>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto shrink-0">
               <a
                 href={`/api/cv/pdf?id=${encodeURIComponent(previewDoc.id)}&preview=1`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={buttonVariants({ variant: "secondary", size: "sm" })}
+                className={buttonVariants({
+                  variant: "secondary",
+                  size: "sm",
+                  className: "w-full sm:w-auto justify-center",
+                })}
               >
                 <span>Open in New Tab</span>
                 <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -529,7 +551,7 @@ export default function AdminCvManagementPage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => setPreviewDoc(null)}
-                className="text-[#aaa] hover:text-white"
+                className="w-full sm:w-auto justify-center text-[#aaa] hover:text-white"
               >
                 <span>Close Preview</span>
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
@@ -549,7 +571,7 @@ export default function AdminCvManagementPage() {
 
       {/* Version History & All Uploaded CV Records */}
       <Card className="overflow-hidden">
-        <div className="p-5 border-b border-white/10 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
           <div>
             <h2 className="font-sans text-base font-medium text-white">
               Uploaded CV Versions ({documents.length})
@@ -575,7 +597,7 @@ export default function AdminCvManagementPage() {
                 key={doc.id}
                 className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/2 transition-colors"
               >
-                <div className="space-y-1 min-w-0">
+                <div className="space-y-1.5 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={doc.is_published ? "success" : "muted"}>
                       {doc.is_published ? "Active / Published" : "Archived / Draft"}
@@ -597,11 +619,12 @@ export default function AdminCvManagementPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-0 self-end sm:self-center shrink-0">
+                <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-0 shrink-0">
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => setPreviewDoc(doc)}
+                    className="w-full sm:w-auto justify-center px-2.5 sm:px-3"
                   >
                     <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>Preview</span>
@@ -612,6 +635,7 @@ export default function AdminCvManagementPage() {
                     size="sm"
                     onClick={() => handleTogglePublish(doc)}
                     disabled={updatingId === doc.id}
+                    className="w-full sm:w-auto justify-center px-2.5 sm:px-3"
                   >
                     {updatingId === doc.id
                       ? "Saving..."
@@ -624,6 +648,7 @@ export default function AdminCvManagementPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => setConfirmDeleteDoc(doc)}
+                    className="w-full sm:w-auto justify-center px-2.5 sm:px-3"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>Delete</span>
