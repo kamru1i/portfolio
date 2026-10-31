@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- Uses raw <img> with onError fallback for arbitrary external favicons and screenshots */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Globe, X } from "lucide-react";
@@ -10,7 +10,6 @@ import { PortfolioProject } from "@/lib/portfolio-data";
 import { getDisplayDomain } from "@/lib/url-utils";
 import {
   MODAL_BACKDROP_CLASSES,
-  MODAL_OUTER_SHELL_CLASSES,
   getProjectAttribution,
 } from "./modal-tokens";
 
@@ -37,6 +36,25 @@ function ProjectPreviewModalContent({
   project: PortfolioProject;
   onClose: () => void;
 }) {
+  const [viewportSize, setViewportSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 1920,
+    height: typeof window !== "undefined" ? window.innerHeight : 1080,
+  });
+  // Default to 16:9 widescreen ratio; refine to exact screenshot ratio on load so zero pixels are ever cropped
+  const [imageRatio, setImageRatio] = useState<number>(16 / 9);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Handle ESC key to dismiss
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -61,6 +79,19 @@ function ProjectPreviewModalContent({
   const faviconUrl = `https://www.google.com/s2/favicons?domain=${displayDomain}&sz=64`;
   const previewImage = project.previewImageUrl || project.thumbnail;
 
+  // Compute exact stage dimensions so the full 16:9 screenshot fits 100% edge-to-edge without cropping
+  const paddingX = viewportSize.width < 640 ? 20 : 40;
+  const maxModalW = Math.min(1152, Math.max(280, viewportSize.width - paddingX));
+  const chromeHeight = 100; // Header (~52px) + Footer (~48px)
+  const maxMediaH = Math.max(
+    180,
+    Math.min(680, Math.round(viewportSize.height * 0.84) - chromeHeight)
+  );
+  const effectiveRatio = imageRatio >= 1.2 ? imageRatio : 16 / 9;
+  const mediaHeight = Math.round(Math.min(maxMediaH, maxModalW / effectiveRatio));
+  const mediaWidth = Math.round(mediaHeight * effectiveRatio);
+  const modalWidth = Math.max(Math.min(maxModalW, 380), mediaWidth);
+
   return (
     <AnimatePresence>
       <motion.div
@@ -78,7 +109,11 @@ function ProjectPreviewModalContent({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 16 }}
           transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-          className={MODAL_OUTER_SHELL_CLASSES}
+          style={{
+            width: `${modalWidth}px`,
+            maxWidth: "calc(100vw - 20px)",
+          }}
+          className="relative rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -177,19 +212,31 @@ function ProjectPreviewModalContent({
             </div>
           </div>
 
-          {/* Main Hero Screenshot Showcase Area (Zero Iframe Lag) */}
-          <div className="relative flex-1 w-full bg-[#0a0b0e] flex items-center justify-center overflow-hidden">
+          {/* Main 16:9 Hero Screenshot Showcase Area (Zero Cropping, Zero Iframe Lag) */}
+          <div
+            style={{
+              height: previewImage ? `${mediaHeight}px` : undefined,
+              minHeight: previewImage ? undefined : "320px",
+            }}
+            className="relative w-full bg-[#0a0b0e] flex items-center justify-center overflow-hidden"
+          >
             {previewImage ? (
-              <div className="relative w-full h-full overflow-hidden group">
+              <div className="relative w-full h-full overflow-hidden group flex items-center justify-center">
                 <img
                   src={previewImage}
                   alt={`${project.title} hero section screenshot`}
                   decoding="async"
-                  className="w-full h-full object-cover object-top"
+                  onLoad={(e) => {
+                    const { naturalWidth, naturalHeight } = e.currentTarget;
+                    if (naturalWidth > 0 && naturalHeight > 0) {
+                      setImageRatio(naturalWidth / naturalHeight);
+                    }
+                  }}
+                  className="w-full h-full object-contain block"
                 />
 
                 {/* Subtle Bottom Gradient & Floating Live Action Bar */}
-                <div className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
 
                 {project.liveUrl && (
                   <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">

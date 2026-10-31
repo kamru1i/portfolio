@@ -221,7 +221,7 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
           {/* MEDIA SECTION: Optimized Hero Section Screenshot Showcase     */}
           {/* ============================================================ */}
           <section className="w-full mb-20 md:mb-28">
-            <div className="w-full h-[380px] sm:h-[540px] md:h-[680px] rounded-2xl overflow-hidden border border-white/15 bg-[#0e0e0e] shadow-[0_30px_70px_rgba(0,0,0,0.85)] flex flex-col">
+            <div className="w-full rounded-2xl overflow-hidden border border-white/15 bg-[#0e0e0e] shadow-[0_30px_70px_rgba(0,0,0,0.85)] flex flex-col">
               {/* Header preview bar */}
               <div className="px-4 py-2.5 bg-[#181818] border-b border-white/10 flex items-center justify-between gap-2 text-xs font-mono-custom text-[#888]">
                 <div className="flex items-center gap-2 min-w-0">
@@ -245,15 +245,15 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                 )}
               </div>
 
-              {/* Viewport Content */}
-              <div className="relative flex-1 w-full h-full bg-[#0a0b10] overflow-hidden">
+              {/* Viewport Content (Full 16:9 Screenshot without Cropping) */}
+              <div className="relative w-full aspect-video bg-[#0a0b10] overflow-hidden flex items-center justify-center">
                 {heroScreenshot ? (
                   /* eslint-disable-next-line @next/next/no-img-element -- Renders local or external screenshot cleanly */
                   <img
                     src={heroScreenshot}
                     alt={`${project.title} hero section screenshot`}
                     decoding="async"
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-contain block"
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-[#0a0b10]">

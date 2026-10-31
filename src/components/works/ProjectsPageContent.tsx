@@ -391,7 +391,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
       {activeTab === "web" && (
         <div className="w-full">
           {allWebProjects.length > 0 ? (
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 items-stretch">
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-stretch">
               {allWebProjects.map((project, idx) => {
                 const projectSlug = project.slug || project.id;
 

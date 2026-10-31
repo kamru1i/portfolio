@@ -62,7 +62,11 @@ export function WebProjectForm({ mode, initialProject }: WebProjectFormProps) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        onKeyDown={shared.handleFormKeyDown}
+        className="space-y-4"
+      >
         <Card className="p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="font-mono-custom text-xs uppercase tracking-wider text-purple-400">

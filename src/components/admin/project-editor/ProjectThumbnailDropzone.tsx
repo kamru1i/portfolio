@@ -9,10 +9,18 @@ import {
   ClipboardPaste,
   RotateCcw,
   ImagePlus,
+  Eye,
+  X,
 } from "lucide-react";
 import { optimizeImageBeforeUpload } from "@/lib/image-optimizer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
 interface ProjectThumbnailDropzoneProps {
@@ -43,6 +51,7 @@ export function ProjectThumbnailDropzone({
   const [uploading, setUploading] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [optimizedLabel, setOptimizedLabel] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const isVideo = targetType === "video";
   const displayPreviewUrl = imageUrl || fallbackPreviewUrl || "";
@@ -214,7 +223,12 @@ export function ProjectThumbnailDropzone({
       >
         <div className="flex items-center gap-2.5 min-w-0">
           {displayPreviewUrl ? (
-            <div className="relative w-12 h-8 rounded overflow-hidden bg-black shrink-0 border border-white/15">
+            <button
+              type="button"
+              onClick={() => setIsPreviewOpen(true)}
+              title="Click to preview attached image"
+              className="group/thumb relative w-12 h-8 rounded overflow-hidden bg-black shrink-0 border border-white/20 hover:border-white/60 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            >
               <Image
                 src={displayPreviewUrl}
                 alt="Uploaded preview"
@@ -222,7 +236,10 @@ export function ProjectThumbnailDropzone({
                 unoptimized
                 className="object-cover object-top"
               />
-            </div>
+              <span className="absolute inset-0 bg-black/55 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                <Eye className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+              </span>
+            </button>
           ) : (
             <div
               className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
@@ -235,11 +252,22 @@ export function ProjectThumbnailDropzone({
             </div>
           )}
           <div className="min-w-0">
-            <p className="font-mono-custom text-[10px] text-[#aaa] truncate">
-              {isDraggingOver
-                ? "Drop Image Here"
-                : "Drop, Paste (Ctrl+V), or Upload"}
-            </p>
+            {displayPreviewUrl && !isDraggingOver ? (
+              <button
+                type="button"
+                onClick={() => setIsPreviewOpen(true)}
+                className="font-mono-custom text-[10px] text-[#bbb] hover:text-white truncate block text-left cursor-pointer transition-colors"
+                title="Click to preview attached image"
+              >
+                Click thumbnail to preview
+              </button>
+            ) : (
+              <p className="font-mono-custom text-[10px] text-[#aaa] truncate">
+                {isDraggingOver
+                  ? "Drop Image Here"
+                  : "Drop, Paste (Ctrl+V), or Upload"}
+              </p>
+            )}
           </div>
         </div>
 
@@ -312,6 +340,59 @@ export function ProjectThumbnailDropzone({
           )}
         </div>
       </div>
+
+      {/* Full-Size Image Preview Modal */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-5xl p-0 overflow-hidden bg-[#121215] border-white/15"
+        >
+          {/* Preview Modal Header */}
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10 bg-[#18181b]">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <DialogTitle className="text-sm font-medium text-white truncate">
+                {isVideo ? "Video Thumbnail Preview" : "Homepage Screenshot Preview"}
+              </DialogTitle>
+              {optimizedLabel && (
+                <Badge variant="success" className="text-[10px]">
+                  {optimizedLabel}
+                </Badge>
+              )}
+            </div>
+
+            <DialogClose
+              aria-label="Close preview"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 hover:bg-white/12 text-[#999] hover:text-white border border-white/10 transition-colors cursor-pointer"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </DialogClose>
+          </div>
+
+          {/* Preview Image Stage */}
+          <div className="relative w-full aspect-video max-h-[75dvh] bg-[#090a0d] flex items-center justify-center overflow-hidden">
+            {displayPreviewUrl && (
+              /* eslint-disable-next-line @next/next/no-img-element -- Full attached preview inside admin modal */
+              <img
+                src={displayPreviewUrl}
+                alt="Attached project preview"
+                className="w-full h-full object-contain block"
+              />
+            )}
+          </div>
+
+          {/* Preview Modal Footer */}
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-t border-white/10 bg-[#161619]">
+            <span className="font-mono-custom text-[11px] text-[#888]">
+              Full 16:9 preview — Close this dialog when ready to save the project.
+            </span>
+            <DialogClose
+              render={<Button type="button" variant="default" size="sm" />}
+            >
+              Close Preview
+            </DialogClose>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

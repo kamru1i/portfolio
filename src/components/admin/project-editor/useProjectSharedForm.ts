@@ -78,6 +78,24 @@ export function useProjectSharedForm({
     }
   };
 
+  /**
+   * Prevents pressing the Enter key inside <input> fields from accidentally
+   * submitting/saving the project form. Only clicking the explicit submit button
+   * (or pressing Enter inside a <textarea> for newlines) is allowed.
+   */
+  const handleFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key !== "Enter") return;
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === "TEXTAREA" ||
+      (target.tagName === "BUTTON" &&
+        (target as HTMLButtonElement).type === "submit")
+    ) {
+      return;
+    }
+    e.preventDefault();
+  };
+
   const submitProject = async (specificFields: SpecificSubmissionFields) => {
     setSubmitting(true);
     setErrorMessage(null);
@@ -185,6 +203,7 @@ export function useProjectSharedForm({
     errorMessage,
     setErrorMessage,
     handleTitleChange,
+    handleFormKeyDown,
     submitProject,
   };
 }
