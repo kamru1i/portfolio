@@ -168,14 +168,14 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
         <div
           role="tablist"
           aria-label="Filter archive projects by discipline"
-          className="inline-flex items-center p-1.5 rounded-full bg-white/4 border border-white/10 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)] w-fit"
+          className="inline-flex items-center p-1.5 rounded-full bg-white/4 border border-white/10 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.3)] w-full sm:w-fit"
         >
           <button
             type="button"
             role="tab"
             aria-selected={activeTab === "video"}
             onClick={() => handleTabChange("video")}
-            className={`relative px-6 sm:px-8 py-2 rounded-full font-mono-custom text-xs sm:text-sm uppercase tracking-wider transition-colors z-10 flex items-center gap-2 ${
+            className={`relative flex-1 sm:flex-initial justify-center px-3.5 sm:px-8 py-2 rounded-full font-mono-custom text-xs sm:text-sm uppercase tracking-wider transition-colors z-10 flex items-center gap-2 whitespace-nowrap ${
               activeTab === "video" ? "text-white font-medium" : "text-white/50 hover:text-white/80"
             }`}
           >
@@ -197,7 +197,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
             role="tab"
             aria-selected={activeTab === "web"}
             onClick={() => handleTabChange("web")}
-            className={`relative px-6 sm:px-8 py-2 rounded-full font-mono-custom text-xs sm:text-sm uppercase tracking-wider transition-colors z-10 flex items-center gap-2 ${
+            className={`relative flex-1 sm:flex-initial justify-center px-3.5 sm:px-8 py-2 rounded-full font-mono-custom text-xs sm:text-sm uppercase tracking-wider transition-colors z-10 flex items-center gap-2 whitespace-nowrap ${
               activeTab === "web" ? "text-white font-medium" : "text-white/50 hover:text-white/80"
             }`}
           >

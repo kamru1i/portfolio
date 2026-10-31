@@ -140,7 +140,7 @@ export function CvPdfViewer({
     <div className="w-full rounded-2xl bg-[#0e0e10] border border-white/10 overflow-hidden shadow-2xl">
       {/* Multi-Document Switcher Tabs (shown when more than 1 document category is published) */}
       {publishedDocuments.length > 1 && (
-        <div className="px-4 sm:px-6 py-3 bg-[#101012] border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-3 bg-[#101012] border-b border-white/10 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
           <span className="font-mono-custom text-[11px] uppercase tracking-widest text-[#777]">
             Official Documents
           </span>
@@ -152,13 +152,13 @@ export function CvPdfViewer({
                   key={docItem.category}
                   type="button"
                   onClick={() => handleSelectCategory(docItem.category)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-mono-custom text-xs transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full font-mono-custom text-[11px] sm:text-xs transition-all cursor-pointer ${
                     isSelected
                       ? "bg-white text-black font-medium shadow-sm"
                       : "bg-white/5 hover:bg-white/10 text-[#aaa] hover:text-white border border-white/10"
                   }`}
                 >
-                  <FileText className="w-3.5 h-3.5" />
+                  <FileText className="w-3.5 h-3.5 shrink-0" />
                   <span>{docItem.label}</span>
                 </button>
               );
@@ -169,12 +169,12 @@ export function CvPdfViewer({
 
       {/* Top Viewer Toolbar */}
       <div className="px-4 sm:px-6 py-4 bg-[#141416] border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 min-w-0">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono-custom text-[11px] uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             Official {activeDoc.shortLabel} PDF
           </span>
-          <span className="font-mono-custom text-xs text-white font-medium truncate">
+          <span className="font-mono-custom text-xs text-white font-medium truncate max-w-full">
             {activeDoc.downloadFilename}
           </span>
           <span className="font-mono-custom text-xs text-[#777]">
@@ -192,7 +192,7 @@ export function CvPdfViewer({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="hidden md:flex flex-wrap items-center gap-2.5 shrink-0">
           <a
             href={activeDoc.pdfUrl}
             target="_blank"
@@ -215,27 +215,27 @@ export function CvPdfViewer({
       </div>
 
       {/* Mobile / Touch Browser Notice + Direct Actions */}
-      <div className="md:hidden p-5 bg-[#111113] border-b border-white/10 space-y-3">
+      <div className="md:hidden p-4 sm:p-5 bg-[#111113] border-b border-white/10 space-y-3">
         <p className="font-mono-custom text-xs text-[#aaa] leading-relaxed">
           Some mobile browsers limit multi-page inline PDF scrolling. For the best reading experience on mobile, open the full PDF directly or download a copy.
         </p>
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <a
             href={downloadUrl}
             download={activeDoc.downloadFilename}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-black font-mono-custom text-xs uppercase tracking-wider font-medium"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white text-black font-mono-custom text-xs uppercase tracking-wider font-medium"
           >
             <span>Download {activeDoc.shortLabel} (PDF)</span>
-            <Download className="h-3.5 w-3.5" />
+            <Download className="h-3.5 w-3.5 shrink-0" />
           </a>
           <a
             href={activeDoc.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10"
           >
             <span>Open Full Screen</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
           </a>
         </div>
       </div>

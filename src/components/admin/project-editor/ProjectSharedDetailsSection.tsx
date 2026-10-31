@@ -237,7 +237,7 @@ export function ProjectSharedDetailsSection({
       </Card>
 
       {/* Clean Bottom Submit Bar — Publish/Draft Toggle + Cancel + Save/Publish Action */}
-      <div className="flex flex-wrap items-center justify-end gap-4 pt-1">
+      <div className="flex flex-wrap items-center justify-end gap-2.5 sm:gap-4 pt-1">
         {/* Publish / Draft Toggle Switch (No Box, Label on Left, Toggle on Right) */}
         <button
           type="button"
@@ -245,13 +245,13 @@ export function ProjectSharedDetailsSection({
           aria-checked={isPublished}
           aria-label={isPublished ? "Status: Publish" : "Status: Draft"}
           onClick={() => setIsPublished(!isPublished)}
-          className={`group inline-flex items-center gap-2.5 h-10 px-1 font-mono-custom text-xs uppercase tracking-wider transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-lg ${
+          className={`group inline-flex items-center gap-2 sm:gap-2.5 h-10 px-1 font-mono-custom text-xs uppercase tracking-wider transition-colors cursor-pointer select-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-lg ${
             isPublished
               ? "text-emerald-400 hover:text-emerald-300"
               : "text-amber-400 hover:text-amber-300"
           }`}
         >
-          <span className="min-w-[56px] text-right font-medium">
+          <span className="min-w-[54px] text-right font-medium">
             {isPublished ? "Publish" : "Draft"}
           </span>
           <span
@@ -284,7 +284,7 @@ export function ProjectSharedDetailsSection({
           className={buttonVariants({
             variant: "secondary",
             size: "default",
-            className: "flex-1 sm:flex-initial justify-center px-5 py-2.5 h-10 text-xs",
+            className: "shrink-0 justify-center px-4 sm:px-5 py-2.5 h-10 text-xs",
           })}
         >
           Cancel
@@ -292,7 +292,7 @@ export function ProjectSharedDetailsSection({
         <Button
           type="submit"
           disabled={submitting}
-          className="flex-1 sm:flex-initial w-[132px] min-w-[132px] justify-center px-5 py-2.5 h-10 text-xs"
+          className="shrink-0 w-[124px] sm:w-[132px] min-w-[124px] sm:min-w-[132px] justify-center px-4 sm:px-5 py-2.5 h-10 text-xs"
         >
           {submitting ? (
             <>
