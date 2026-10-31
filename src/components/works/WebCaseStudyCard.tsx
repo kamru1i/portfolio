@@ -2,9 +2,6 @@
 /* eslint-disable @next/next/no-img-element -- Uses raw <img> with onError fallback for arbitrary external favicons and screenshots */
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { getDisplayDomain } from "@/lib/url-utils";
 
@@ -54,8 +51,8 @@ export function WebCaseStudyCard({
             } transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.03]`}
           />
 
-          {/* Ambient Dark Gradients for Crisp Text Contrast */}
-          <div className="absolute inset-0 bg-linear-to-b from-black/80 via-black/15 to-black/85 pointer-events-none transition-opacity duration-300 group-hover:opacity-40" />
+          {/* Subtle Ambient Vignette so the screenshot stays crisp & visible both normally and on hover */}
+          <div className="absolute inset-0 bg-linear-to-b from-black/35 via-transparent to-black/55 pointer-events-none transition-opacity duration-300 group-hover:opacity-20" />
         </div>
       ) : (
         /* Static Fallback Canvas when no screenshot image is available */
@@ -104,121 +101,35 @@ export function WebCaseStudyCard({
         </div>
       )}
 
-      {/* Default State: Top Header (Title + Category + Live Indicator) */}
-      <div className="relative z-10 p-4 sm:p-5 flex flex-col transition-transform duration-300 group-hover:-translate-y-0.5">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-mono-custom text-[10px] sm:text-[11px] uppercase tracking-wider text-emerald-400 font-medium">
-            Live Production
-          </span>
-          <span className="text-white/30 text-xs">•</span>
-          <span className="font-mono-custom text-[10px] sm:text-[11px] text-white/60 truncate max-w-[160px]">
-            {displayDomain}
-          </span>
-        </div>
-
-        <h3 className="font-sans text-base sm:text-lg font-medium tracking-tight text-white leading-snug truncate">
-          {project.title}
-        </h3>
-        <p className="font-sans text-[11px] sm:text-xs text-[#b5b5b5] mt-0.5 font-normal truncate">
-          {project.category || "Brand Identity • Website Design"}
-        </p>
-      </div>
-
-      {/* Default State: Bottom Metadata (@Year + Case Study Link + Preview Pill) */}
-      <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between gap-2 transition-transform duration-300 group-hover:translate-y-0.5">
-        <span className="font-mono-custom text-xs text-[#999]">
-          {project.year ? `@${project.year}` : ""}
-        </span>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/projects/web/${project.slug || project.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 font-mono-custom text-[11px] text-white/85 hover:text-white border border-white/15 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-sm transition-colors"
-          >
-            <span>Details</span>
-            <ArrowRight className="h-3 w-3" aria-hidden="true" />
-          </Link>
-          <span className="font-mono-custom text-[11px] text-white/65 border border-white/10 px-2.5 py-0.5 rounded-full bg-black/50 backdrop-blur-xs">
-            Live Preview
-          </span>
-        </div>
-      </div>
-
-      {/* Interactive Card Hover Overlay */}
-      <div className="absolute inset-0 z-20 bg-black/85 backdrop-blur-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 ease-out flex flex-col justify-between p-4 sm:p-5">
-        {/* Top Title Reminder in Hover State */}
-        <div className="w-full flex items-center justify-between gap-2">
-          <span className="font-sans text-sm font-medium text-white truncate">
+      {/* Top-Left: Liquid Glass Effect Card (Project Name -> URL -> Brand Identity) */}
+      <div className="relative z-10 p-3.5 sm:p-4 flex items-start justify-between pointer-events-none">
+        <div className="max-w-[85%] rounded-2xl px-3.5 py-2.5 bg-black/35 bg-linear-to-br from-white/18 via-white/8 to-white/4 backdrop-blur-md border border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] transition-all duration-300 group-hover:border-white/35 group-hover:bg-black/45">
+          <h3 className="font-sans text-sm sm:text-base font-medium tracking-tight text-white leading-snug truncate">
             {project.title}
-          </span>
-          <span className="font-mono-custom text-[10px] text-emerald-400 uppercase tracking-wider shrink-0">
-            16:9 Preview
-          </span>
-        </div>
+          </h3>
 
-        {/* Center Content: Impact Narrative Statement */}
-        <div className="w-full my-auto py-1">
-          <p className="font-sans text-xs sm:text-sm font-normal leading-relaxed text-white/95 line-clamp-3">
-            {project.description}
-          </p>
-
-          {/* Thin Hairline Divider Rule */}
-          <div className="w-full h-px bg-white/15 my-2.5 sm:my-3" />
-        </div>
-
-        {/* Bottom Actions Row: Emblem Icon + Client on Left, Arrow Button on Right */}
-        <div className="flex items-center justify-between w-full">
-          {/* Left: 4-bar Equalizer Emblem Icon + Client Name */}
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="flex items-center gap-[3px] shrink-0" aria-hidden="true">
-              <span className="w-1 h-3 bg-neutral-400 rounded-full" />
-              <span className="w-1 h-4 bg-neutral-200 rounded-full" />
-              <span className="w-1 h-3.5 bg-neutral-300 rounded-full" />
-              <span className="w-1 h-2 bg-neutral-400 rounded-full" />
-            </div>
-            <span className="font-sans text-xs font-medium text-neutral-300 tracking-wide truncate max-w-[130px] sm:max-w-[170px]">
-              {project.client || "Emblem"}
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+            <span className="font-mono-custom text-[10px] sm:text-[11px] text-white/85 truncate">
+              {displayDomain}
             </span>
           </div>
 
-          {/* Right: Case Study Link + Optional GitHub + Preview Arrow Button */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <Link
-              href={`/projects/web/${project.slug || project.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="px-2.5 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono-custom text-[11px] uppercase tracking-wider border border-white/10 transition-all flex items-center justify-center shadow-sm"
-            >
-              Details
-            </Link>
-
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono-custom text-xs border border-white/10 transition-all flex items-center justify-center shadow-sm"
-                aria-label={`View ${project.title} source on GitHub`}
-              >
-                <GitHubBrandIcon className="h-4 w-4" aria-hidden="true" />
-              </a>
-            )}
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPreviewWeb(project);
-              }}
-              className="w-8 h-8 sm:px-3 rounded-xl bg-white/20 hover:bg-white text-white hover:text-black transition-all flex items-center justify-center text-sm shadow-sm group-hover:scale-105 cursor-pointer"
-              aria-label={`Preview live website for ${project.title}`}
-            >
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
+          <p className="font-sans text-[10px] sm:text-[11px] text-white/70 mt-0.5 font-normal truncate">
+            {project.category || "Brand Identity • Website Design"}
+          </p>
         </div>
+      </div>
+
+      {/* Bottom-Left: Year Metadata Only */}
+      <div className="relative z-10 px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between pointer-events-none">
+        {project.year ? (
+          <span className="font-mono-custom text-xs text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+            @{project.year}
+          </span>
+        ) : (
+          <span />
+        )}
       </div>
     </div>
   );
