@@ -13,7 +13,7 @@ import {
   Check,
   Loader2,
   Trash2,
-  Sparkles,
+  ScanSearch,
   ClipboardPaste,
   RotateCcw,
   ImagePlus,
@@ -556,19 +556,19 @@ export function ProjectEditorForm({
                     {resolvingVideo ? (
                       <>
                         <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                        <span>Resolving...</span>
+                        <span>Detecting...</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{isEdit ? "Re-Detect" : "Detect & Preview"}</span>
+                        <ScanSearch className="h-3.5 w-3.5 text-sky-400" aria-hidden="true" />
+                        <span>Detect</span>
                       </>
                     )}
                   </Button>
                 </div>
               </div>
 
-              {/* Compact Boxless Aspect Ratio Selector right after Detect & Preview */}
+              {/* Compact Boxless Aspect Ratio Selector right after Detect */}
               <div className="shrink-0">
                 <span className="font-mono-custom text-[10px] uppercase tracking-wider text-[#777] block mb-1 xl:text-right">
                   Aspect Ratio *
@@ -576,11 +576,11 @@ export function ProjectEditorForm({
                 <div className="flex items-center gap-1 sm:gap-1.5 bg-black/30 px-2 py-1 rounded-xl border border-white/10">
                   {(
                     [
-                      { id: "16:9", label: "16:9", sub: "Landscape", box: "w-6 h-3.5" },
-                      { id: "9:16", label: "9:16", sub: "Portrait", box: "w-3 h-5" },
-                      { id: "1:1", label: "1:1", sub: "Square", box: "w-4 h-4" },
-                      { id: "4:3", label: "4:3", sub: "Standard", box: "w-5 h-3.5" },
-                      { id: "5:4", label: "5:4", sub: "Near-Sq", box: "w-4.5 h-3.5" },
+                      { id: "16:9", label: "16:9", box: "w-6 h-3.5" },
+                      { id: "9:16", label: "9:16", box: "w-3 h-5" },
+                      { id: "1:1", label: "1:1", box: "w-4 h-4" },
+                      { id: "4:3", label: "4:3", box: "w-5 h-3.5" },
+                      { id: "5:4", label: "5:4", box: "w-4.5 h-3.5" },
                     ] as const
                   ).map((opt) => {
                     const isSelected = aspectRatio === opt.id;
@@ -607,9 +607,6 @@ export function ProjectEditorForm({
                             } rounded-[2px]`}
                           />
                         </div>
-                        <span className="font-mono-custom text-[9px] text-[#888] leading-none">
-                          {opt.sub}
-                        </span>
                       </button>
                     );
                   })}
