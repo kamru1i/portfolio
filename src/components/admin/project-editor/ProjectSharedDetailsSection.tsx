@@ -236,21 +236,24 @@ export function ProjectSharedDetailsSection({
         </div>
       </Card>
 
-      {/* Clean Bottom Submit Bar — Publish/Draft Toggle + Cancel + Save Action */}
-      <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
-        {/* Publish / Draft Toggle Switch */}
+      {/* Clean Bottom Submit Bar — Publish/Draft Toggle + Cancel + Save/Publish Action */}
+      <div className="flex flex-wrap items-center justify-end gap-4 pt-1">
+        {/* Publish / Draft Toggle Switch (No Box, Label on Left, Toggle on Right) */}
         <button
           type="button"
           role="switch"
           aria-checked={isPublished}
           aria-label={isPublished ? "Status: Publish" : "Status: Draft"}
           onClick={() => setIsPublished(!isPublished)}
-          className={`group inline-flex items-center gap-3 px-4 h-10 rounded-xl border font-mono-custom text-xs uppercase tracking-wider transition-all cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+          className={`group inline-flex items-center gap-2.5 h-10 px-1 font-mono-custom text-xs uppercase tracking-wider transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-lg ${
             isPublished
-              ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-300 hover:border-emerald-400/60"
-              : "bg-white/4 border-white/12 text-amber-300/90 hover:border-white/25 hover:bg-white/6"
+              ? "text-emerald-400 hover:text-emerald-300"
+              : "text-amber-400 hover:text-amber-300"
           }`}
         >
+          <span className="min-w-[56px] text-right font-medium">
+            {isPublished ? "Publish" : "Draft"}
+          </span>
           <span
             aria-hidden="true"
             className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border transition-colors duration-200 ${
@@ -266,9 +269,6 @@ export function ProjectSharedDetailsSection({
                   : "translate-x-0.5 bg-amber-400"
               }`}
             />
-          </span>
-          <span className="min-w-[52px] text-left font-medium">
-            {isPublished ? "Publish" : "Draft"}
           </span>
         </button>
 
@@ -292,19 +292,15 @@ export function ProjectSharedDetailsSection({
         <Button
           type="submit"
           disabled={submitting}
-          className="flex-1 sm:flex-initial justify-center px-6 py-2.5 h-10 text-xs"
+          className="flex-1 sm:flex-initial w-[132px] min-w-[132px] justify-center px-5 py-2.5 h-10 text-xs"
         >
           {submitting ? (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-              <span>
-                {isPublished ? "Publishing Project..." : "Drafting Project..."}
-              </span>
+              <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" aria-hidden="true" />
+              <span>{isPublished ? "Publishing..." : "Saving..."}</span>
             </>
           ) : (
-            <span>
-              {isPublished ? "Save & Publish Project" : "Save & Draft Project"}
-            </span>
+            <span>{isPublished ? "Publish" : "Save"}</span>
           )}
         </Button>
       </div>
