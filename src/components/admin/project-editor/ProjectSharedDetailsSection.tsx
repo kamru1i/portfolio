@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { ProjectType } from "@/types/project";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  getSavedAdminReturnUrl,
   markAdminReturnScrollRestore,
   SharedProjectFormController,
 } from "./useProjectSharedForm";
@@ -24,6 +26,7 @@ export function ProjectSharedDetailsSection({
   projectId,
   shared,
 }: ProjectSharedDetailsSectionProps) {
+  const router = useRouter();
   const isVideo = discipline === "video";
   const {
     isEdit,
@@ -259,9 +262,11 @@ export function ProjectSharedDetailsSection({
       <div className="flex items-center justify-end gap-3 pt-1">
         <Link
           href={shared.returnUrl}
-          onClick={() => {
+          onClick={(e) => {
             if (isEdit) {
+              e.preventDefault();
               markAdminReturnScrollRestore(projectId);
+              router.push(getSavedAdminReturnUrl(discipline));
             }
           }}
           className={buttonVariants({

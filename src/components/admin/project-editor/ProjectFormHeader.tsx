@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Film, Globe } from "lucide-react";
 import { ProjectType } from "@/types/project";
 import { buttonVariants } from "@/components/ui/button";
@@ -20,8 +21,9 @@ export function ProjectFormHeader({
   isEdit,
   projectId,
 }: ProjectFormHeaderProps) {
+  const router = useRouter();
   const isVideo = discipline === "video";
-  const cancelHref = isEdit ? getSavedAdminReturnUrl(discipline) : `/admin?tab=${discipline}`;
+  const cancelHref = `/admin?tab=${discipline}`;
 
   return (
     <div className="flex items-center justify-between gap-4">
@@ -66,9 +68,11 @@ export function ProjectFormHeader({
 
       <Link
         href={cancelHref}
-        onClick={() => {
+        onClick={(e) => {
           if (isEdit) {
+            e.preventDefault();
             markAdminReturnScrollRestore(projectId);
+            router.push(getSavedAdminReturnUrl(discipline));
           }
         }}
         className={buttonVariants({ variant: "secondary", size: "sm" })}

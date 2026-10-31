@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -94,18 +94,14 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<FilterTab>(
-    () => readInitialAdminViewState().tab
-  );
-  const [searchQuery, setSearchQuery] = useState<string>(
-    () => readInitialAdminViewState().searchQuery
-  );
-  const [currentPage, setCurrentPage] = useState<number>(
-    () => readInitialAdminViewState().page
-  );
+  // Deterministic initial states so SSR and client hydration match 100%
+  const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [highlightedProjectId, setHighlightedProjectId] = useState<string | null>(
-    () => readInitialAdminViewState().highlightedProjectId
+    null
   );
+  const hasRestoredViewRef = useRef(false);
   const pageSize = 12;
 
   const [togglingId, setTogglingId] = useState<string | null>(null);
@@ -114,7 +110,7 @@ export default function AdminDashboardPage() {
 
   // Sync URL query params and sessionStorage whenever tab, page, or searchQuery changes
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !hasRestoredViewRef.current) return;
     const params = new URLSearchParams(window.location.search);
     if (activeTab === "all") {
       params.delete("tab");
@@ -161,6 +157,16 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     let isMounted = true;
     (async () => {
+      await Promise.resolve();
+      if (!isMounted) return;
+
+      const restored = readInitialAdminViewState();
+      hasRestoredViewRef.current = true;
+      setActiveTab(restored.tab);
+      setSearchQuery(restored.searchQuery);
+      setCurrentPage(restored.page);
+      setHighlightedProjectId(restored.highlightedProjectId);
+
       try {
         const res = await fetch("/api/admin/projects");
         if (!res.ok) {
@@ -169,7 +175,35 @@ export default function AdminDashboardPage() {
         }
         const data = await res.json();
         if (isMounted) {
-          setProjects(data.projects || []);
+          const loadedProjects: ProjectRecord[] = data.projects || [];
+          setProjects(loadedProjects);
+
+          // Ensure the page containing the edited project is selected if priority changed
+          if (restored.highlightedProjectId) {
+            const filtered = loadedProjects.filter((p) => {
+              if (restored.tab === "video" && p.type !== "video") return false;
+              if (restored.tab === "web" && p.type !== "web") return false;
+              if (restored.tab === "published" && !p.is_published) return false;
+              if (restored.tab === "drafts" && p.is_published) return false;
+              if (restored.searchQuery.trim()) {
+                const q = restored.searchQuery.toLowerCase();
+                const matchTitle = p.title.toLowerCase().includes(q);
+                const matchClient =
+                  p.client_name?.toLowerCase().includes(q) || false;
+                const matchTags =
+                  p.tags?.some((t) => t.toLowerCase().includes(q)) || false;
+                return matchTitle || matchClient || matchTags;
+              }
+              return true;
+            });
+            const idx = filtered.findIndex(
+              (p) => p.id === restored.highlightedProjectId
+            );
+            if (idx !== -1) {
+              const targetPage = Math.floor(idx / pageSize) + 1;
+              setCurrentPage(targetPage);
+            }
+          }
         }
       } catch (err: unknown) {
         if (isMounted) {

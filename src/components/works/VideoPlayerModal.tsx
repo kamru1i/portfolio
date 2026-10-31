@@ -1,8 +1,16 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Uses raw <img> for full-bleed thumbnail fallback */
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Film, X } from "lucide-react";
+import { Film, Play, X } from "lucide-react";
+import {
+  YouTubeBrandIcon,
+  TikTokBrandIcon,
+  VimeoBrandIcon,
+  InstagramBrandIcon,
+  FacebookBrandIcon,
+} from "@/components/common/BrandIcons";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { detectVideoProvider, resolvePlayableEmbedUrl } from "@/lib/video-metadata";
 import {
@@ -12,6 +20,23 @@ import {
   computeAspectModalDimensions,
 } from "./modal-tokens";
 
+function renderPlatformIcon(provider: string) {
+  switch (provider) {
+    case "youtube":
+      return <YouTubeBrandIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />;
+    case "tiktok":
+      return <TikTokBrandIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />;
+    case "vimeo":
+      return <VimeoBrandIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />;
+    case "instagram":
+      return <InstagramBrandIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />;
+    case "facebook":
+      return <FacebookBrandIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />;
+    default:
+      return <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-current" />;
+  }
+}
+
 interface VideoPlayerModalProps {
   project: PortfolioProject | null;
   onClose: () => void;
@@ -19,6 +44,7 @@ interface VideoPlayerModalProps {
 
 export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [failedVideoId, setFailedVideoId] = useState<string | null>(null);
   const [viewportSize, setViewportSize] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 1920,
     height: typeof window !== "undefined" ? window.innerHeight : 1080,
@@ -69,12 +95,18 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
     privacyEnhanced: true,
   });
 
-  const isDirectVideo = provider === "local" || (!embedUrl && url.match(/\.(mp4|webm|ogg|mov)$/i));
-  const isSocialExternal = !isDirectVideo && !embedUrl;
+  const isDirectVideo =
+    (provider === "local" || (!embedUrl && Boolean(url.match(/\.(mp4|webm|ogg|mov)$/i)))) &&
+    failedVideoId !== project.id;
+  const fallbackThumbnail = project.previewImageUrl || project.thumbnail;
 
   const attribution = getProjectAttribution(project);
   const isPortrait = project.format === "9:16";
   const truncatedTitle = getTruncatedModalTitle(project.title, isPortrait ? 4 : 5);
+  const platformLabel =
+    provider && provider !== "other" && provider !== "local"
+      ? provider.charAt(0).toUpperCase() + provider.slice(1)
+      : "Original Platform";
 
   const dimensions = computeAspectModalDimensions(
     project.format,
@@ -145,26 +177,27 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
                   href={project.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-2.5 sm:px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-mono-custom text-xs border border-white/10 transition-colors flex items-center gap-1 shrink-0"
-                  title="Watch on original video platform"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+                  title={`Watch on ${platformLabel}`}
+                  aria-label={`Watch on ${platformLabel}`}
                 >
-                  <span>Watch</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  {renderPlatformIcon(provider)}
                 </a>
               )}
 
               <button
                 type="button"
                 onClick={onClose}
+                title="Close Preview"
                 aria-label="Close video player"
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors shrink-0 ml-0.5"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors shrink-0 ml-0.5 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          {/* Full-Bleed Media Viewport matching Web Modal pattern (starts immediately below header, fills available space) */}
+          {/* Full-Bleed Media Viewport matching modal aspect ratio with zero empty space */}
           <div className="relative flex-1 min-w-0 min-h-0 w-full h-full bg-black overflow-hidden flex items-center justify-center">
             {embedUrl ? (
               /* YouTube / Vimeo Embedded Player — fills 100% of media viewport full-bleed */
@@ -180,39 +213,37 @@ export function VideoPlayerModal({ project, onClose }: VideoPlayerModalProps) {
               <video
                 ref={videoRef}
                 src={url}
-                poster={project.thumbnail}
+                poster={fallbackThumbnail}
                 autoPlay
                 playsInline
                 controls
-                className="w-full h-full block object-contain border-0"
+                onError={() => setFailedVideoId(project.id)}
+                className="w-full h-full block object-cover border-0"
               />
-            ) : isSocialExternal ? (
-              /* Social Video Fallback (TikTok / Instagram / Facebook) */
+            ) : fallbackThumbnail ? (
+              /* Full-Bleed Thumbnail Fallback when video cannot be embedded/played in modal */
+              <a
+                href={url || undefined}
+                target={url ? "_blank" : undefined}
+                rel={url ? "noopener noreferrer" : undefined}
+                title={url ? `Watch on ${platformLabel}` : project.title}
+                className="relative group w-full h-full block overflow-hidden"
+              >
+                <img
+                  src={fallbackThumbnail}
+                  alt={project.title}
+                  decoding="async"
+                  className="w-full h-full object-cover block"
+                />
+              </a>
+            ) : (
               <div className="flex flex-col items-center justify-center text-center p-6 max-w-sm mx-auto">
                 <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/10 flex items-center justify-center text-white/80 mb-3">
                   <Film className="h-6 w-6" />
                 </div>
-                <h4 className="font-sans font-medium text-base text-white mb-1.5">
-                  External Social Production
+                <h4 className="font-sans font-medium text-base text-white">
+                  {project.title}
                 </h4>
-                <p className="font-mono-custom text-xs text-[#888] leading-relaxed mb-5">
-                  This {provider.toUpperCase()} video is hosted on an external social network platform.
-                </p>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
-                >
-                  <span>Watch on {provider.toUpperCase()}</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </a>
-              </div>
-            ) : (
-              <div className="text-center p-8">
-                <p className="font-mono-custom text-sm text-[#888]">
-                  Video preview asset loading...
-                </p>
               </div>
             )}
           </div>

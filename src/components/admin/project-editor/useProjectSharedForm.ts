@@ -92,9 +92,8 @@ export function useProjectSharedForm({
 }: UseProjectSharedFormOptions) {
   const router = useRouter();
   const isEdit = mode === "edit" && Boolean(initialProject);
-  const [returnUrl] = useState<string>(() =>
-    isEdit ? getSavedAdminReturnUrl(discipline) : `/admin?tab=${discipline}`
-  );
+  // Deterministic SSR-safe default href; actual saved returnUrl is resolved on click/submit
+  const returnUrl = `/admin?tab=${discipline}`;
 
   const [title, setTitle] = useState(initialProject?.title ?? "");
   const [slug, setSlug] = useState(initialProject?.slug ?? "");
