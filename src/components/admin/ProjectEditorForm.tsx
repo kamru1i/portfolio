@@ -454,14 +454,14 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
   };
 
   return (
-    <div className="w-full space-y-8 select-none">
+    <div className="w-full space-y-5 select-none">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal uppercase tracking-tight">
+          <h1 className="font-gambarino text-2xl sm:text-3xl text-white font-normal uppercase tracking-tight">
             {isEdit ? "Edit Project" : "Create Project"}
           </h1>
-          <p className="font-mono-custom text-xs text-[#888] mt-1">
+          <p className="font-mono-custom text-xs text-[#888] mt-0.5">
             {isEdit
               ? "Update project metadata, media preview settings, and case study details."
               : "Configure discipline, media source, and case study details for a new portfolio item."}
@@ -470,7 +470,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
 
         <Link
           href="/admin"
-          className={buttonVariants({ variant: "secondary", size: "default" })}
+          className={buttonVariants({ variant: "secondary", size: "sm" })}
         >
           Cancel
         </Link>
@@ -478,58 +478,62 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
 
       {/* Discipline Selection (Create) or Fixed Discipline Indicator (Edit) */}
       {!isEdit ? (
-        <Card className="p-6 space-y-4">
+        <Card className="p-4 space-y-2.5">
           <Label>1. Select Project Discipline</Label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setProjectType("video")}
-              className={`p-5 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+              className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 isVideo
                   ? "bg-white/10 border-white text-white shadow-md ring-1 ring-white/20"
                   : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
               }`}
             >
-              <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-sky-400 mb-3">
-                <Film className="h-5 w-5" aria-hidden="true" />
+              <div className="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-sky-400 shrink-0">
+                <Film className="h-4.5 w-4.5" aria-hidden="true" />
               </div>
-              <div className="font-sans font-medium text-base text-white">
-                Video Project
+              <div className="min-w-0">
+                <div className="font-sans font-medium text-sm text-white">
+                  Video Project
+                </div>
+                <p className="font-mono-custom text-[11px] text-[#888] truncate">
+                  Editorial video showcase, 16:9 or 9:16, YouTube/TikTok auto-metadata.
+                </p>
               </div>
-              <p className="font-mono-custom text-xs text-[#888] mt-1">
-                Editorial video showcase layout, 16:9 or 9:16, YouTube/TikTok auto-metadata.
-              </p>
             </button>
 
             <button
               type="button"
               onClick={() => setProjectType("web")}
-              className={`p-5 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+              className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                 !isVideo
                   ? "bg-white/10 border-white text-white shadow-md ring-1 ring-white/20"
                   : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
               }`}
             >
-              <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/25 flex items-center justify-center text-purple-400 mb-3">
-                <Globe className="h-5 w-5" aria-hidden="true" />
+              <div className="w-9 h-9 rounded-lg bg-purple-500/15 border border-purple-500/25 flex items-center justify-center text-purple-400 shrink-0">
+                <Globe className="h-4.5 w-4.5" aria-hidden="true" />
               </div>
-              <div className="font-sans font-medium text-base text-white">
-                Web Project
+              <div className="min-w-0">
+                <div className="font-sans font-medium text-sm text-white">
+                  Web Project
+                </div>
+                <p className="font-mono-custom text-[11px] text-[#888] truncate">
+                  4-column web case study cards, live preview modal, GitHub integration.
+                </p>
               </div>
-              <p className="font-mono-custom text-xs text-[#888] mt-1">
-                4-column web case study cards, live preview modal, GitHub integration.
-              </p>
             </button>
           </div>
         </Card>
       ) : (
-        <Card className="p-4 flex items-center justify-between">
+        <Card className="p-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/8 border border-white/10 flex items-center justify-center text-white">
+            <div className="w-9 h-9 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center text-white">
               {isVideo ? (
-                <Film className="h-5 w-5 text-sky-400" aria-hidden="true" />
+                <Film className="h-4.5 w-4.5 text-sky-400" aria-hidden="true" />
               ) : (
-                <Globe className="h-5 w-5 text-purple-400" aria-hidden="true" />
+                <Globe className="h-4.5 w-4.5 text-purple-400" aria-hidden="true" />
               )}
             </div>
             <div>
@@ -557,445 +561,355 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
       )}
 
       {/* Main Editor Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {isVideo ? (
-          <Card className="p-6 space-y-5">
-            <h3 className="font-mono-custom text-xs uppercase tracking-wider text-sky-400">
-              Video Source &amp; Metadata
-            </h3>
-
-            <div>
-              <Label htmlFor="project-video-url" className="mb-2">
-                Video URL (YouTube, Vimeo, TikTok, Facebook, Instagram, MP4, etc.) *
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="project-video-url"
-                  type="url"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  onBlur={() => {
-                    if (!isEdit) handleResolveVideo();
-                  }}
-                  required
-                  placeholder="https://www.youtube.com/watch?v=... or https://www.tiktok.com/@..."
-                  className="flex-1"
-                />
-                <Button
-                  variant="secondary"
-                  onClick={() => handleResolveVideo()}
-                  disabled={resolvingVideo || !videoUrl.trim()}
-                  className="h-auto px-4 py-3 shrink-0"
-                >
-                  {resolvingVideo ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                      <span>Resolving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>{isEdit ? "Re-Detect" : "Detect & Preview"}</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-              <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
-                Automatically resolves provider, aspect ratio, and default thumbnail (if available from YouTube/Vimeo/TikTok).
-              </p>
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-mono-custom text-xs uppercase tracking-wider text-sky-400">
+                Video Source, Aspect Ratio &amp; Thumbnail
+              </h3>
+              <span className="font-mono-custom text-[11px] text-[#666]">
+                Active Ratio: <strong className="text-white">{aspectRatio}</strong>
+              </span>
             </div>
 
-            {resolveError && (
-              <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-200 text-xs font-mono-custom">
-                {resolveError} — You can upload, drag &amp; drop, or paste a custom thumbnail image below.
-              </div>
-            )}
-
-            {/* 5-Option Aspect Ratio Selector */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label>Aspect Ratio Format *</Label>
-                <span className="font-mono-custom text-[11px] text-[#666]">
-                  Active: <strong className="text-white">{aspectRatio}</strong>
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                {(
-                  [
-                    { id: "16:9", label: "16:9", sub: "Landscape", box: "w-8 h-4.5" },
-                    { id: "9:16", label: "9:16", sub: "Portrait", box: "w-4 h-7" },
-                    { id: "1:1", label: "1:1", sub: "Square", box: "w-5.5 h-5.5" },
-                    { id: "4:3", label: "4:3", sub: "Standard", box: "w-7 h-5" },
-                    { id: "5:4", label: "5:4", sub: "Near-Square", box: "w-6.5 h-5" },
-                  ] as const
-                ).map((opt) => {
-                  const isSelected = aspectRatio === opt.id;
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setAspectRatio(opt.id as AspectRatio)}
-                      className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                        isSelected
-                          ? "bg-white/15 border-white text-white shadow-sm ring-1 ring-white/20"
-                          : "bg-white/2 border-white/10 text-[#888] hover:border-white/20 hover:text-white"
-                      }`}
-                    >
-                      <div
-                        className={`${opt.box} border-2 ${
-                          isSelected
-                            ? "border-white bg-white/20"
-                            : "border-white/30 bg-white/5"
-                        } rounded-sm flex items-center justify-center`}
-                      />
-                      <div className="text-center">
-                        <span className="font-mono-custom text-xs font-semibold block leading-tight">
-                          {opt.label}
-                        </span>
-                        <span className="font-mono-custom text-[10px] text-[#777] block mt-0.5">
-                          {opt.sub}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
-                Source of truth for editorial works card display and player stage modal.
-              </p>
-            </div>
-
-            {/* Video Card Thumbnail — Auto-Detected Default + Custom Upload / Drag & Drop / Clipboard Paste */}
-            <div className="space-y-3 pt-2 border-t border-white/10">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <Label>Video Card Thumbnail (Auto-Detected or Custom Upload)</Label>
-                <span className="font-mono-custom text-[11px] text-emerald-400 flex items-center gap-1">
-                  {videoThumbnailUrl ? (
-                    <>
-                      <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>
-                        {isCustomVideoThumbnail
-                          ? "Custom Thumbnail Active"
-                          : "Auto-Detected Thumbnail Active"}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-[#888]">
-                      Auto-detects from YouTube/Vimeo or Upload Custom Image
-                    </span>
-                  )}
-                </span>
-              </div>
-
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (!isDraggingOver) setIsDraggingOver(true);
-                }}
-                onDragLeave={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsDraggingOver(false);
-                }}
-                onDrop={(e) => handleDropImage(e, "video")}
-                className={`p-5 rounded-xl border border-dashed transition-all flex flex-col lg:flex-row items-center justify-between gap-4 ${
-                  isDraggingOver
-                    ? "bg-sky-500/10 border-sky-400 ring-2 ring-sky-400/25"
-                    : "bg-[#18181b] border-white/20 hover:border-white/40"
-                }`}
-              >
-                <div className="flex items-start gap-3.5 text-center sm:text-left">
-                  <div className="hidden sm:flex w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 items-center justify-center text-sky-400 shrink-0 mt-0.5">
-                    <ImagePlus className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-sans text-sm font-medium text-white">
-                      {isDraggingOver
-                        ? "Drop Thumbnail Image Here to Upload"
-                        : "Drag & Drop, Paste (Ctrl+V / Win+V), or Upload Video Thumbnail"}
-                    </p>
-                    <p className="font-mono-custom text-[11px] text-[#888]">
-                      If the video link has an auto-thumbnail (like YouTube), it is used by default. Upload or paste (`Ctrl+V`) a custom image for external links or custom artwork (PNG, JPG, WebP, AVIF — max 8 MB).
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
+            {/* Row 1: Video URL + Detect & Preview Button + Inline Compact Aspect Ratio Icons */}
+            <div className="flex flex-col xl:flex-row xl:items-end gap-4">
+              <div className="flex-1 min-w-0">
+                <Label htmlFor="project-video-url" className="mb-1.5">
+                  Video URL (YouTube, Vimeo, TikTok, MP4, etc.) *
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="project-video-url"
+                    type="url"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    onBlur={() => {
+                      if (!isEdit) handleResolveVideo();
+                    }}
+                    required
+                    placeholder="https://www.youtube.com/watch?v=... or https://www.tiktok.com/@..."
+                    className="flex-1 h-10 py-2"
+                  />
                   <Button
                     type="button"
                     variant="secondary"
-                    disabled={uploadingScreenshot}
-                    onClick={() => handleClipboardButtonPaste("video")}
-                    className="h-auto px-3.5 py-2.5 text-xs"
-                    title="Paste copied image from clipboard (or press Ctrl+V anywhere)"
+                    onClick={() => handleResolveVideo()}
+                    disabled={resolvingVideo || !videoUrl.trim()}
+                    className="h-10 px-3.5 py-2 shrink-0 text-xs"
                   >
-                    <ClipboardPaste className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>Paste (Ctrl+V)</span>
-                  </Button>
-
-                  <label className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-2 shrink-0 shadow-sm">
-                    {uploadingScreenshot ? (
+                    {resolvingVideo ? (
                       <>
                         <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                        <span>Uploading...</span>
+                        <span>Resolving...</span>
                       </>
                     ) : (
                       <>
-                        <Upload className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>Upload Image</span>
+                        <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>{isEdit ? "Re-Detect" : "Detect & Preview"}</span>
                       </>
                     )}
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp,image/avif"
+                  </Button>
+                </div>
+              </div>
+
+              {/* Compact Boxless Aspect Ratio Selector right after Detect & Preview */}
+              <div className="shrink-0">
+                <span className="font-mono-custom text-[10px] uppercase tracking-wider text-[#777] block mb-1 xl:text-right">
+                  Aspect Ratio *
+                </span>
+                <div className="flex items-center gap-1 sm:gap-1.5 bg-black/30 px-2 py-1 rounded-xl border border-white/10">
+                  {(
+                    [
+                      { id: "16:9", label: "16:9", sub: "Landscape", box: "w-6 h-3.5" },
+                      { id: "9:16", label: "9:16", sub: "Portrait", box: "w-3 h-5" },
+                      { id: "1:1", label: "1:1", sub: "Square", box: "w-4 h-4" },
+                      { id: "4:3", label: "4:3", sub: "Standard", box: "w-5 h-3.5" },
+                      { id: "5:4", label: "5:4", sub: "Near-Sq", box: "w-4.5 h-3.5" },
+                    ] as const
+                  ).map((opt) => {
+                    const isSelected = aspectRatio === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setAspectRatio(opt.id as AspectRatio)}
+                        className={`px-2.5 py-1 rounded-lg flex flex-col items-center justify-center gap-1 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                          isSelected
+                            ? "bg-white/15 text-white shadow-xs"
+                            : "text-[#777] hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        <span className="font-mono-custom text-[10px] font-semibold leading-none">
+                          {opt.label}
+                        </span>
+                        <div className="h-5 flex items-center justify-center">
+                          <div
+                            className={`${opt.box} border ${
+                              isSelected
+                                ? "border-sky-400 bg-sky-400/25"
+                                : "border-white/30 bg-white/5"
+                            } rounded-[2px]`}
+                          />
+                        </div>
+                        <span className="font-mono-custom text-[9px] text-[#888] leading-none">
+                          {opt.sub}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {resolveError && (
+              <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-200 text-xs font-mono-custom">
+                {resolveError} — Upload, drag &amp; drop, or paste (`Ctrl+V`) a custom thumbnail below.
+              </div>
+            )}
+
+            {/* Row 2: Compact Video Thumbnail (Drag & Drop + Paste + Upload + Direct URL + Preview) */}
+            <div className="pt-2 border-t border-white/10 space-y-2.5">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+                {/* Drag & Drop / Paste / Upload Box */}
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!isDraggingOver) setIsDraggingOver(true);
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingOver(false);
+                  }}
+                  onDrop={(e) => handleDropImage(e, "video")}
+                  className={`lg:col-span-7 p-3.5 rounded-xl border border-dashed transition-all flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                    isDraggingOver
+                      ? "bg-sky-500/10 border-sky-400 ring-2 ring-sky-400/25"
+                      : "bg-[#18181b] border-white/20 hover:border-white/40"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 text-center sm:text-left min-w-0">
+                    {(videoThumbnailUrl || fallbackSvgThumbnail) ? (
+                      <div className="relative w-16 h-11 rounded-md overflow-hidden bg-black shrink-0 border border-white/15">
+                        <Image
+                          src={videoThumbnailUrl || fallbackSvgThumbnail || ""}
+                          alt="Video thumbnail preview"
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="hidden sm:flex w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 items-center justify-center text-sky-400 shrink-0">
+                        <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
+                        <p className="font-sans text-xs font-medium text-white truncate">
+                          {isDraggingOver
+                            ? "Drop Thumbnail Here"
+                            : "Video Thumbnail (Auto or Custom)"}
+                        </p>
+                        {videoThumbnailUrl && (
+                          <Badge
+                            variant={isCustomVideoThumbnail ? "success" : "info"}
+                            className="text-[9px] px-1.5 py-0"
+                          >
+                            {isCustomVideoThumbnail ? "Custom" : "Auto"}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="font-mono-custom text-[10px] text-[#888] truncate">
+                        Auto-detects from YouTube/Vimeo, or Drag &amp; Drop / Paste (`Ctrl+V`)
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {autoDetectedThumbnail &&
+                      videoThumbnailUrl !== autoDetectedThumbnail && (
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="xs"
+                          onClick={() => {
+                            setVideoThumbnailUrl(autoDetectedThumbnail);
+                            setIsCustomVideoThumbnail(false);
+                          }}
+                          title="Restore Auto-Detected Thumbnail"
+                        >
+                          <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                          <span>Auto</span>
+                        </Button>
+                      )}
+
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="xs"
                       disabled={uploadingScreenshot}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          void handleUploadImage(file, "video");
-                          e.target.value = "";
-                        }
-                      }}
-                      className="hidden"
-                    />
-                  </label>
+                      onClick={() => handleClipboardButtonPaste("video")}
+                      title="Paste copied image from clipboard (Ctrl+V)"
+                    >
+                      <ClipboardPaste className="h-3 w-3" aria-hidden="true" />
+                      <span>Paste</span>
+                    </Button>
+
+                    <label className="px-3 py-1.5 rounded-lg bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-xs">
+                      {uploadingScreenshot ? (
+                        <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Upload className="h-3 w-3" aria-hidden="true" />
+                      )}
+                      <span>{uploadingScreenshot ? "..." : "Upload"}</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/avif"
+                        disabled={uploadingScreenshot}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            void handleUploadImage(file, "video");
+                            e.target.value = "";
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {videoThumbnailUrl && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="xs"
+                        onClick={() => {
+                          setVideoThumbnailUrl("");
+                          setIsCustomVideoThumbnail(false);
+                        }}
+                        title="Remove Thumbnail"
+                      >
+                        <Trash2 className="h-3 w-3" aria-hidden="true" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Direct Thumbnail URL Input on the Same Row */}
+                <div className="lg:col-span-5 flex flex-col justify-center bg-[#18181b] p-3.5 rounded-xl border border-white/10">
+                  <Label
+                    htmlFor="project-video-thumbnail-url"
+                    className="text-[10px] text-[#777] mb-1"
+                  >
+                    Or Paste Thumbnail Image URL / Path Directly
+                  </Label>
+                  <Input
+                    id="project-video-thumbnail-url"
+                    type="text"
+                    value={videoThumbnailUrl}
+                    onChange={(e) => {
+                      const nextVal = e.target.value;
+                      setVideoThumbnailUrl(nextVal);
+                      setIsCustomVideoThumbnail(
+                        Boolean(nextVal.trim()) &&
+                          nextVal.trim() !== autoDetectedThumbnail
+                      );
+                    }}
+                    placeholder="https://i.ytimg.com/... or /images/..."
+                    className="h-8 py-1 text-xs font-mono-custom"
+                  />
                 </div>
               </div>
 
               {screenshotError && (
-                <div className="p-3 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
+                <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
                   {screenshotError}
                 </div>
               )}
-
-              {(videoThumbnailUrl || fallbackSvgThumbnail) && (
-                <div className="p-4 rounded-xl bg-black/50 border border-white/10 flex flex-col sm:flex-row items-center gap-4">
-                  <div
-                    className={`relative ${
-                      aspectRatio === "9:16"
-                        ? "w-20 h-36"
-                        : aspectRatio === "1:1"
-                        ? "w-24 h-24"
-                        : "w-44 h-24"
-                    } rounded-lg overflow-hidden bg-black shrink-0 border border-white/15`}
-                  >
-                    <Image
-                      src={videoThumbnailUrl || fallbackSvgThumbnail || ""}
-                      alt="Video thumbnail preview"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0 space-y-2 w-full text-center sm:text-left">
-                    <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {videoThumbnailUrl ? (
-                          <Badge
-                            variant={isCustomVideoThumbnail ? "success" : "info"}
-                          >
-                            <Check className="h-3 w-3" aria-hidden="true" />
-                            <span>
-                              {isCustomVideoThumbnail
-                                ? "Custom Video Thumbnail"
-                                : "Auto-Detected Video Thumbnail"}
-                            </span>
-                          </Badge>
-                        ) : (
-                          <Badge variant="default">
-                            Branded Fallback Preview Card
-                          </Badge>
-                        )}
-                        {videoProvider && (
-                          <Badge variant="default">
-                            {videoProvider.toUpperCase()}
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        {autoDetectedThumbnail &&
-                          videoThumbnailUrl !== autoDetectedThumbnail && (
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="xs"
-                              onClick={() => {
-                                setVideoThumbnailUrl(autoDetectedThumbnail);
-                                setIsCustomVideoThumbnail(false);
-                              }}
-                            >
-                              <RotateCcw className="h-3 w-3" aria-hidden="true" />
-                              <span>Use Auto Thumbnail</span>
-                            </Button>
-                          )}
-
-                        {videoThumbnailUrl && (
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="xs"
-                            onClick={() => {
-                              setVideoThumbnailUrl("");
-                              setIsCustomVideoThumbnail(false);
-                            }}
-                          >
-                            <Trash2 className="h-3 w-3" aria-hidden="true" />
-                            <span>Remove</span>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="font-mono-custom text-xs text-[#aaa]">
-                      Active Ratio: <strong className="text-white">{aspectRatio}</strong>
-                      {videoId && (
-                        <span className="ml-2 text-[#777]">
-                          (ID: <span className="text-white">{videoId}</span>)
-                        </span>
-                      )}
-                    </div>
-
-                    {videoThumbnailUrl && (
-                      <p className="font-mono-custom text-xs text-[#888] truncate">
-                        {videoThumbnailUrl}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <Label
-                  htmlFor="project-video-thumbnail-url"
-                  className="text-[11px] text-[#777] mb-1.5"
-                >
-                  Or Paste Thumbnail Image URL / Path Directly
-                </Label>
-                <Input
-                  id="project-video-thumbnail-url"
-                  type="text"
-                  value={videoThumbnailUrl}
-                  onChange={(e) => {
-                    const nextVal = e.target.value;
-                    setVideoThumbnailUrl(nextVal);
-                    setIsCustomVideoThumbnail(
-                      Boolean(nextVal.trim()) && nextVal.trim() !== autoDetectedThumbnail
-                    );
-                  }}
-                  placeholder="https://i.ytimg.com/... or /images/projects/... or https://..."
-                  className="py-2.5 text-xs font-mono-custom"
-                />
-              </div>
             </div>
           </Card>
         ) : (
-          <Card className="p-6 space-y-5">
+          <Card className="p-5 space-y-4">
             <h3 className="font-mono-custom text-xs uppercase tracking-wider text-purple-400">
               Web Application Links, Preview Mode &amp; Screenshot
             </h3>
 
-            <div>
-              <Label htmlFor="project-live-url" className="mb-2">
-                Live Website URL *
-              </Label>
-              <Input
-                id="project-live-url"
-                type="url"
-                value={liveUrl}
-                onChange={(e) => setLiveUrl(e.target.value)}
-                required
-                placeholder="https://example.com"
-              />
-              <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
-                Clicking the project card opens the preview modal with direct links to this Live Website and GitHub.
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="project-github-url" className="mb-2">
-                GitHub Repository URL (Optional)
-              </Label>
-              <Input
-                id="project-github-url"
-                type="url"
-                value={githubUrl}
-                onChange={(e) => setGithubUrl(e.target.value)}
-                placeholder="https://github.com/kamru1i/project"
-              />
-            </div>
-
-            {/* Web Preview Mode Selector */}
-            <div className="space-y-2 pt-1">
-              <div className="flex items-center justify-between">
-                <Label>Interactive Modal Preview Mode</Label>
-                <span className="font-mono-custom text-[11px] text-[#777]">
-                  Active:{" "}
-                  <strong className="text-white">
-                    {previewMode === "iframe" ? "Live Iframe" : "Protected Fallback"}
-                  </strong>
-                </span>
+            {/* Row 1 (Single Line): Live Website URL + GitHub Repository URL */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="project-live-url" className="mb-1.5">
+                  Live Website URL *
+                </Label>
+                <Input
+                  id="project-live-url"
+                  type="url"
+                  value={liveUrl}
+                  onChange={(e) => setLiveUrl(e.target.value)}
+                  required
+                  placeholder="https://example.com"
+                  className="h-10 py-2"
+                />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setPreviewMode("iframe")}
-                  className={`p-4 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                    previewMode === "iframe"
-                      ? "bg-emerald-950/30 border-emerald-500/60 text-white"
-                      : "bg-[#18181b] border-white/10 text-[#888] hover:border-white/25 hover:text-white"
-                  }`}
-                >
-                  <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-emerald-300 flex items-center gap-2">
-                    <Monitor className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span>Live Interactive Iframe</span>
-                  </div>
-                  <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
-                    Embeds the live site directly inside the modal viewport with desktop/mobile switcher.
-                  </p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPreviewMode("fallback")}
-                  className={`p-4 rounded-xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                    previewMode === "fallback"
-                      ? "bg-amber-950/30 border-amber-500/60 text-white"
-                      : "bg-[#18181b] border-white/10 text-[#888] hover:border-white/25 hover:text-white"
-                  }`}
-                >
-                  <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-amber-300 flex items-center gap-2">
-                    <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span>Protected / Fallback Card</span>
-                  </div>
-                  <p className="font-mono-custom text-[11px] text-[#888] mt-1 leading-relaxed">
-                    Use when target site sets X-Frame-Options or CSP frame-ancestors; displays summary &amp; launch CTA cleanly.
-                  </p>
-                </button>
+              <div>
+                <Label htmlFor="project-github-url" className="mb-1.5">
+                  GitHub Repository URL (Optional)
+                </Label>
+                <Input
+                  id="project-github-url"
+                  type="url"
+                  value={githubUrl}
+                  onChange={(e) => setGithubUrl(e.target.value)}
+                  placeholder="https://github.com/kamru1i/project"
+                  className="h-10 py-2"
+                />
               </div>
             </div>
 
-            {/* Homepage Screenshot Upload, Drag & Drop, Clipboard Paste & Static Preview */}
-            <div className="space-y-3 pt-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <Label>Homepage Screenshot (Static Card View) *</Label>
-                <span className="font-mono-custom text-[11px] text-emerald-400 flex items-center gap-1">
-                  {webPreviewImageUrl ? (
-                    <>
-                      <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>Screenshot Ready</span>
-                    </>
-                  ) : (
-                    <span className="text-[#888]">
-                      Drag &amp; Drop, Paste (Ctrl+V), or Upload PNG / JPG / WebP
-                    </span>
-                  )}
-                </span>
-              </div>
+            {/* Row 2 (Single Line): Live Interactive Iframe + Protected Fallback Card + Drag & Drop / Paste Screenshot */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch pt-1">
+              {/* 1. Live Interactive Iframe */}
+              <button
+                type="button"
+                onClick={() => setPreviewMode("iframe")}
+                className={`lg:col-span-3 p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                  previewMode === "iframe"
+                    ? "bg-emerald-950/30 border-emerald-500/60 text-white"
+                    : "bg-[#18181b] border-white/10 text-[#888] hover:border-white/25 hover:text-white"
+                }`}
+              >
+                <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-emerald-300 flex items-center gap-2">
+                  <Monitor className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>Live Interactive Iframe</span>
+                </div>
+                <p className="font-mono-custom text-[10px] text-[#888] mt-1 leading-snug">
+                  Embeds live site inside modal with desktop/mobile switcher.
+                </p>
+              </button>
 
+              {/* 2. Protected / Fallback Card */}
+              <button
+                type="button"
+                onClick={() => setPreviewMode("fallback")}
+                className={`lg:col-span-3 p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                  previewMode === "fallback"
+                    ? "bg-amber-950/30 border-amber-500/60 text-white"
+                    : "bg-[#18181b] border-white/10 text-[#888] hover:border-white/25 hover:text-white"
+                }`}
+              >
+                <div className="font-mono-custom text-xs font-semibold uppercase tracking-wider text-amber-300 flex items-center gap-2">
+                  <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>Protected / Fallback Card</span>
+                </div>
+                <p className="font-mono-custom text-[10px] text-[#888] mt-1 leading-snug">
+                  For sites with X-Frame-Options/CSP; shows summary &amp; launch CTA.
+                </p>
+              </button>
+
+              {/* 3. Drag & Drop / Paste (Ctrl+V) / Upload Screenshot Box on the Same Line */}
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -1008,135 +922,132 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                   setIsDraggingOver(false);
                 }}
                 onDrop={(e) => handleDropImage(e, "web")}
-                className={`p-5 rounded-xl border border-dashed transition-all flex flex-col lg:flex-row items-center justify-between gap-4 ${
+                className={`lg:col-span-6 p-3.5 rounded-xl border border-dashed transition-all flex flex-col justify-between gap-2.5 ${
                   isDraggingOver
                     ? "bg-purple-500/10 border-purple-400 ring-2 ring-purple-400/25"
                     : "bg-[#18181b] border-white/20 hover:border-white/40"
                 }`}
               >
-                <div className="flex items-start gap-3.5 text-center sm:text-left">
-                  <div className="hidden sm:flex w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 items-center justify-center text-purple-400 shrink-0 mt-0.5">
-                    <ImagePlus className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-sans text-sm font-medium text-white">
-                      {isDraggingOver
-                        ? "Drop Screenshot Image Here to Upload"
-                        : "Drag & Drop, Paste (Ctrl+V / Win+V), or Upload Homepage Screenshot"}
-                    </p>
-                    <p className="font-mono-custom text-[11px] text-[#888]">
-                      Displayed statically on the project card for instant loading. Copy any screenshot and press `Ctrl+V` (or `Win+V`) anywhere, or drop/upload PNG, JPG, WebP, AVIF (max 8 MB).
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={uploadingScreenshot}
-                    onClick={() => handleClipboardButtonPaste("web")}
-                    className="h-auto px-3.5 py-2.5 text-xs"
-                    title="Paste copied screenshot from clipboard (or press Ctrl+V anywhere)"
-                  >
-                    <ClipboardPaste className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>Paste (Ctrl+V)</span>
-                  </Button>
-
-                  <label className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-2 shrink-0 shadow-sm">
-                    {uploadingScreenshot ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                        <span>Uploading...</span>
-                      </>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {webPreviewImageUrl ? (
+                      <div className="relative w-14 h-9 rounded overflow-hidden bg-[#0e0e0e] border border-white/15 shrink-0">
+                        <Image
+                          src={webPreviewImageUrl}
+                          alt="Screenshot preview"
+                          fill
+                          unoptimized
+                          className="object-cover object-top"
+                        />
+                      </div>
                     ) : (
-                      <>
-                        <Upload className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>Upload Image</span>
-                      </>
+                      <div className="hidden sm:flex w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 items-center justify-center text-purple-400 shrink-0">
+                        <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                      </div>
                     )}
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp,image/avif"
-                      disabled={uploadingScreenshot}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          void handleUploadImage(file, "web");
-                          e.target.value = "";
-                        }
-                      }}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {screenshotError && (
-                <div className="p-3 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
-                  {screenshotError}
-                </div>
-              )}
-
-              {webPreviewImageUrl && (
-                <div className="p-4 rounded-xl bg-black/50 border border-white/10 flex flex-col sm:flex-row items-center gap-4">
-                  <div className="relative w-full sm:w-48 h-28 rounded-lg overflow-hidden bg-[#0e0e0e] border border-white/15 shrink-0">
-                    <Image
-                      src={webPreviewImageUrl}
-                      alt="Homepage screenshot preview"
-                      fill
-                      unoptimized
-                      className="object-cover object-top"
-                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-sans text-xs font-medium text-white truncate">
+                          {isDraggingOver
+                            ? "Drop Screenshot Here"
+                            : "Homepage Screenshot *"}
+                        </span>
+                        {webPreviewImageUrl && (
+                          <Badge variant="success" className="text-[9px] px-1.5 py-0">
+                            Ready
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="font-mono-custom text-[10px] text-[#888] truncate">
+                        Drag &amp; Drop, Paste (`Ctrl+V` / `Win+V`), or Upload
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0 space-y-2 w-full">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge variant="success">
-                        Active Static Card Screenshot
-                      </Badge>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="xs"
+                      disabled={uploadingScreenshot}
+                      onClick={() => handleClipboardButtonPaste("web")}
+                      title="Paste copied screenshot from clipboard (Ctrl+V)"
+                    >
+                      <ClipboardPaste className="h-3 w-3" aria-hidden="true" />
+                      <span>Paste</span>
+                    </Button>
+
+                    <label className="px-3 py-1.5 rounded-lg bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-xs">
+                      {uploadingScreenshot ? (
+                        <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Upload className="h-3 w-3" aria-hidden="true" />
+                      )}
+                      <span>{uploadingScreenshot ? "..." : "Upload"}</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/avif"
+                        disabled={uploadingScreenshot}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            void handleUploadImage(file, "web");
+                            e.target.value = "";
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {webPreviewImageUrl && (
                       <Button
                         type="button"
                         variant="destructive"
                         size="xs"
                         onClick={() => setWebPreviewImageUrl("")}
+                        title="Remove Screenshot"
                       >
                         <Trash2 className="h-3 w-3" aria-hidden="true" />
-                        <span>Remove</span>
                       </Button>
-                    </div>
-                    <p className="font-mono-custom text-xs text-[#888] truncate">
-                      {webPreviewImageUrl}
-                    </p>
+                    )}
                   </div>
                 </div>
-              )}
 
-              <div>
-                <Label htmlFor="project-screenshot-url" className="text-[11px] text-[#777] mb-1.5">
-                  Or Paste Screenshot Image URL / Path Directly
-                </Label>
+                {/* Compact Direct URL Input inside the same card */}
                 <Input
                   id="project-screenshot-url"
                   type="text"
                   value={webPreviewImageUrl}
                   onChange={(e) => setWebPreviewImageUrl(e.target.value)}
-                  placeholder="/images/web-projects/web-project-3.png or https://..."
-                  className="py-2.5 text-xs font-mono-custom"
+                  placeholder="Or paste screenshot URL / path (/images/web-projects/... or https://...)"
+                  className="h-7 py-1 px-2.5 text-[11px] font-mono-custom bg-black/40"
                 />
               </div>
             </div>
+
+            {screenshotError && (
+              <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
+                {screenshotError}
+              </div>
+            )}
           </Card>
         )}
 
-        {/* Shared Project Details */}
-        <Card className="p-6 space-y-5">
-          <h3 className="font-mono-custom text-xs uppercase tracking-wider text-white/70">
-            Project Information
-          </h3>
+        {/* Shared Project Information & Case Study Details */}
+        <Card className="p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-mono-custom text-xs uppercase tracking-wider text-white/70">
+              Project Information &amp; Case Study Details
+            </h3>
+            <span className="font-mono-custom text-[11px] text-[#666]">
+              /projects/{projectType}/{slug || initialProject?.id || "[slug]"}
+            </span>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Line 1: Project Title + URL Slug + Client / Brand Name */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="project-title" className="mb-2">
+              <Label htmlFor="project-title" className="mb-1.5">
                 Project Title *
               </Label>
               <Input
@@ -1146,11 +1057,12 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 onChange={(e) => handleTitleChange(e.target.value)}
                 required
                 placeholder="e.g. Syston Autos Cinema"
+                className="h-10 py-2"
               />
             </div>
 
             <div>
-              <Label htmlFor="project-slug" className="mb-2">
+              <Label htmlFor="project-slug" className="mb-1.5">
                 URL Slug *
               </Label>
               <Input
@@ -1160,14 +1072,12 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 onChange={(e) => setSlug(e.target.value)}
                 required
                 placeholder="syston-autos-cinema"
-                className="font-mono-custom"
+                className="h-10 py-2 font-mono-custom"
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="project-client" className="mb-2">
+              <Label htmlFor="project-client" className="mb-1.5">
                 Client / Brand Name
               </Label>
               <Input
@@ -1176,11 +1086,15 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="e.g. Independent Client Project"
+                className="h-10 py-2"
               />
             </div>
+          </div>
 
+          {/* Line 2: Year + Your Role + Deliverables */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="project-year" className="mb-2">
+              <Label htmlFor="project-year" className="mb-1.5">
                 Year
               </Label>
               <Input
@@ -1188,119 +1102,111 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 type="text"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                placeholder="e.g. 2025"
-                className="font-mono-custom"
+                placeholder="e.g. 2026"
+                className="h-10 py-2 font-mono-custom"
               />
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="project-description" className="mb-2">
-              Short Summary / Description
-            </Label>
-            <Textarea
-              id="project-description"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Concise summary displayed on project cards and the top of the case study page..."
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="project-tags" className="mb-2">
-              Tags / Technologies (comma separated)
-            </Label>
-            <Input
-              id="project-tags"
-              type="text"
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
-              placeholder={
-                isVideo
-                  ? "e.g. Premiere Pro, DaVinci Resolve, Sound Design"
-                  : "e.g. Next.js, TypeScript, Tailwind CSS, Supabase"
-              }
-              className="font-mono-custom"
-            />
-          </div>
-
-          {/* Case Study Detail Fields */}
-          <div className="pt-4 border-t border-white/5 space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-mono-custom text-xs uppercase tracking-wider text-emerald-400">
-                Case Study Page Details (Optional)
-              </h4>
-              <span className="font-mono-custom text-[11px] text-[#666]">
-                Displayed on /projects/{projectType}/
-                {slug || initialProject?.id || "[slug]"}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="project-role" className="mb-2">
-                  Your Role
-                </Label>
-                <Input
-                  id="project-role"
-                  type="text"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  placeholder={
-                    isVideo
-                      ? "e.g. Video Editor & AI Content Creator"
-                      : "e.g. Web Developer & UI Engineer"
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="project-deliverables" className="mb-2">
-                  Deliverables (comma separated)
-                </Label>
-                <Input
-                  id="project-deliverables"
-                  type="text"
-                  value={deliverablesInput}
-                  onChange={(e) => setDeliverablesInput(e.target.value)}
-                  placeholder={
-                    isVideo
-                      ? "e.g. Master Cut, Color Grading, Audio Mix"
-                      : "e.g. Production Web App, Admin CMS, REST API"
-                  }
-                  className="font-mono-custom"
-                />
-              </div>
             </div>
 
             <div>
-              <Label htmlFor="project-overview" className="mb-2">
-                Detailed Case Study Overview
+              <Label htmlFor="project-role" className="mb-1.5">
+                Your Role
               </Label>
-              <Textarea
-                id="project-overview"
-                rows={4}
-                value={overview}
-                onChange={(e) => setOverview(e.target.value)}
-                placeholder="In-depth breakdown of the architecture, editing workflow, challenges solved, and final delivery..."
+              <Input
+                id="project-role"
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                placeholder={
+                  isVideo
+                    ? "e.g. Video Editor & AI Content Creator"
+                    : "e.g. Web Developer & UI Engineer"
+                }
+                className="h-10 py-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="project-deliverables" className="mb-1.5">
+                Deliverables (comma separated)
+              </Label>
+              <Input
+                id="project-deliverables"
+                type="text"
+                value={deliverablesInput}
+                onChange={(e) => setDeliverablesInput(e.target.value)}
+                placeholder={
+                  isVideo
+                    ? "e.g. Master Cut, Color Grading, Audio Mix"
+                    : "e.g. Production Web App, Admin CMS, REST API"
+                }
+                className="h-10 py-2 font-mono-custom"
               />
             </div>
           </div>
 
-          {/* Manual Display Priority */}
-          <div className="pt-4 border-t border-white/5">
-            <div className="flex items-center justify-between mb-2">
-              <Label htmlFor="project-priority">
-                Manual Display Priority (Rank)
+          {/* Line 3: Tags / Technologies + Short Summary / Description on the Same Line */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <div>
+              <Label htmlFor="project-tags" className="mb-1.5">
+                Tags / Technologies (comma separated)
               </Label>
-              <span className="font-mono-custom text-[11px] text-amber-400">
-                {manualPriority
-                  ? `Rank #${manualPriority}`
-                  : "Unranked (Automatic Recency)"}
-              </span>
+              <Input
+                id="project-tags"
+                type="text"
+                value={tagsInput}
+                onChange={(e) => setTagsInput(e.target.value)}
+                placeholder={
+                  isVideo
+                    ? "e.g. Premiere Pro, DaVinci Resolve, Sound Design"
+                    : "e.g. Next.js, TypeScript, Tailwind CSS, Supabase"
+                }
+                className="h-10 py-2 font-mono-custom"
+              />
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+
+            <div>
+              <Label htmlFor="project-description" className="mb-1.5">
+                Short Summary / Description
+              </Label>
+              <Input
+                id="project-description"
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Concise summary displayed on project cards and top of case study..."
+                className="h-10 py-2"
+              />
+            </div>
+          </div>
+
+          {/* Line 4: Detailed Case Study Overview right below */}
+          <div>
+            <Label htmlFor="project-overview" className="mb-1.5">
+              Detailed Case Study Overview
+            </Label>
+            <Textarea
+              id="project-overview"
+              rows={3}
+              value={overview}
+              onChange={(e) => setOverview(e.target.value)}
+              placeholder="In-depth breakdown of the architecture, editing workflow, challenges solved, and final delivery..."
+            />
+          </div>
+        </Card>
+
+        {/* Bottom Single-Line Action Bar: Manual Display Priority + Publishing Status + Cancel & Submit */}
+        <Card className="p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            {/* Compact Manual Display Priority */}
+            <div className="flex items-center gap-2.5">
+              <div>
+                <Label htmlFor="project-priority" className="mb-0 text-xs">
+                  Priority Rank
+                </Label>
+                <span className="font-mono-custom text-[10px] text-amber-400 block">
+                  {manualPriority ? `Rank #${manualPriority}` : "Auto Recency"}
+                </span>
+              </div>
               <Input
                 id="project-priority"
                 type="number"
@@ -1308,66 +1214,69 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 step="1"
                 value={manualPriority}
                 onChange={(e) => setManualPriority(e.target.value)}
-                placeholder="e.g. 1 (Top priority), 2, 3..."
-                className="w-full sm:w-56 font-mono-custom"
+                placeholder="e.g. 1, 2..."
+                className="w-28 h-9 py-1.5 text-xs font-mono-custom"
               />
-              <p className="font-mono-custom text-[11px] text-[#777] leading-relaxed">
-                Optional positive integer. Ranked projects (1, 2, 3...) display first on the public website within their tab, followed by unranked projects by newest publication date.
-              </p>
+            </div>
+
+            <div className="hidden sm:block h-8 w-px bg-white/10" />
+
+            {/* Compact Publishing Status */}
+            <div className="flex items-center gap-3">
+              <div>
+                <span className="font-mono-custom text-xs uppercase tracking-wider text-white/90 block">
+                  Status
+                </span>
+                <span className="font-mono-custom text-[10px] text-[#777] block">
+                  {isPublished ? "Public on site" : "Hidden draft"}
+                </span>
+              </div>
+
+              <Button
+                type="button"
+                variant={isPublished ? "success" : "warning"}
+                size="sm"
+                onClick={() => setIsPublished(!isPublished)}
+                className="uppercase tracking-wider h-9 px-3.5"
+              >
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    isPublished ? "bg-emerald-400" : "bg-amber-400"
+                  }`}
+                />
+                <span>{isPublished ? "Published" : "Draft"}</span>
+              </Button>
             </div>
           </div>
-        </Card>
 
-        {/* Publish State Controls */}
-        <Card className="p-6 flex items-center justify-between">
-          <div>
-            <span className="font-sans font-medium text-sm text-white block">
-              Publishing Status
-            </span>
-            <span className="font-mono-custom text-xs text-[#777] block mt-0.5">
-              {isPublished
-                ? "Publicly visible on the live website."
-                : "Saved as draft. Hidden from public visitors."}
-            </span>
+          {/* Cancel + Save & Publish Buttons on the Same Line */}
+          <div className="flex items-center justify-end gap-2.5 shrink-0">
+            <Link
+              href="/admin"
+              className={buttonVariants({
+                variant: "secondary",
+                size: "default",
+                className: "px-4 py-2 h-9 text-xs",
+              })}
+            >
+              Cancel
+            </Link>
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="px-5 py-2 h-9 text-xs"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  <span>{isEdit ? "Saving..." : "Publishing..."}</span>
+                </>
+              ) : (
+                <span>{isEdit ? "Save Changes" : "Save & Publish Project"}</span>
+              )}
+            </Button>
           </div>
-
-          <Button
-            variant={isPublished ? "success" : "warning"}
-            onClick={() => setIsPublished(!isPublished)}
-            className="uppercase tracking-wider"
-          >
-            <span
-              className={`h-2 w-2 rounded-full ${
-                isPublished ? "bg-emerald-400" : "bg-amber-400"
-              }`}
-            />
-            <span>{isPublished ? "Published" : "Draft"}</span>
-          </Button>
         </Card>
-
-        {/* Submit Controls */}
-        <div className="flex items-center justify-end gap-3 pt-4">
-          <Link
-            href="/admin"
-            className={buttonVariants({ variant: "secondary", size: "default", className: "px-5 py-2.5 h-auto" })}
-          >
-            Cancel
-          </Link>
-          <Button
-            type="submit"
-            disabled={submitting}
-            className="px-6 py-2.5 h-auto"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                <span>{isEdit ? "Saving Changes..." : "Saving Project..."}</span>
-              </>
-            ) : (
-              <span>{isEdit ? "Save Changes" : "Save & Publish Project"}</span>
-            )}
-          </Button>
-        </div>
       </form>
     </div>
   );
