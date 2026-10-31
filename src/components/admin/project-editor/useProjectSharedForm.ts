@@ -220,8 +220,25 @@ export function useProjectSharedForm({
       }
 
       const savedProjectId = resData.project?.id || initialProject?.id;
-      markAdminReturnScrollRestore(savedProjectId);
-      const targetUrl = isEdit ? getSavedAdminReturnUrl(discipline) : returnUrl;
+      const destinationTab = isPublished ? discipline : "drafts";
+      const targetUrl = `/admin?tab=${destinationTab}`;
+      try {
+        window.sessionStorage.setItem(
+          ADMIN_RETURN_STATE_KEY,
+          JSON.stringify({
+            tab: destinationTab,
+            page: 1,
+            searchQuery: "",
+            scrollY: 0,
+            projectId: savedProjectId,
+            isAllProjectsMode: true,
+            returnUrl: targetUrl,
+            shouldRestoreScroll: true,
+          })
+        );
+      } catch {
+        // Ignore storage write errors
+      }
       router.push(targetUrl);
       router.refresh();
     } catch (err: unknown) {

@@ -254,8 +254,8 @@ export default function AdminDashboardPage() {
           // Ensure the page containing the edited project is selected if priority changed
           if (restored.highlightedProjectId && restored.mode === "projects") {
             const filtered = loadedProjects.filter((p) => {
-              if (restored.tab === "video" && p.type !== "video") return false;
-              if (restored.tab === "web" && p.type !== "web") return false;
+              if (restored.tab === "video" && (p.type !== "video" || !p.is_published)) return false;
+              if (restored.tab === "web" && (p.type !== "web" || !p.is_published)) return false;
               if (restored.tab === "published" && !p.is_published) return false;
               if (restored.tab === "drafts" && p.is_published) return false;
               if (restored.searchQuery.trim()) {
@@ -298,8 +298,8 @@ export default function AdminDashboardPage() {
     const total = projects.length;
     const published = projects.filter((p) => p.is_published).length;
     const drafts = total - published;
-    const video = projects.filter((p) => p.type === "video").length;
-    const web = projects.filter((p) => p.type === "web").length;
+    const video = projects.filter((p) => p.type === "video" && p.is_published).length;
+    const web = projects.filter((p) => p.type === "web" && p.is_published).length;
     return { total, published, drafts, video, web };
   }, [projects]);
 
@@ -307,8 +307,8 @@ export default function AdminDashboardPage() {
   const filteredProjects = useMemo(() => {
     return projects.filter((p) => {
       // Tab filter
-      if (activeTab === "video" && p.type !== "video") return false;
-      if (activeTab === "web" && p.type !== "web") return false;
+      if (activeTab === "video" && (p.type !== "video" || !p.is_published)) return false;
+      if (activeTab === "web" && (p.type !== "web" || !p.is_published)) return false;
       if (activeTab === "published" && !p.is_published) return false;
       if (activeTab === "drafts" && p.is_published) return false;
 
