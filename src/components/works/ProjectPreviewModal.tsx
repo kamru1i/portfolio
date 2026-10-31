@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Globe, X } from "lucide-react";
+import { FileText, Globe, X } from "lucide-react";
 import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { PortfolioProject } from "@/lib/portfolio-data";
 import { getDisplayDomain } from "@/lib/url-utils";
@@ -82,10 +82,10 @@ function ProjectPreviewModalContent({
   // Compute exact stage dimensions so the full 16:9 screenshot fits 100% edge-to-edge without cropping
   const paddingX = viewportSize.width < 640 ? 20 : 40;
   const maxModalW = Math.min(1152, Math.max(280, viewportSize.width - paddingX));
-  const chromeHeight = 100; // Header (~52px) + Footer (~48px)
+  const chromeHeight = 52; // Top Header Bar only
   const maxMediaH = Math.max(
     180,
-    Math.min(680, Math.round(viewportSize.height * 0.84) - chromeHeight)
+    Math.min(700, Math.round(viewportSize.height * 0.84) - chromeHeight)
   );
   const effectiveRatio = imageRatio >= 1.2 ? imageRatio : 16 / 9;
   const mediaHeight = Math.round(Math.min(maxMediaH, maxModalW / effectiveRatio));
@@ -165,15 +165,16 @@ function ProjectPreviewModalContent({
               </div>
             )}
 
-            {/* Right: Actions */}
+            {/* Right: Icon Actions (Case Study, GitHub, Live Website, Close) */}
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <Link
                 href={`/projects/web/${project.slug || project.id}`}
                 onClick={onClose}
-                className="hidden sm:inline-flex px-3 py-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs border border-white/10 transition-colors items-center gap-1.5"
+                title="View Case Study"
+                aria-label="View Case Study"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 transition-colors cursor-pointer"
               >
-                <span>Case Study</span>
-                <ArrowRight className="h-3 w-3" />
+                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Link>
 
               {project.githubUrl && (
@@ -181,11 +182,11 @@ function ProjectPreviewModalContent({
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-2.5 sm:px-3 py-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs border border-white/10 transition-colors flex items-center gap-1.5"
+                  title="GitHub Repository"
+                  aria-label="GitHub Repository"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 transition-colors cursor-pointer"
                 >
-                  <GitHubBrandIcon className="h-3.5 w-3.5" />
-                  <span>GitHub</span>
-                  <ArrowUpRight className="h-3 w-3" />
+                  <GitHubBrandIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </a>
               )}
 
@@ -194,16 +195,18 @@ function ProjectPreviewModalContent({
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-white text-black hover:bg-neutral-200 font-sans text-xs font-medium transition-colors flex items-center gap-1 shadow-sm"
+                  title="Visit Live Site"
+                  aria-label="Visit Live Site"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-white text-black hover:bg-neutral-200 transition-colors shadow-sm cursor-pointer"
                 >
-                  <span>Visit Live Site</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </a>
               )}
 
               <button
                 type="button"
                 onClick={onClose}
+                title="Close Preview"
                 aria-label="Close project preview"
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 transition-colors ml-0.5 cursor-pointer"
               >
@@ -221,7 +224,7 @@ function ProjectPreviewModalContent({
             className="relative w-full bg-[#0a0b0e] flex items-center justify-center overflow-hidden"
           >
             {previewImage ? (
-              <div className="relative w-full h-full overflow-hidden group flex items-center justify-center">
+              <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
                 <img
                   src={previewImage}
                   alt={`${project.title} hero section screenshot`}
@@ -234,23 +237,6 @@ function ProjectPreviewModalContent({
                   }}
                   className="w-full h-full object-contain block"
                 />
-
-                {/* Subtle Bottom Gradient & Floating Live Action Bar */}
-                <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
-
-                {project.liveUrl && (
-                  <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-full bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs transition-all flex items-center gap-1.5 shadow-xl"
-                    >
-                      <span>Open Live Website</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </a>
-                  </div>
-                )}
               </div>
             ) : (
               <div className="p-8 text-center flex flex-col items-center justify-center max-w-md">
@@ -260,39 +246,11 @@ function ProjectPreviewModalContent({
                 <h4 className="font-sans font-medium text-xl text-white mb-2">
                   {project.title}
                 </h4>
-                <p className="font-mono-custom text-xs text-[#999] leading-relaxed mb-5">
+                <p className="font-mono-custom text-xs text-[#999] leading-relaxed">
                   {project.description}
                 </p>
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-all flex items-center gap-1.5"
-                  >
-                    <span>Open Live Website</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </a>
-                )}
               </div>
             )}
-          </div>
-
-          {/* Footer Meta Bar */}
-          <div className="px-5 py-3 border-t border-white/10 bg-[#161616] flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
-            <p className="font-mono-custom text-xs text-[#888] truncate max-w-xl">
-              {project.description}
-            </p>
-            <div className="flex flex-wrap gap-1.5 shrink-0">
-              {project.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="font-mono-custom text-[11px] text-[#777] bg-white/4 px-2 py-0.5 rounded border border-white/6"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
           </div>
         </motion.div>
       </motion.div>
