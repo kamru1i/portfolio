@@ -15,6 +15,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { ProjectRecord } from "@/types/project";
+import { ContactInquiryRecord } from "@/lib/inquiries-service";
+import { CvDocumentRecord } from "@/lib/cv-service";
 import { getDisplayDomain } from "@/lib/url-utils";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -32,8 +34,15 @@ import {
   ADMIN_RETURN_STATE_KEY,
   AdminProjectsReturnState,
 } from "@/components/admin/project-editor/useProjectSharedForm";
+import {
+  ADMIN_VIEW_EVENT,
+  AdminProjectSubTab,
+  AdminViewEventDetail,
+  dispatchAdminViewChange,
+} from "@/components/admin/AdminSidebarShell";
+import { AdminExecutiveOverview } from "@/components/admin/AdminExecutiveOverview";
 
-type FilterTab = "all" | "video" | "web" | "published" | "drafts";
+type FilterTab = AdminProjectSubTab;
 
 function isValidFilterTab(value: string | null | undefined): value is FilterTab {
   return (
@@ -46,17 +55,25 @@ function isValidFilterTab(value: string | null | undefined): value is FilterTab 
 }
 
 function readInitialAdminViewState(): {
+  mode: "dashboard" | "projects";
   tab: FilterTab;
   page: number;
   searchQuery: string;
   highlightedProjectId: string | null;
 } {
   if (typeof window === "undefined") {
-    return { tab: "all", page: 1, searchQuery: "", highlightedProjectId: null };
+    return {
+      mode: "dashboard",
+      tab: "all",
+      page: 1,
+      searchQuery: "",
+      highlightedProjectId: null,
+    };
   }
   const params = new URLSearchParams(window.location.search);
   const urlTab = params.get("tab");
   const urlPage = parseInt(params.get("page") || "", 10);
+  const hasProjectsHash = window.location.hash === "#projects-manager";
 
   let saved: Partial<AdminProjectsReturnState> | null = null;
   try {
@@ -67,6 +84,11 @@ function readInitialAdminViewState(): {
   } catch {
     // Ignore storage read errors
   }
+
+  const isProjectsView =
+    isValidFilterTab(urlTab) ||
+    hasProjectsHash ||
+    Boolean(saved?.shouldRestoreScroll && saved?.isAllProjectsMode);
 
   const tab: FilterTab = isValidFilterTab(urlTab)
     ? urlTab
@@ -86,15 +108,28 @@ function readInitialAdminViewState(): {
       ? saved.projectId
       : null;
 
-  return { tab, page, searchQuery, highlightedProjectId };
+  return {
+    mode: isProjectsView ? "projects" : "dashboard",
+    tab,
+    page,
+    searchQuery,
+    highlightedProjectId,
+  };
 }
 
 export default function AdminDashboardPage() {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
+  const [inquiries, setInquiries] = useState<ContactInquiryRecord[]>([]);
+  const [cvDocuments, setCvDocuments] = useState<CvDocumentRecord[]>([]);
+  const [activeCvDocument, setActiveCvDocument] =
+    useState<CvDocumentRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Deterministic initial states so SSR and client hydration match 100%
+  const [viewMode, setViewMode] = useState<"dashboard" | "projects">(
+    "dashboard"
+  );
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -108,23 +143,45 @@ export default function AdminDashboardPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteProject, setConfirmDeleteProject] = useState<ProjectRecord | null>(null);
 
-  // Sync URL query params and sessionStorage whenever tab, page, or searchQuery changes
+  // Listen for sidebar view/sub-tab changes
+  useEffect(() => {
+    const handleSidebarViewChange = (e: Event) => {
+      const custom = e as CustomEvent<AdminViewEventDetail>;
+      if (!custom.detail) return;
+      if (custom.detail.mode === "dashboard") {
+        setViewMode("dashboard");
+      } else if (custom.detail.mode === "projects") {
+        setViewMode("projects");
+        if (custom.detail.tab) {
+          setActiveTab(custom.detail.tab);
+          setCurrentPage(1);
+        }
+      }
+    };
+    window.addEventListener(ADMIN_VIEW_EVENT, handleSidebarViewChange);
+    return () =>
+      window.removeEventListener(ADMIN_VIEW_EVENT, handleSidebarViewChange);
+  }, []);
+
+  // Sync URL query params and sessionStorage whenever viewMode, tab, page, or searchQuery changes
   useEffect(() => {
     if (typeof window === "undefined" || !hasRestoredViewRef.current) return;
     const params = new URLSearchParams(window.location.search);
-    if (activeTab === "all") {
+
+    if (viewMode === "dashboard") {
       params.delete("tab");
-    } else {
-      params.set("tab", activeTab);
-    }
-    if (currentPage <= 1) {
       params.delete("page");
     } else {
-      params.set("page", String(currentPage));
+      params.set("tab", activeTab);
+      if (currentPage <= 1) {
+        params.delete("page");
+      } else {
+        params.set("page", String(currentPage));
+      }
     }
+
     const queryStr = params.toString() ? `?${params.toString()}` : "";
-    const hashStr = window.location.hash || "";
-    const nextUrl = `/admin${queryStr}${hashStr}`;
+    const nextUrl = `/admin${queryStr}`;
     window.history.replaceState(null, "", nextUrl);
 
     try {
@@ -140,8 +197,7 @@ export default function AdminDashboardPage() {
           ? existing.scrollY ?? window.scrollY
           : window.scrollY,
         projectId: existing.projectId,
-        isAllProjectsMode:
-          hashStr === "#projects-manager" || Boolean(existing.isAllProjectsMode),
+        isAllProjectsMode: viewMode === "projects",
         returnUrl: nextUrl,
         shouldRestoreScroll: existing.shouldRestoreScroll,
       };
@@ -152,7 +208,7 @@ export default function AdminDashboardPage() {
     } catch {
       // Ignore storage write errors
     }
-  }, [activeTab, currentPage, searchQuery]);
+  }, [viewMode, activeTab, currentPage, searchQuery]);
 
   useEffect(() => {
     let isMounted = true;
@@ -162,24 +218,41 @@ export default function AdminDashboardPage() {
 
       const restored = readInitialAdminViewState();
       hasRestoredViewRef.current = true;
+      setViewMode(restored.mode);
       setActiveTab(restored.tab);
       setSearchQuery(restored.searchQuery);
       setCurrentPage(restored.page);
       setHighlightedProjectId(restored.highlightedProjectId);
 
       try {
-        const res = await fetch("/api/admin/projects");
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
+        const [projectsRes, inquiriesRes, cvRes] = await Promise.all([
+          fetch("/api/admin/projects"),
+          fetch("/api/admin/inquiries").catch(() => null),
+          fetch("/api/admin/cv").catch(() => null),
+        ]);
+
+        if (!projectsRes.ok) {
+          const data = await projectsRes.json().catch(() => ({}));
           throw new Error(data.error || "Failed to load projects");
         }
-        const data = await res.json();
+
+        const [projectsData, inquiriesData, cvData] = await Promise.all([
+          projectsRes.json(),
+          inquiriesRes && inquiriesRes.ok
+            ? inquiriesRes.json().catch(() => ({}))
+            : Promise.resolve({}),
+          cvRes && cvRes.ok ? cvRes.json().catch(() => ({})) : Promise.resolve({}),
+        ]);
+
         if (isMounted) {
-          const loadedProjects: ProjectRecord[] = data.projects || [];
+          const loadedProjects: ProjectRecord[] = projectsData.projects || [];
           setProjects(loadedProjects);
+          setInquiries(inquiriesData.inquiries || []);
+          setCvDocuments(cvData.documents || []);
+          setActiveCvDocument(cvData.activeDocument || null);
 
           // Ensure the page containing the edited project is selected if priority changed
-          if (restored.highlightedProjectId) {
+          if (restored.highlightedProjectId && restored.mode === "projects") {
             const filtered = loadedProjects.filter((p) => {
               if (restored.tab === "video" && p.type !== "video") return false;
               if (restored.tab === "web" && p.type !== "web") return false;
@@ -316,18 +389,19 @@ export default function AdminDashboardPage() {
     if (typeof window === "undefined") return;
     try {
       const params = new URLSearchParams();
-      if (activeTab !== "all") params.set("tab", activeTab);
-      if (currentPage > 1) params.set("page", String(currentPage));
+      if (viewMode === "projects") {
+        params.set("tab", activeTab);
+        if (currentPage > 1) params.set("page", String(currentPage));
+      }
       const queryStr = params.toString() ? `?${params.toString()}` : "";
-      const hashStr = window.location.hash || "";
       const returnState: AdminProjectsReturnState = {
         tab: activeTab,
         page: currentPage,
         searchQuery,
         scrollY: window.scrollY,
         projectId,
-        isAllProjectsMode: hashStr === "#projects-manager",
-        returnUrl: `/admin${queryStr}${hashStr}`,
+        isAllProjectsMode: viewMode === "projects",
+        returnUrl: `/admin${queryStr}`,
         shouldRestoreScroll: true,
       };
       window.sessionStorage.setItem(
@@ -336,6 +410,16 @@ export default function AdminDashboardPage() {
       );
     } catch {
       // Ignore storage write errors
+    }
+  };
+
+  const handleSelectProjectsTab = (tab: FilterTab) => {
+    setViewMode("projects");
+    setActiveTab(tab);
+    setCurrentPage(1);
+    dispatchAdminViewChange({ mode: "projects", tab });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -386,20 +470,89 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const activeCategoryTitle =
+    activeTab === "video"
+      ? "Video Projects"
+      : activeTab === "web"
+      ? "Web Projects"
+      : activeTab === "published"
+      ? "Published Projects"
+      : activeTab === "drafts"
+      ? "Draft Projects"
+      : "All Projects";
+
+  const activeCategoryDescription =
+    activeTab === "video"
+      ? `Showing ${filteredProjects.length} of ${stats.video} video showcase works.`
+      : activeTab === "web"
+      ? `Showing ${filteredProjects.length} of ${stats.web} web engineering case studies.`
+      : activeTab === "published"
+      ? `Showing ${filteredProjects.length} live published works.`
+      : activeTab === "drafts"
+      ? `Showing ${filteredProjects.length} unpublished draft works.`
+      : `Showing ${filteredProjects.length} of ${stats.total} total portfolio works across Video and Web.`;
+
+  if (viewMode === "dashboard") {
+    return (
+      <div className="select-none">
+        {errorMsg && (
+          <div className="mb-6 p-4 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
+            {errorMsg}
+          </div>
+        )}
+        <AdminExecutiveOverview
+          projects={projects}
+          inquiries={inquiries}
+          cvDocuments={cvDocuments}
+          activeCvDocument={activeCvDocument}
+          loading={loading}
+          togglingId={togglingId}
+          onSelectProjectsTab={handleSelectProjectsTab}
+          onTogglePublish={handleTogglePublish}
+          onSaveEditReturnState={handleSaveEditReturnState}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8 select-none">
-      {/* Top Welcome & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div id="projects-manager" className="space-y-6 select-none">
+      {/* Top Category Header, Search & Create Actions */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal tracking-tight uppercase">
-            Project Overview
-          </h1>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal tracking-tight uppercase">
+              {activeCategoryTitle}
+            </h1>
+            <Badge variant="default" className="font-mono-custom text-xs px-2.5 py-0.5">
+              {filteredProjects.length}
+            </Badge>
+          </div>
           <p className="font-mono-custom text-xs text-[#888] mt-1">
-            Manage, publish, and inspect portfolio works across Video and Web systems.
+            {activeCategoryDescription}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {/* Search Bar */}
+          <div className="relative w-full sm:w-64">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#666]"
+            />
+            <Input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              aria-label="Search projects"
+              placeholder="Search projects..."
+              className="pl-9 pr-4 py-2 h-9 bg-[#141416] text-xs font-mono-custom"
+            />
+          </div>
+
           <Link
             href="/admin/projects/new?type=video"
             className={buttonVariants({
@@ -422,114 +575,6 @@ export default function AdminDashboardPage() {
             <Globe className="h-3.5 w-3.5" aria-hidden="true" />
             <span>+ Web Project</span>
           </Link>
-        </div>
-      </div>
-
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-        <Card className="p-4 rounded-xl">
-          <span className="font-mono-custom text-[11px] text-[#888] uppercase tracking-wider block mb-1">
-            Total
-          </span>
-          <span className="font-sans text-2xl font-semibold text-white">
-            {stats.total}
-          </span>
-        </Card>
-
-        <Card className="p-4 rounded-xl">
-          <span className="font-mono-custom text-[11px] text-emerald-400/80 uppercase tracking-wider block mb-1">
-            Published
-          </span>
-          <span className="font-sans text-2xl font-semibold text-emerald-400">
-            {stats.published}
-          </span>
-        </Card>
-
-        <Card className="p-4 rounded-xl">
-          <span className="font-mono-custom text-[11px] text-amber-400/80 uppercase tracking-wider block mb-1">
-            Drafts
-          </span>
-          <span className="font-sans text-2xl font-semibold text-amber-400">
-            {stats.drafts}
-          </span>
-        </Card>
-
-        <Card className="p-4 rounded-xl">
-          <span className="font-mono-custom text-[11px] text-sky-400/80 uppercase tracking-wider block mb-1">
-            Video
-          </span>
-          <span className="font-sans text-2xl font-semibold text-sky-400">
-            {stats.video}
-          </span>
-        </Card>
-
-        <Card className="p-4 rounded-xl col-span-2 sm:col-span-1">
-          <span className="font-mono-custom text-[11px] text-purple-400/80 uppercase tracking-wider block mb-1">
-            Web
-          </span>
-          <span className="font-sans text-2xl font-semibold text-purple-400">
-            {stats.web}
-          </span>
-        </Card>
-      </div>
-
-      {/* Filter Tabs & Search Controls */}
-      <div
-        id="projects-manager"
-        className="scroll-mt-20 flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2"
-      >
-        {/* Filter Pills */}
-        <div
-          role="tablist"
-          aria-label="Filter projects by category or status"
-          className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#141416] border border-white/10"
-        >
-          {(
-            [
-              { id: "all", label: "All Projects" },
-              { id: "video", label: "Video" },
-              { id: "web", label: "Web" },
-              { id: "published", label: "Published" },
-              { id: "drafts", label: "Drafts" },
-            ] as const
-          ).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setCurrentPage(1);
-              }}
-              className={`px-3 py-1.5 rounded-lg font-mono-custom text-xs uppercase tracking-wider transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                activeTab === tab.id
-                  ? "bg-white/15 text-white font-medium shadow-sm"
-                  : "text-[#888] hover:text-white"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative w-full md:w-72">
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#666]"
-          />
-          <Input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            aria-label="Search projects"
-            placeholder="Search projects..."
-            className="pl-9 pr-4 py-2 h-9 bg-[#141416] text-xs font-mono-custom"
-          />
         </div>
       </div>
 
