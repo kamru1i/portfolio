@@ -15,12 +15,12 @@ import {
   Loader2,
 } from "lucide-react";
 import {
-  CvDocumentRecord,
+  type CvDocumentRecord,
   DOCUMENT_CATEGORIES,
-  DocumentCategory,
+  type DocumentCategory,
   getDocumentCategory,
   normalizeDocumentCategory,
-} from "@/lib/cv-service";
+} from "@/lib/document-categories";
 import {
   ADMIN_DOC_EVENT,
   AdminDocEventDetail,

@@ -23,7 +23,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ProjectType } from "@/types/project";
-import type { DocumentCategory } from "@/lib/cv-service";
+import type { DocumentCategory } from "@/lib/document-categories";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 import { AdminNavLogout } from "@/app/admin/(dashboard)/AdminNavLogout";
 import { Badge } from "@/components/ui/badge";

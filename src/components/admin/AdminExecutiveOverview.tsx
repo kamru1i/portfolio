@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { ProjectRecord } from "@/types/project";
 import { ContactInquiryRecord } from "@/lib/inquiries-service";
-import { CvDocumentRecord } from "@/lib/cv-service";
+import type { CvDocumentRecord } from "@/lib/document-categories";
 import { getDisplayDomain } from "@/lib/url-utils";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
