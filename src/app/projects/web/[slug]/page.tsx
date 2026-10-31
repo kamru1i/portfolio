@@ -245,18 +245,18 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                 )}
               </div>
 
-              {/* Viewport Content (Full 16:9 Screenshot without Cropping) */}
-              <div className="relative w-full aspect-video bg-[#0a0b10] overflow-hidden flex items-center justify-center">
+              {/* Viewport Content (Exact Screenshot Dimensions without Black Bars or Cropping) */}
+              <div className="relative w-full bg-[#0a0b10] overflow-hidden">
                 {heroScreenshot ? (
                   /* eslint-disable-next-line @next/next/no-img-element -- Renders local or external screenshot cleanly */
                   <img
                     src={heroScreenshot}
                     alt={`${project.title} hero section screenshot`}
                     decoding="async"
-                    className="w-full h-full object-contain block"
+                    className="w-full h-auto block"
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-[#0a0b10]">
+                  <div className="w-full py-20 flex flex-col items-center justify-center p-8 text-center bg-[#0a0b10]">
                     <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/80 mb-4">
                       <Globe className="h-7 w-7" />
                     </div>
