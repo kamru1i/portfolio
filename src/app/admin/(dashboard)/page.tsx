@@ -28,22 +28,135 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  ADMIN_RETURN_STATE_KEY,
+  AdminProjectsReturnState,
+} from "@/components/admin/project-editor/useProjectSharedForm";
 
 type FilterTab = "all" | "video" | "web" | "published" | "drafts";
+
+function isValidFilterTab(value: string | null | undefined): value is FilterTab {
+  return (
+    value === "all" ||
+    value === "video" ||
+    value === "web" ||
+    value === "published" ||
+    value === "drafts"
+  );
+}
+
+function readInitialAdminViewState(): {
+  tab: FilterTab;
+  page: number;
+  searchQuery: string;
+  highlightedProjectId: string | null;
+} {
+  if (typeof window === "undefined") {
+    return { tab: "all", page: 1, searchQuery: "", highlightedProjectId: null };
+  }
+  const params = new URLSearchParams(window.location.search);
+  const urlTab = params.get("tab");
+  const urlPage = parseInt(params.get("page") || "", 10);
+
+  let saved: Partial<AdminProjectsReturnState> | null = null;
+  try {
+    const raw = window.sessionStorage.getItem(ADMIN_RETURN_STATE_KEY);
+    if (raw) {
+      saved = JSON.parse(raw) as Partial<AdminProjectsReturnState>;
+    }
+  } catch {
+    // Ignore storage read errors
+  }
+
+  const tab: FilterTab = isValidFilterTab(urlTab)
+    ? urlTab
+    : isValidFilterTab(saved?.tab)
+    ? saved.tab
+    : "all";
+  const page =
+    Number.isFinite(urlPage) && urlPage > 0
+      ? urlPage
+      : typeof saved?.page === "number" && saved.page > 0
+      ? saved.page
+      : 1;
+  const searchQuery =
+    typeof saved?.searchQuery === "string" ? saved.searchQuery : "";
+  const highlightedProjectId =
+    saved?.shouldRestoreScroll && typeof saved?.projectId === "string"
+      ? saved.projectId
+      : null;
+
+  return { tab, page, searchQuery, highlightedProjectId };
+}
 
 export default function AdminDashboardPage() {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<FilterTab>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<FilterTab>(
+    () => readInitialAdminViewState().tab
+  );
+  const [searchQuery, setSearchQuery] = useState<string>(
+    () => readInitialAdminViewState().searchQuery
+  );
+  const [currentPage, setCurrentPage] = useState<number>(
+    () => readInitialAdminViewState().page
+  );
+  const [highlightedProjectId, setHighlightedProjectId] = useState<string | null>(
+    () => readInitialAdminViewState().highlightedProjectId
+  );
   const pageSize = 12;
 
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteProject, setConfirmDeleteProject] = useState<ProjectRecord | null>(null);
+
+  // Sync URL query params and sessionStorage whenever tab, page, or searchQuery changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (activeTab === "all") {
+      params.delete("tab");
+    } else {
+      params.set("tab", activeTab);
+    }
+    if (currentPage <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(currentPage));
+    }
+    const queryStr = params.toString() ? `?${params.toString()}` : "";
+    const hashStr = window.location.hash || "";
+    const nextUrl = `/admin${queryStr}${hashStr}`;
+    window.history.replaceState(null, "", nextUrl);
+
+    try {
+      const existingRaw = window.sessionStorage.getItem(ADMIN_RETURN_STATE_KEY);
+      const existing = existingRaw
+        ? (JSON.parse(existingRaw) as Partial<AdminProjectsReturnState>)
+        : {};
+      const updatedState: AdminProjectsReturnState = {
+        tab: activeTab,
+        page: currentPage,
+        searchQuery,
+        scrollY: existing.shouldRestoreScroll
+          ? existing.scrollY ?? window.scrollY
+          : window.scrollY,
+        projectId: existing.projectId,
+        isAllProjectsMode:
+          hashStr === "#projects-manager" || Boolean(existing.isAllProjectsMode),
+        returnUrl: nextUrl,
+        shouldRestoreScroll: existing.shouldRestoreScroll,
+      };
+      window.sessionStorage.setItem(
+        ADMIN_RETURN_STATE_KEY,
+        JSON.stringify(updatedState)
+      );
+    } catch {
+      // Ignore storage write errors
+    }
+  }, [activeTab, currentPage, searchQuery]);
 
   useEffect(() => {
     let isMounted = true;
@@ -112,6 +225,85 @@ export default function AdminDashboardPage() {
     const from = (currentPage - 1) * pageSize;
     return filteredProjects.slice(from, from + pageSize);
   }, [filteredProjects, currentPage, pageSize]);
+
+  // Restore scroll position & project row when returning from Edit / Create
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+
+    try {
+      const raw = window.sessionStorage.getItem(ADMIN_RETURN_STATE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as Partial<AdminProjectsReturnState>;
+      if (!saved.shouldRestoreScroll) return;
+
+      // Clear the one-shot restore flag now that we are on the right tab & page
+      window.sessionStorage.setItem(
+        ADMIN_RETURN_STATE_KEY,
+        JSON.stringify({
+          ...saved,
+          shouldRestoreScroll: false,
+        })
+      );
+
+      const targetScrollY =
+        typeof saved.scrollY === "number" ? saved.scrollY : 0;
+      const targetProjectId = saved.projectId;
+
+      requestAnimationFrame(() => {
+        if (targetScrollY > 0) {
+          window.scrollTo({ top: targetScrollY, behavior: "instant" });
+        }
+        if (targetProjectId) {
+          const rowEl = document.getElementById(
+            `admin-project-row-${targetProjectId}`
+          );
+          if (rowEl) {
+            const rect = rowEl.getBoundingClientRect();
+            const isVisibleInViewport =
+              rect.top >= 72 && rect.bottom <= window.innerHeight - 24;
+            if (!isVisibleInViewport) {
+              rowEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          }
+        }
+      });
+
+      const timer = window.setTimeout(() => {
+        setHighlightedProjectId(null);
+      }, 2400);
+
+      return () => window.clearTimeout(timer);
+    } catch {
+      // Ignore storage read errors
+    }
+  }, [loading, filteredProjects, currentPage, pageSize]);
+
+  const handleSaveEditReturnState = (projectId: string) => {
+    if (typeof window === "undefined") return;
+    try {
+      const params = new URLSearchParams();
+      if (activeTab !== "all") params.set("tab", activeTab);
+      if (currentPage > 1) params.set("page", String(currentPage));
+      const queryStr = params.toString() ? `?${params.toString()}` : "";
+      const hashStr = window.location.hash || "";
+      const returnState: AdminProjectsReturnState = {
+        tab: activeTab,
+        page: currentPage,
+        searchQuery,
+        scrollY: window.scrollY,
+        projectId,
+        isAllProjectsMode: hashStr === "#projects-manager",
+        returnUrl: `/admin${queryStr}${hashStr}`,
+        shouldRestoreScroll: true,
+      };
+      window.sessionStorage.setItem(
+        ADMIN_RETURN_STATE_KEY,
+        JSON.stringify(returnState)
+      );
+    } catch {
+      // Ignore storage write errors
+    }
+  };
 
   // Toggle publish state
   const handleTogglePublish = async (project: ProjectRecord) => {
@@ -336,11 +528,17 @@ export default function AdminDashboardPage() {
           {paginatedProjects.map((project) => {
             const isVideo = project.type === "video";
             const is916 = project.aspect_ratio === "9:16";
+            const isHighlighted = highlightedProjectId === project.id;
 
             return (
               <div
                 key={project.id}
-                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/2 transition-colors"
+                id={`admin-project-row-${project.id}`}
+                className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors duration-500 ${
+                  isHighlighted
+                    ? "bg-emerald-500/8 ring-1 ring-inset ring-emerald-500/35"
+                    : "hover:bg-white/2"
+                }`}
               >
                 {/* Project Media Thumbnail + Details */}
                 <div className="flex items-start sm:items-center gap-4 min-w-0">
@@ -443,6 +641,7 @@ export default function AdminDashboardPage() {
                   {/* Edit Link */}
                   <Link
                     href={`/admin/projects/${project.id}/edit`}
+                    onClick={() => handleSaveEditReturnState(project.id)}
                     className={buttonVariants({ variant: "secondary", size: "sm" })}
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />

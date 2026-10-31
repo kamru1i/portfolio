@@ -164,6 +164,18 @@ export function AdminSidebarShell({
     const syncLocationState = () => {
       if (window.location.hash === "#projects-manager") {
         setIsAllProjectsMode(true);
+      } else {
+        try {
+          const raw = window.sessionStorage.getItem("admin_projects_return_state");
+          if (raw) {
+            const parsed = JSON.parse(raw) as { isAllProjectsMode?: boolean };
+            if (parsed.isAllProjectsMode) {
+              setIsAllProjectsMode(true);
+            }
+          }
+        } catch {
+          // Ignore storage read errors
+        }
       }
       const params = new URLSearchParams(window.location.search);
       const t = params.get("type");
@@ -184,8 +196,20 @@ export function AdminSidebarShell({
   }, [pathname]);
 
   // When arriving on /admin in All Projects mode, ensure #projects-manager is scrolled into view
+  // UNLESS returning from editing a project with saved scroll/row restoration pending
   useEffect(() => {
     if (pathname === "/admin" && isAllProjectsMode) {
+      try {
+        const raw = window.sessionStorage.getItem("admin_projects_return_state");
+        if (raw) {
+          const parsed = JSON.parse(raw) as { shouldRestoreScroll?: boolean };
+          if (parsed.shouldRestoreScroll) {
+            return;
+          }
+        }
+      } catch {
+        // Ignore storage read errors
+      }
       const el = document.getElementById("projects-manager");
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -227,9 +251,14 @@ export function AdminSidebarShell({
     if (item.id === "dashboard") {
       setIsAllProjectsMode(false);
       setNewProjectExpanded(false);
+      try {
+        window.sessionStorage.removeItem("admin_projects_return_state");
+      } catch {
+        // Ignore storage errors
+      }
       if (pathname === "/admin") {
         setNavOverride(null);
-        window.history.replaceState(null, "", "/admin");
+        window.history.replaceState(null, "", `/admin${window.location.search}`);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         setNavOverride({ fromPathname: pathname, targetId: "dashboard" });

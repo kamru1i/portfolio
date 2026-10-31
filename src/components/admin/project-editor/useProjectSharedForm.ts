@@ -36,6 +36,55 @@ export interface SpecificSubmissionFields {
   preview_image_url: string | null;
 }
 
+export const ADMIN_RETURN_STATE_KEY = "admin_projects_return_state";
+
+export interface AdminProjectsReturnState {
+  tab: string;
+  page: number;
+  searchQuery: string;
+  scrollY: number;
+  projectId?: string;
+  isAllProjectsMode?: boolean;
+  returnUrl: string;
+  shouldRestoreScroll?: boolean;
+}
+
+export function getSavedAdminReturnUrl(fallbackDiscipline?: ProjectType): string {
+  if (typeof window === "undefined") return "/admin";
+  try {
+    const raw = window.sessionStorage.getItem(ADMIN_RETURN_STATE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<AdminProjectsReturnState>;
+      if (parsed.returnUrl && parsed.returnUrl.startsWith("/admin")) {
+        return parsed.returnUrl;
+      }
+    }
+  } catch {
+    // Ignore storage read errors
+  }
+  return fallbackDiscipline ? `/admin?tab=${fallbackDiscipline}` : "/admin";
+}
+
+export function markAdminReturnScrollRestore(projectId?: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.sessionStorage.getItem(ADMIN_RETURN_STATE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as AdminProjectsReturnState;
+      window.sessionStorage.setItem(
+        ADMIN_RETURN_STATE_KEY,
+        JSON.stringify({
+          ...parsed,
+          projectId: projectId ?? parsed.projectId,
+          shouldRestoreScroll: true,
+        })
+      );
+    }
+  } catch {
+    // Ignore storage write errors
+  }
+}
+
 export function useProjectSharedForm({
   mode,
   discipline,
@@ -43,6 +92,9 @@ export function useProjectSharedForm({
 }: UseProjectSharedFormOptions) {
   const router = useRouter();
   const isEdit = mode === "edit" && Boolean(initialProject);
+  const [returnUrl] = useState<string>(() =>
+    isEdit ? getSavedAdminReturnUrl(discipline) : `/admin?tab=${discipline}`
+  );
 
   const [title, setTitle] = useState(initialProject?.title ?? "");
   const [slug, setSlug] = useState(initialProject?.slug ?? "");
@@ -166,7 +218,10 @@ export function useProjectSharedForm({
         );
       }
 
-      router.push("/admin");
+      const savedProjectId = resData.project?.id || initialProject?.id;
+      markAdminReturnScrollRestore(savedProjectId);
+      const targetUrl = isEdit ? getSavedAdminReturnUrl(discipline) : returnUrl;
+      router.push(targetUrl);
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(
@@ -178,6 +233,7 @@ export function useProjectSharedForm({
 
   return {
     isEdit,
+    returnUrl,
     title,
     slug,
     setSlug,

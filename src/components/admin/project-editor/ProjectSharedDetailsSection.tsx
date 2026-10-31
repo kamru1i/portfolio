@@ -8,7 +8,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { SharedProjectFormController } from "./useProjectSharedForm";
+import {
+  markAdminReturnScrollRestore,
+  SharedProjectFormController,
+} from "./useProjectSharedForm";
 
 interface ProjectSharedDetailsSectionProps {
   discipline: ProjectType;
@@ -255,7 +258,12 @@ export function ProjectSharedDetailsSection({
       {/* Clean Bottom Submit Bar — Only Cancel & Save/Publish Project */}
       <div className="flex items-center justify-end gap-3 pt-1">
         <Link
-          href="/admin"
+          href={shared.returnUrl}
+          onClick={() => {
+            if (isEdit) {
+              markAdminReturnScrollRestore(projectId);
+            }
+          }}
           className={buttonVariants({
             variant: "secondary",
             size: "default",

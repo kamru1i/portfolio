@@ -4,6 +4,10 @@ import Link from "next/link";
 import { Film, Globe } from "lucide-react";
 import { ProjectType } from "@/types/project";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  getSavedAdminReturnUrl,
+  markAdminReturnScrollRestore,
+} from "./useProjectSharedForm";
 
 interface ProjectFormHeaderProps {
   discipline: ProjectType;
@@ -17,6 +21,7 @@ export function ProjectFormHeader({
   projectId,
 }: ProjectFormHeaderProps) {
   const isVideo = discipline === "video";
+  const cancelHref = isEdit ? getSavedAdminReturnUrl(discipline) : `/admin?tab=${discipline}`;
 
   return (
     <div className="flex items-center justify-between gap-4">
@@ -60,7 +65,12 @@ export function ProjectFormHeader({
       </div>
 
       <Link
-        href="/admin"
+        href={cancelHref}
+        onClick={() => {
+          if (isEdit) {
+            markAdminReturnScrollRestore(projectId);
+          }
+        }}
         className={buttonVariants({ variant: "secondary", size: "sm" })}
       >
         Cancel
