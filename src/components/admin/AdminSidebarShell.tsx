@@ -317,7 +317,7 @@ export function AdminSidebarShell({
       const params = new URLSearchParams(window.location.search);
       const urlTab = params.get("tab");
 
-      if (window.location.pathname === "/admin") {
+      if (pathname === "/admin" && window.location.pathname === "/admin") {
         if (isValidProjectSubTab(urlTab)) {
           setIsAllProjectsMode(true);
           setActiveProjectsSubTab(urlTab);
@@ -331,17 +331,22 @@ export function AdminSidebarShell({
             if (raw) {
               const parsed = JSON.parse(raw) as {
                 isAllProjectsMode?: boolean;
+                shouldRestoreScroll?: boolean;
                 tab?: string;
               };
-              if (parsed.isAllProjectsMode) {
+              if (parsed.shouldRestoreScroll && parsed.isAllProjectsMode) {
                 setIsAllProjectsMode(true);
                 if (isValidProjectSubTab(parsed.tab)) {
                   setActiveProjectsSubTab(parsed.tab);
                 }
+              } else {
+                setIsAllProjectsMode(false);
               }
+            } else {
+              setIsAllProjectsMode(false);
             }
           } catch {
-            // Ignore storage read errors
+            setIsAllProjectsMode(false);
           }
         }
       } else {
@@ -814,12 +819,7 @@ export function AdminSidebarShell({
                 href="/admin"
                 onClick={() => {
                   setIsAllProjectsMode(false);
-                  setAllProjectsExpanded(false);
-                  try {
-                    window.sessionStorage.removeItem("admin_projects_return_state");
-                  } catch {
-                    // Ignore storage errors
-                  }
+                  clearProjectsReturnState();
                   if (pathname === "/admin") {
                     setNavOverride(null);
                     window.history.replaceState(null, "", "/admin");

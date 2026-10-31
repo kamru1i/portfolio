@@ -21,6 +21,13 @@ const MENU_LINKS = [
   { label: "Contact", href: "/contact-us" },
 ];
 
+const DOCUMENT_SUB_PILLS = [
+  { label: "Curriculum Vitae", href: "/cv" },
+  { label: "Resume", href: "/cv?doc=resume" },
+  { label: "Portfolio", href: "/cv?doc=portfolio" },
+  { label: "Cover Letter", href: "/cv?doc=cover-letter" },
+];
+
 export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
   // ESC key listener to dismiss
   useEffect(() => {
@@ -130,18 +137,35 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                           </span>
                         </a>
                       ) : (
-                        <Link
-                          href={item.href}
-                          onClick={(e) => handleLinkClick(e, item.href)}
-                          className="group inline-flex items-center gap-4 text-white/80 hover:text-white transition-colors duration-200"
-                        >
-                          <span className="font-mono-custom text-xs sm:text-sm text-[#777] group-hover:text-emerald-400 transition-colors">
-                            0{index + 1}
-                          </span>
-                          <span className="text-4xl sm:text-5xl md:text-6xl font-gambarino tracking-tight group-hover:translate-x-2 transition-transform duration-200">
-                            {item.label}
-                          </span>
-                        </Link>
+                        <div className="flex flex-col">
+                          <Link
+                            href={item.href}
+                            onClick={(e) => handleLinkClick(e, item.href)}
+                            className="group inline-flex items-center gap-4 text-white/80 hover:text-white transition-colors duration-200"
+                          >
+                            <span className="font-mono-custom text-xs sm:text-sm text-[#777] group-hover:text-emerald-400 transition-colors">
+                              0{index + 1}
+                            </span>
+                            <span className="text-4xl sm:text-5xl md:text-6xl font-gambarino tracking-tight group-hover:translate-x-2 transition-transform duration-200">
+                              {item.label}
+                            </span>
+                          </Link>
+
+                          {item.href === "/cv" && (
+                            <div className="mt-2.5 mb-1 pl-7 sm:pl-9 flex flex-wrap items-center gap-2">
+                              {DOCUMENT_SUB_PILLS.map((docPill) => (
+                                <Link
+                                  key={docPill.label}
+                                  href={docPill.href}
+                                  onClick={() => onClose()}
+                                  className="px-3 py-1 rounded-full bg-white/6 hover:bg-white text-white/80 hover:text-black border border-white/12 hover:border-white font-mono-custom text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-200"
+                                >
+                                  {docPill.label}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </motion.div>
                   );
