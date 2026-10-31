@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { LayoutDashboard, Menu, X } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { useDhakaClock } from "@/hooks/useDhakaClock";
+import { createClient } from "@/lib/supabase/client";
 import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
 import { FullScreenMenu } from "./FullScreenMenu";
 
@@ -28,6 +29,43 @@ function getServerDesktopSnapshot() {
 export function Navigation({ isRevealed = true }: NavigationProps) {
   const timeStr = useDhakaClock("7:00 PM (GMT +6)");
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+    let isMounted = true;
+    const supabase = createClient();
+
+    const checkAdminStatus = async (userId?: string) => {
+      if (!userId) {
+        if (isMounted) setIsAdmin(false);
+        return;
+      }
+      const { data: adminRecord } = await supabase
+        .from("admin_users")
+        .select("id")
+        .eq("id", userId)
+        .maybeSingle();
+      if (isMounted) {
+        setIsAdmin(Boolean(adminRecord));
+      }
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      checkAdminStatus(session?.user?.id);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      checkAdminStatus(session?.user?.id);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const isDesktop = useSyncExternalStore(
     subscribeDesktop,
@@ -155,26 +193,40 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
               <span>{timeStr}</span>
             </div>
 
-            {/* Menu / Close Button */}
-            <button
-              type="button"
-              onClick={() => setIsMenuOpen((prev) => !prev)}
-              aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-expanded={isMenuOpen}
-              className="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/25 text-white text-[12px] sm:text-[13px] font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-            >
-              {isMenuOpen ? (
-                <>
-                  <X className="h-3.5 w-3.5 text-white" aria-hidden="true" />
-                  <span>CLOSE</span>
-                </>
-              ) : (
-                <>
-                  <Menu className="h-3.5 w-3.5 text-white" aria-hidden="true" />
-                  <span>MENU</span>
-                </>
+            {/* Conditional Admin Dashboard Icon + Menu / Close Button */}
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMenuOpen(false)}
+                  title="Admin Dashboard"
+                  aria-label="Open Admin Dashboard"
+                  className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/25 text-white transition-all duration-200 hover:scale-[1.04] active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                >
+                  <LayoutDashboard className="h-4 w-4 text-white" aria-hidden="true" />
+                </Link>
               )}
-            </button>
+
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+                aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={isMenuOpen}
+                className="inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/25 text-white text-[12px] sm:text-[13px] font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              >
+                {isMenuOpen ? (
+                  <>
+                    <X className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                    <span>CLOSE</span>
+                  </>
+                ) : (
+                  <>
+                    <Menu className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                    <span>MENU</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </nav>
       </motion.header>
