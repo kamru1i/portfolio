@@ -234,7 +234,7 @@ export const PORTFOLIO_DATA = {
         "End-to-end AI video production, prompt engineering, scene composition, and post-production refinement using Google Veo, ChatGPT Sora, Kling 3.0, and DaVinci Resolve.",
       aspect: "small",
       colSpan: "col-span-12 md:col-span-4",
-      image: "/images/work-1-biqolpo.png",
+      image: "/images/services/ai-content-hero.webp",
       tags: ["Google Veo", "Kling 3.0", "DaVinci Resolve", "AI Compositing"],
       links: [
         { label: "Video 01", url: "#" },
@@ -253,7 +253,7 @@ export const PORTFOLIO_DATA = {
         "Short-form automotive promotional series with precision rhythm, speed ramping, engine audio enhancement, and cinematic color grading across 6 episodes.",
       aspect: "large",
       colSpan: "col-span-12 md:col-span-8",
-      image: "/images/work-2-syston.png",
+      image: "/images/hero-gallery/hero-card-2.webp",
       tags: ["Premiere Pro", "After Effects", "Sound Design", "Color Grading"],
       links: [
         { label: "Video 01", url: "#" },
@@ -275,7 +275,7 @@ export const PORTFOLIO_DATA = {
         "Modular, component-driven web interfaces built in React.js, Tailwind CSS, and JavaScript (ES6) with responsive layouts and REST API integrations.",
       aspect: "large",
       colSpan: "col-span-12 md:col-span-8 md:col-start-3",
-      image: "/images/work-3-web.png",
+      image: "/images/services/web-dev-hero.webp",
       tags: ["React.js", "JavaScript (ES6)", "Tailwind CSS", "REST APIs"],
       links: [{ label: "View Architecture", url: "#" }],
     },
@@ -290,7 +290,7 @@ export const PORTFOLIO_DATA = {
         "Multi-domain web hosting administration, DNS/SSL management, cPanel Webmail and Outlook support, VPN setup, malware cleanup, and office IT operations.",
       aspect: "large",
       colSpan: "col-span-12 md:col-span-8",
-      image: "/images/work-4-it.png",
+      image: "/images/services/it-infra-hero.webp",
       tags: ["cPanel Hosting", "DNS / SSL", "Network VPN", "Security Maintenance"],
       links: [{ label: "Operations Overview", url: "#" }],
     },
@@ -305,7 +305,7 @@ export const PORTFOLIO_DATA = {
         "Fast-paced promotional video series focused on vehicular presentation, crisp transitions, motion graphics badges, and multi-platform optimization.",
       aspect: "small",
       colSpan: "col-span-12 md:col-span-4",
-      image: "/images/work-5-bfcars.png",
+      image: "/images/hero-gallery/hero-card-3.webp",
       tags: ["CapCut", "Premiere Pro", "Motion Graphics", "Social Format"],
       links: [
         { label: "Video 01", url: "#" },
@@ -760,7 +760,7 @@ export const PORTFOLIO_DATA = {
           role: "AI-Assisted Video Editing & Content Creation",
           summary:
             "Visual storytelling, creative editing, AI-generated asset integration, and final content refinement.",
-          image: "/images/work-1-biqolpo.png",
+          image: "/images/hero-gallery/hero-card-2.webp",
         },
         {
           title: "Syston Autos Ltd",
@@ -768,7 +768,7 @@ export const PORTFOLIO_DATA = {
           role: "Social Media Video Editing",
           summary:
             "Short-form automotive promotional content, social-first editing, pacing, transitions, and platform delivery.",
-          image: "/images/work-2-syston.png",
+          image: "/images/hero-gallery/hero-card-1.webp",
         },
         {
           title: "B&F Cars",
@@ -776,15 +776,16 @@ export const PORTFOLIO_DATA = {
           role: "Automotive Promotional Content",
           summary:
             "Commercial vehicle showcases, short-form editing, visual presentation, and social media optimization.",
-          image: "/images/work-5-bfcars.png",
+          image: "/images/hero-gallery/hero-card-3.webp",
         },
       ],
       images: [
-        "/images/work-1-biqolpo.png",
-        "/images/work-2-syston.png",
-        "/images/work-5-bfcars.png",
+        "/images/services/video-editing-hero.webp",
+        "/images/hero-gallery/hero-card-2.webp",
+        "/images/hero-gallery/hero-card-3.webp",
+        "/images/hero-gallery/hero-card-1.webp",
       ],
-      image: "/images/work-1-biqolpo.png",
+      image: "/images/services/video-editing-hero.webp",
     },
     {
       id: "ai-assisted-content",
@@ -905,7 +906,7 @@ export const PORTFOLIO_DATA = {
           role: "AI-Assisted Content Production",
           summary:
             "Generative video workflows, prompt design, AI asset integration, and timeline narrative assembly.",
-          image: "/images/hero-card-1.png",
+          image: "/images/services/ai-content-hero.webp",
         },
         {
           title: "Visual Narrative Concepting",
@@ -913,15 +914,15 @@ export const PORTFOLIO_DATA = {
           role: "Concept & Asset Synthesis",
           summary:
             "Exploration of hybrid AI visual techniques, motion consistency, and prompt-driven scene composition.",
-          image: "/images/hero-card-2.png",
+          image: "/images/hero-gallery/hero-card-4.webp",
         },
       ],
       images: [
-        "/images/hero-card-1.png",
-        "/images/hero-card-2.png",
-        "/images/work-4-it.png",
+        "/images/services/ai-content-hero.webp",
+        "/images/hero-gallery/hero-card-4.webp",
+        "/images/services/ai-content-2.webp",
       ],
-      image: "/images/hero-card-1.png",
+      image: "/images/services/ai-content-hero.webp",
     },
     {
       id: "web-development",
@@ -1067,7 +1068,7 @@ export const PORTFOLIO_DATA = {
           role: "Front-End & Full-Stack Development",
           summary:
             "Responsive web applications, component engineering, performance tuning, and CMS architecture.",
-          image: "/images/work-3-web.png",
+          image: "/images/hero-gallery/hero-card-5.webp",
         },
         {
           title: "Job Portal Platform",
@@ -1075,15 +1076,15 @@ export const PORTFOLIO_DATA = {
           role: "WordPress Developer",
           summary:
             "Custom WordPress development, listing automation, performance optimization, and routine maintenance.",
-          image: "/images/hero-card-4.png",
+          image: "/images/services/web-dev-2.webp",
         },
       ],
       images: [
-        "/images/work-3-web.png",
-        "/images/hero-card-4.png",
-        "/images/hero-card-5.png",
+        "/images/services/web-dev-hero.webp",
+        "/images/hero-gallery/hero-card-5.webp",
+        "/images/services/web-dev-2.webp",
       ],
-      image: "/images/work-3-web.png",
+      image: "/images/services/web-dev-hero.webp",
     },
     {
       id: "it-support",
@@ -1203,15 +1204,15 @@ export const PORTFOLIO_DATA = {
           role: "Assistant IT Manager",
           summary:
             "Workstation fleet maintenance, domain renewals, cPanel hosting, SSL installations, and CCTV surveillance.",
-          image: "/images/work-4-it.png",
+          image: "/images/services/it-infra-2.webp",
         },
       ],
       images: [
-        "/images/work-4-it.png",
-        "/images/hero-card-3.png",
-        "/images/work-1-biqolpo.png",
+        "/images/services/it-infra-hero.webp",
+        "/images/services/it-infra-2.webp",
+        "/images/services/it-infra-3.webp",
       ],
-      image: "/images/work-4-it.png",
+      image: "/images/services/it-infra-hero.webp",
     },
   ] as ServiceItem[],
 
