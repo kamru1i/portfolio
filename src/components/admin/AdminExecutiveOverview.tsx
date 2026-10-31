@@ -3,19 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Plus,
-  Film,
-  Globe,
   Inbox,
   FileText,
   ArrowRight,
   ExternalLink,
   Download,
   Pencil,
-  CheckCircle2,
   AlertTriangle,
   Sparkles,
-  Clock,
   Layers,
   Loader2,
 } from "lucide-react";
@@ -105,108 +100,15 @@ export function AdminExecutiveOverview({
 
   return (
     <div className="space-y-7">
-      {/* Top Executive Header & Quick Create Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal uppercase tracking-tight">
-            Dashboard Overview
-          </h1>
-          <p className="font-mono-custom text-xs sm:text-sm text-[#888] mt-1">
-            Executive command center across portfolio works, client inquiries, and active CV.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Link
-            href="/admin/projects/new?type=video"
-            className={buttonVariants({
-              variant: "secondary",
-              size: "sm",
-              className: "px-3.5 py-2",
-            })}
-          >
-            <Film className="h-3.5 w-3.5 text-sky-400" aria-hidden="true" />
-            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Video Project</span>
-          </Link>
-
-          <Link
-            href="/admin/projects/new?type=web"
-            className={buttonVariants({
-              variant: "default",
-              size: "sm",
-              className: "px-3.5 py-2",
-            })}
-          >
-            <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Web Project</span>
-          </Link>
-        </div>
+      {/* Top Executive Header */}
+      <div>
+        <h1 className="font-gambarino text-3xl sm:text-4xl text-white font-normal uppercase tracking-tight">
+          Dashboard Overview
+        </h1>
+        <p className="font-mono-custom text-xs sm:text-sm text-[#888] mt-1">
+          Executive command center across portfolio works, client inquiries, and active CV.
+        </p>
       </div>
-
-      {/* Smart Attention / System Health Banner */}
-      {!loading && (
-        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white/2 border border-white/8">
-          <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono-custom">
-            {unreadInquiries > 0 ? (
-              <Link
-                href="/admin/inquiries"
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 transition-colors"
-              >
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <span>
-                  {unreadInquiries} Unread Client{" "}
-                  {unreadInquiries === 1 ? "Inquiry" : "Inquiries"}
-                </span>
-                <ArrowRight className="h-3 w-3" aria-hidden="true" />
-              </Link>
-            ) : (
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
-                <span>Inbox Zero (All Inquiries Reviewed)</span>
-              </span>
-            )}
-
-            {draftProjects > 0 && (
-              <button
-                type="button"
-                onClick={() => onSelectProjectsTab("drafts")}
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-[#ccc] hover:text-white transition-colors cursor-pointer"
-              >
-                <Clock className="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
-                <span>
-                  {draftProjects} Draft {draftProjects === 1 ? "Project" : "Projects"}
-                </span>
-              </button>
-            )}
-
-            {!activeCvDocument ? (
-              <Link
-                href="/admin/cv"
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500/25 transition-colors"
-              >
-                <AlertTriangle className="h-3.5 w-3.5 text-red-400" aria-hidden="true" />
-                <span>No Active Published CV</span>
-              </Link>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/4 border border-white/8 text-[#999]">
-                <FileText className="h-3 w-3 text-emerald-400" aria-hidden="true" />
-                <span>Active CV: {activeCvDocument.version_label || "Live"}</span>
-              </span>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => onSelectProjectsTab("all")}
-            className="inline-flex items-center gap-1.5 font-mono-custom text-xs text-[#999] hover:text-white transition-colors cursor-pointer"
-          >
-            <span>Open Full Project Manager</span>
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </button>
-        </div>
-      )}
 
       {/* Section 1: Interactive Project Overview Stat Cards */}
       <div className="space-y-3">

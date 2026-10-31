@@ -553,28 +553,37 @@ export default function AdminDashboardPage() {
             />
           </div>
 
-          <Link
-            href="/admin/projects/new?type=video"
-            className={buttonVariants({
-              variant: "secondary",
-              size: "sm",
-              className: "px-3.5 py-2 h-9",
-            })}
-          >
-            <Film className="h-3.5 w-3.5 text-sky-400" aria-hidden="true" />
-            <span>+ Video Project</span>
-          </Link>
-          <Link
-            href="/admin/projects/new?type=web"
-            className={buttonVariants({
-              variant: "default",
-              size: "sm",
-              className: "px-3.5 py-2 h-9",
-            })}
-          >
-            <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>+ Web Project</span>
-          </Link>
+          {(activeTab === "all" || activeTab === "video") && (
+            <Link
+              href="/admin/projects/new?type=video"
+              className={buttonVariants({
+                variant: activeTab === "video" ? "default" : "secondary",
+                size: "sm",
+                className: "px-3.5 py-2 h-9",
+              })}
+            >
+              <Film
+                className={`h-3.5 w-3.5 ${
+                  activeTab === "video" ? "" : "text-sky-400"
+                }`}
+                aria-hidden="true"
+              />
+              <span>+ Video Project</span>
+            </Link>
+          )}
+          {(activeTab === "all" || activeTab === "web") && (
+            <Link
+              href="/admin/projects/new?type=web"
+              className={buttonVariants({
+                variant: "default",
+                size: "sm",
+                className: "px-3.5 py-2 h-9",
+              })}
+            >
+              <Globe className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>+ Web Project</span>
+            </Link>
+          )}
         </div>
       </div>
 
