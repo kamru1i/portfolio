@@ -285,8 +285,19 @@ function normalizeProjectRecord(record: ProjectRecord): ProjectRecord {
       generateSlug(p.title) === recordSlug
   );
 
+  const resolvedPriority =
+    record.manual_priority !== null &&
+    record.manual_priority !== undefined &&
+    Number(record.manual_priority) > 0
+      ? Math.floor(Number(record.manual_priority))
+      : record.sort_order && Number(record.sort_order) > 0
+      ? Math.floor(Number(record.sort_order))
+      : null;
+
   return {
     ...record,
+    manual_priority: resolvedPriority,
+    sort_order: resolvedPriority ?? 0,
     description: extracted.description,
     role: extracted.role || fallbackMatch?.role || null,
     overview: extracted.overview || fallbackMatch?.overview || null,
@@ -295,6 +306,117 @@ function normalizeProjectRecord(record: ProjectRecord): ProjectRecord {
         ? extracted.deliverables
         : fallbackMatch?.deliverables || [],
   };
+}
+
+/**
+ * Shifts existing projects of the same discipline (`video` or `web`) down by +1
+ * whenever a newly created or updated project takes an already-occupied priority slot.
+ * For example, if priorities 1..7 exist and a project is assigned priority 5,
+ * the previous #5 becomes #6, #6 becomes #7, and #7 becomes #8.
+ */
+async function shiftCompetingProjectPriorities(
+  supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>,
+  projectType: "video" | "web",
+  targetPriority: number,
+  excludeProjectId: string
+): Promise<void> {
+  if (!Number.isInteger(targetPriority) || targetPriority <= 0) {
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id, manual_priority, sort_order, updated_at, created_at")
+    .eq("type", projectType)
+    .neq("id", excludeProjectId);
+
+  if (error || !data || data.length === 0) {
+    return;
+  }
+
+  type PriorityCandidate = {
+    id: string;
+    effPriority: number;
+    updatedAtMs: number;
+    createdAtMs: number;
+  };
+
+  const candidates: PriorityCandidate[] = [];
+  for (const row of data) {
+    const rawPri =
+      row.manual_priority !== null &&
+      row.manual_priority !== undefined &&
+      Number(row.manual_priority) > 0
+        ? Math.floor(Number(row.manual_priority))
+        : row.sort_order !== null &&
+          row.sort_order !== undefined &&
+          Number(row.sort_order) > 0
+        ? Math.floor(Number(row.sort_order))
+        : null;
+
+    if (rawPri !== null && rawPri >= targetPriority) {
+      candidates.push({
+        id: row.id,
+        effPriority: rawPri,
+        updatedAtMs: row.updated_at ? new Date(row.updated_at).getTime() : 0,
+        createdAtMs: row.created_at ? new Date(row.created_at).getTime() : 0,
+      });
+    }
+  }
+
+  if (candidates.length === 0) {
+    return;
+  }
+
+  // Sort ascending by current priority; if any duplicates already exist, newer stays ahead of older
+  candidates.sort((a, b) => {
+    if (a.effPriority !== b.effPriority) {
+      return a.effPriority - b.effPriority;
+    }
+    if (b.updatedAtMs !== a.updatedAtMs) {
+      return b.updatedAtMs - a.updatedAtMs;
+    }
+    if (b.createdAtMs !== a.createdAtMs) {
+      return b.createdAtMs - a.createdAtMs;
+    }
+    return a.id.localeCompare(b.id);
+  });
+
+  // Only cascade-shift if targetPriority is actually occupied (collision at targetPriority)
+  if (candidates[0].effPriority > targetPriority) {
+    return;
+  }
+
+  let nextRequiredPriority = targetPriority + 1;
+  const shifts: Array<{ id: string; newPriority: number }> = [];
+
+  for (const item of candidates) {
+    if (item.effPriority < nextRequiredPriority) {
+      shifts.push({
+        id: item.id,
+        newPriority: nextRequiredPriority,
+      });
+      nextRequiredPriority += 1;
+    } else {
+      nextRequiredPriority = item.effPriority + 1;
+    }
+  }
+
+  if (shifts.length === 0) {
+    return;
+  }
+
+  await Promise.all(
+    shifts.map(({ id, newPriority }) =>
+      supabase
+        .from("projects")
+        .update({
+          manual_priority: newPriority,
+          sort_order: newPriority,
+        })
+        .eq("id", id)
+    )
+  );
 }
 
 /**
@@ -462,9 +584,10 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
   }
 
   // Parse manual priority (positive integer or null)
-  const manualPriority = input.manual_priority && Number(input.manual_priority) > 0 
-    ? Number(input.manual_priority) 
-    : null;
+  const manualPriority =
+    input.manual_priority && Number(input.manual_priority) > 0
+      ? Math.floor(Number(input.manual_priority))
+      : null;
 
   // Normalize preview mode & embeddability for web projects
   const previewMode = input.preview_mode === "fallback" || input.can_embed === false ? "fallback" : "iframe";
@@ -544,6 +667,14 @@ export async function createProject(input: ProjectInsert): Promise<ProjectRecord
   }
 
   const normalizedCreated = normalizeProjectRecord(data as ProjectRecord);
+  if (manualPriority !== null && manualPriority > 0) {
+    await shiftCompetingProjectPriorities(
+      supabase,
+      normalizedCreated.type,
+      manualPriority,
+      normalizedCreated.id
+    );
+  }
   revalidateProjectRoutes(normalizedCreated.slug);
   return normalizedCreated;
 }
@@ -652,10 +783,13 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
   }
 
   // If manual priority is specified, normalize and mirror to sort_order
+  let updatedManualPriority: number | null | undefined = undefined;
   if (updates.manual_priority !== undefined) {
-    const manualPriority = updates.manual_priority && Number(updates.manual_priority) > 0
-      ? Number(updates.manual_priority)
-      : null;
+    const manualPriority =
+      updates.manual_priority && Number(updates.manual_priority) > 0
+        ? Math.floor(Number(updates.manual_priority))
+        : null;
+    updatedManualPriority = manualPriority;
     updatePayload.manual_priority = manualPriority;
     updatePayload.sort_order = manualPriority ?? 0;
   }
@@ -745,6 +879,14 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
   }
 
   const normalizedUpdated = normalizeProjectRecord(data as ProjectRecord);
+  if (updatedManualPriority !== undefined && updatedManualPriority !== null && updatedManualPriority > 0) {
+    await shiftCompetingProjectPriorities(
+      supabase,
+      normalizedUpdated.type,
+      updatedManualPriority,
+      normalizedUpdated.id
+    );
+  }
   revalidateProjectRoutes(normalizedUpdated.slug);
   return normalizedUpdated;
 }
