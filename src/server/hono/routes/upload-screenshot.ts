@@ -71,6 +71,8 @@ uploadScreenshotRoute.post("/", async (c) => {
 
     const formData = await c.req.formData();
     const fileEntry = formData.get("file");
+    const rawFolder = formData.get("folder");
+    const folderPrefix = rawFolder === "video" ? "video" : "web";
 
     if (!fileEntry || !(fileEntry instanceof File)) {
       return c.json({ error: "Please select a valid screenshot image file." }, 400);
@@ -103,9 +105,14 @@ uploadScreenshotRoute.post("/", async (c) => {
       );
     }
 
-    const sanitizedFileName = sanitizeImageFilename(fileEntry.name || "screenshot", ext);
+    const defaultStem = folderPrefix === "video" ? "video-thumbnail" : "homepage-screenshot";
+    const rawName =
+      fileEntry.name && fileEntry.name !== "image.png" && fileEntry.name !== "blob"
+        ? fileEntry.name
+        : defaultStem;
+    const sanitizedFileName = sanitizeImageFilename(rawName, ext);
     const uniqueKey = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const storagePath = `web/${uniqueKey}-${sanitizedFileName}`;
+    const storagePath = `${folderPrefix}/${uniqueKey}-${sanitizedFileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from(SCREENSHOT_BUCKET_NAME)

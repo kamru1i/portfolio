@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Film } from "lucide-react";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
 import { resolvePlayableEmbedUrl } from "@/lib/video-metadata";
-import { serializeJsonLd } from "@/lib/url-utils";
+import { isNextImageOptimizedUrl, serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
@@ -247,6 +247,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                     src={project.thumbnail}
                     alt={project.title}
                     fill
+                    unoptimized={!isNextImageOptimizedUrl(project.thumbnail)}
                     sizes="(max-width: 1024px) 100vw, 1024px"
                     className="object-cover opacity-30 blur-sm"
                   />
@@ -277,6 +278,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                   src={project.thumbnail}
                   alt={project.title}
                   fill
+                  unoptimized={!isNextImageOptimizedUrl(project.thumbnail)}
                   sizes="(max-width: 1024px) 100vw, 1024px"
                   className="object-cover"
                 />

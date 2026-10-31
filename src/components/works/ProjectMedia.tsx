@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Play, ArrowUpRight } from "lucide-react";
 import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { PortfolioProject } from "@/lib/portfolio-data";
+import { isNextImageOptimizedUrl } from "@/lib/url-utils";
 
 interface ProjectMediaProps {
   project: PortfolioProject;
@@ -52,6 +53,7 @@ export function ProjectMedia({
           src={project.thumbnail}
           alt={project.title}
           fill
+          unoptimized={!isNextImageOptimizedUrl(project.thumbnail)}
           className="object-cover"
           sizes={isLarge ? "(max-width: 768px) 100vw, 704px" : "(max-width: 768px) 100vw, 352px"}
           priority={isLarge}

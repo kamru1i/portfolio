@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +14,9 @@ import {
   Loader2,
   Trash2,
   Sparkles,
+  ClipboardPaste,
+  RotateCcw,
+  ImagePlus,
 } from "lucide-react";
 import {
   AspectRatio,
@@ -90,8 +93,47 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
   const [videoId, setVideoId] = useState<string | null>(
     initialProject?.video_id ?? null
   );
-  const [resolvedThumbnail, setResolvedThumbnail] = useState<string | null>(
-    initialProject?.type === "video" ? initialProject.preview_image_url : null
+
+  const initialVideoPreview =
+    initialProject?.type === "video" ? initialProject.preview_image_url ?? "" : "";
+  const isInitialSvgFallback = initialVideoPreview.startsWith("data:image/svg+xml");
+
+  const [videoThumbnailUrl, setVideoThumbnailUrl] = useState<string>(
+    isInitialSvgFallback ? "" : initialVideoPreview
+  );
+  const [autoDetectedThumbnail, setAutoDetectedThumbnail] = useState<string | null>(
+    () => {
+      if (initialProject?.type !== "video") return null;
+      if (
+        initialVideoPreview &&
+        !isInitialSvgFallback &&
+        (initialVideoPreview.includes("ytimg.com") ||
+          initialVideoPreview.includes("vimeocdn.com") ||
+          initialVideoPreview.includes("tiktokcdn"))
+      ) {
+        return initialVideoPreview;
+      }
+      if (initialProject.video_provider === "youtube" && initialProject.video_id) {
+        return `https://i.ytimg.com/vi/${initialProject.video_id}/hqdefault.jpg`;
+      }
+      return null;
+    }
+  );
+  const [fallbackSvgThumbnail, setFallbackSvgThumbnail] = useState<string | null>(
+    isInitialSvgFallback ? initialVideoPreview : null
+  );
+  const [isCustomVideoThumbnail, setIsCustomVideoThumbnail] = useState<boolean>(
+    () => {
+      if (!initialVideoPreview || isInitialSvgFallback) return false;
+      if (
+        initialVideoPreview.includes("ytimg.com") ||
+        initialVideoPreview.includes("vimeocdn.com") ||
+        initialVideoPreview.includes("tiktokcdn")
+      ) {
+        return false;
+      }
+      return true;
+    }
   );
   const [resolutionStatus, setResolutionStatus] = useState<string | null>(null);
   const [resolvingVideo, setResolvingVideo] = useState(false);
@@ -112,8 +154,11 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
       ? initialProject.preview_image_url ?? ""
       : ""
   );
+
+  // Shared Image Upload / Drag & Drop / Clipboard Paste State
   const [uploadingScreenshot, setUploadingScreenshot] = useState(false);
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   // Submission State
   const [submitting, setSubmitting] = useState(false);
@@ -127,32 +172,124 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
     }
   };
 
-  const handleUploadScreenshot = async (file: File) => {
-    setUploadingScreenshot(true);
+  const handleUploadImage = useCallback(
+    async (file: File, targetType: "video" | "web" = isVideo ? "video" : "web") => {
+      setUploadingScreenshot(true);
+      setScreenshotError(null);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("folder", targetType);
+
+        const res = await fetch("/api/admin/upload-screenshot", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(
+            data.error ||
+              (targetType === "video"
+                ? "Failed to upload video thumbnail"
+                : "Failed to upload screenshot")
+          );
+        }
+
+        if (data.url) {
+          if (targetType === "video") {
+            setVideoThumbnailUrl(data.url);
+            setIsCustomVideoThumbnail(true);
+          } else {
+            setWebPreviewImageUrl(data.url);
+          }
+        }
+      } catch (err: unknown) {
+        setScreenshotError(
+          err instanceof Error ? err.message : "Failed to upload image"
+        );
+      } finally {
+        setUploadingScreenshot(false);
+      }
+    },
+    [isVideo]
+  );
+
+  // Global Clipboard Paste listener (Ctrl+V / Win+V image paste)
+  useEffect(() => {
+    const onWindowPaste = (e: ClipboardEvent) => {
+      if (uploadingScreenshot) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i += 1) {
+        const item = items[i];
+        if (item.kind === "file" && item.type.startsWith("image/")) {
+          const blob = item.getAsFile();
+          if (blob) {
+            e.preventDefault();
+            const ext = item.type.split("/")[1] || "png";
+            const fileName = `${isVideo ? "video-thumbnail" : "web-screenshot"}-${Date.now()}.${ext}`;
+            const imageFile = new File([blob], fileName, { type: item.type });
+            void handleUploadImage(imageFile, isVideo ? "video" : "web");
+            return;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("paste", onWindowPaste);
+    return () => window.removeEventListener("paste", onWindowPaste);
+  }, [handleUploadImage, isVideo, uploadingScreenshot]);
+
+  const handleClipboardButtonPaste = async (targetType: "video" | "web") => {
     setScreenshotError(null);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await fetch("/api/admin/upload-screenshot", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to upload screenshot");
+      if (!navigator.clipboard || !navigator.clipboard.read) {
+        throw new Error(
+          "Your browser does not support button clipboard reading. Press Ctrl+V (or Win+V) directly to paste your copied image."
+        );
       }
-
-      if (data.url) {
-        setWebPreviewImageUrl(data.url);
+      const clipboardItems = await navigator.clipboard.read();
+      for (const item of clipboardItems) {
+        const imageType = item.types.find((t) => t.startsWith("image/"));
+        if (imageType) {
+          const blob = await item.getType(imageType);
+          const ext = imageType.split("/")[1] || "png";
+          const fileName = `${targetType === "video" ? "video-thumbnail" : "web-screenshot"}-${Date.now()}.${ext}`;
+          const file = new File([blob], fileName, { type: imageType });
+          await handleUploadImage(file, targetType);
+          return;
+        }
       }
+      throw new Error(
+        "No copied image found in clipboard. Copy a screenshot or image first, then press Ctrl+V or click Paste Image."
+      );
     } catch (err: unknown) {
       setScreenshotError(
-        err instanceof Error ? err.message : "Failed to upload screenshot image"
+        err instanceof Error
+          ? err.message
+          : "Press Ctrl+V (or Win+V) directly on the page to paste your copied image."
       );
-    } finally {
-      setUploadingScreenshot(false);
+    }
+  };
+
+  const handleDropImage = (
+    e: React.DragEvent<HTMLDivElement>,
+    targetType: "video" | "web"
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    if (uploadingScreenshot) return;
+
+    const file = e.dataTransfer?.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setScreenshotError("Please drop a valid image file (PNG, JPG, WebP, or AVIF).");
+        return;
+      }
+      void handleUploadImage(file, targetType);
     }
   };
 
@@ -176,8 +313,23 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
       const meta = data.meta;
       setVideoProvider(meta.provider);
       setVideoId(meta.videoId);
-      setResolvedThumbnail(meta.thumbnailUrl);
       setResolutionStatus(meta.status || null);
+
+      const isRealThumbnail =
+        meta.status === "available" &&
+        typeof meta.thumbnailUrl === "string" &&
+        !meta.thumbnailUrl.startsWith("data:image/svg+xml");
+
+      if (isRealThumbnail) {
+        setAutoDetectedThumbnail(meta.thumbnailUrl);
+        if (!isCustomVideoThumbnail || !videoThumbnailUrl.trim()) {
+          setVideoThumbnailUrl(meta.thumbnailUrl);
+          setIsCustomVideoThumbnail(false);
+        }
+      } else if (typeof meta.thumbnailUrl === "string") {
+        setFallbackSvgThumbnail(meta.thumbnailUrl);
+      }
+
       if (meta.aspectRatio) {
         setAspectRatio(meta.aspectRatio);
       }
@@ -235,6 +387,12 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
         .map((d) => d.trim())
         .filter(Boolean);
 
+      const effectiveVideoThumbnail =
+        videoThumbnailUrl.trim() ||
+        autoDetectedThumbnail ||
+        fallbackSvgThumbnail ||
+        null;
+
       const payload = {
         ...(isEdit ? {} : { type: projectType }),
         title: title.trim(),
@@ -254,7 +412,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               video_provider: videoProvider || "other",
               video_id: videoId || null,
               aspect_ratio: aspectRatio,
-              preview_image_url: resolvedThumbnail || null,
+              preview_image_url: effectiveVideoThumbnail,
             }
           : {
               live_url: liveUrl.trim(),
@@ -408,7 +566,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
 
             <div>
               <Label htmlFor="project-video-url" className="mb-2">
-                Video URL (YouTube, Vimeo, TikTok, MP4) *
+                Video URL (YouTube, Vimeo, TikTok, Facebook, Instagram, MP4, etc.) *
               </Label>
               <div className="flex gap-2">
                 <Input
@@ -443,63 +601,13 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                 </Button>
               </div>
               <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
-                Automatically resolves provider, aspect ratio, and public high-res thumbnail.
+                Automatically resolves provider, aspect ratio, and default thumbnail (if available from YouTube/Vimeo/TikTok).
               </p>
             </div>
 
-            {resolvedThumbnail && (
-              <div className="p-4 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-center gap-4">
-                <div
-                  className={`relative ${
-                    aspectRatio === "9:16"
-                      ? "w-20 h-36"
-                      : aspectRatio === "1:1"
-                      ? "w-24 h-24"
-                      : "w-40 h-24"
-                  } rounded-lg overflow-hidden bg-black shrink-0 border border-white/15`}
-                >
-                  <Image
-                    src={resolvedThumbnail}
-                    alt="Resolved video thumbnail"
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                </div>
-                <div className="space-y-1.5 text-center sm:text-left flex-1">
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    <Badge
-                      variant={resolutionStatus === "available" ? "success" : "info"}
-                    >
-                      <Check className="h-3 w-3" aria-hidden="true" />
-                      <span>
-                        {resolutionStatus === "available"
-                          ? "Direct Thumbnail"
-                          : isEdit
-                          ? "Resolved Thumbnail"
-                          : "Branded Preview Card"}
-                      </span>
-                    </Badge>
-                    <Badge variant="default">
-                      {videoProvider?.toUpperCase()}
-                    </Badge>
-                  </div>
-
-                  <div className="font-mono-custom text-xs text-[#aaa]">
-                    Active Ratio: <strong className="text-white">{aspectRatio}</strong>
-                    {videoId && (
-                      <span className="ml-2 text-[#777]">
-                        (ID: <span className="text-white">{videoId}</span>)
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
             {resolveError && (
               <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-200 text-xs font-mono-custom">
-                {resolveError} {!isEdit && "(A branded fallback card will be used)"}
+                {resolveError} — You can upload, drag &amp; drop, or paste a custom thumbnail image below.
               </div>
             )}
 
@@ -556,6 +664,231 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               <p className="font-mono-custom text-[11px] text-[#666] mt-1.5">
                 Source of truth for editorial works card display and player stage modal.
               </p>
+            </div>
+
+            {/* Video Card Thumbnail — Auto-Detected Default + Custom Upload / Drag & Drop / Clipboard Paste */}
+            <div className="space-y-3 pt-2 border-t border-white/10">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label>Video Card Thumbnail (Auto-Detected or Custom Upload)</Label>
+                <span className="font-mono-custom text-[11px] text-emerald-400 flex items-center gap-1">
+                  {videoThumbnailUrl ? (
+                    <>
+                      <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>
+                        {isCustomVideoThumbnail
+                          ? "Custom Thumbnail Active"
+                          : "Auto-Detected Thumbnail Active"}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-[#888]">
+                      Auto-detects from YouTube/Vimeo or Upload Custom Image
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!isDraggingOver) setIsDraggingOver(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingOver(false);
+                }}
+                onDrop={(e) => handleDropImage(e, "video")}
+                className={`p-5 rounded-xl border border-dashed transition-all flex flex-col lg:flex-row items-center justify-between gap-4 ${
+                  isDraggingOver
+                    ? "bg-sky-500/10 border-sky-400 ring-2 ring-sky-400/25"
+                    : "bg-[#18181b] border-white/20 hover:border-white/40"
+                }`}
+              >
+                <div className="flex items-start gap-3.5 text-center sm:text-left">
+                  <div className="hidden sm:flex w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 items-center justify-center text-sky-400 shrink-0 mt-0.5">
+                    <ImagePlus className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-sans text-sm font-medium text-white">
+                      {isDraggingOver
+                        ? "Drop Thumbnail Image Here to Upload"
+                        : "Drag & Drop, Paste (Ctrl+V / Win+V), or Upload Video Thumbnail"}
+                    </p>
+                    <p className="font-mono-custom text-[11px] text-[#888]">
+                      If the video link has an auto-thumbnail (like YouTube), it is used by default. Upload or paste (`Ctrl+V`) a custom image for external links or custom artwork (PNG, JPG, WebP, AVIF — max 8 MB).
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={uploadingScreenshot}
+                    onClick={() => handleClipboardButtonPaste("video")}
+                    className="h-auto px-3.5 py-2.5 text-xs"
+                    title="Paste copied image from clipboard (or press Ctrl+V anywhere)"
+                  >
+                    <ClipboardPaste className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Paste (Ctrl+V)</span>
+                  </Button>
+
+                  <label className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-2 shrink-0 shadow-sm">
+                    {uploadingScreenshot ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Upload Image</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/avif"
+                      disabled={uploadingScreenshot}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          void handleUploadImage(file, "video");
+                          e.target.value = "";
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {screenshotError && (
+                <div className="p-3 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom">
+                  {screenshotError}
+                </div>
+              )}
+
+              {(videoThumbnailUrl || fallbackSvgThumbnail) && (
+                <div className="p-4 rounded-xl bg-black/50 border border-white/10 flex flex-col sm:flex-row items-center gap-4">
+                  <div
+                    className={`relative ${
+                      aspectRatio === "9:16"
+                        ? "w-20 h-36"
+                        : aspectRatio === "1:1"
+                        ? "w-24 h-24"
+                        : "w-44 h-24"
+                    } rounded-lg overflow-hidden bg-black shrink-0 border border-white/15`}
+                  >
+                    <Image
+                      src={videoThumbnailUrl || fallbackSvgThumbnail || ""}
+                      alt="Video thumbnail preview"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-2 w-full text-center sm:text-left">
+                    <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {videoThumbnailUrl ? (
+                          <Badge
+                            variant={isCustomVideoThumbnail ? "success" : "info"}
+                          >
+                            <Check className="h-3 w-3" aria-hidden="true" />
+                            <span>
+                              {isCustomVideoThumbnail
+                                ? "Custom Video Thumbnail"
+                                : "Auto-Detected Video Thumbnail"}
+                            </span>
+                          </Badge>
+                        ) : (
+                          <Badge variant="default">
+                            Branded Fallback Preview Card
+                          </Badge>
+                        )}
+                        {videoProvider && (
+                          <Badge variant="default">
+                            {videoProvider.toUpperCase()}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {autoDetectedThumbnail &&
+                          videoThumbnailUrl !== autoDetectedThumbnail && (
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="xs"
+                              onClick={() => {
+                                setVideoThumbnailUrl(autoDetectedThumbnail);
+                                setIsCustomVideoThumbnail(false);
+                              }}
+                            >
+                              <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                              <span>Use Auto Thumbnail</span>
+                            </Button>
+                          )}
+
+                        {videoThumbnailUrl && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="xs"
+                            onClick={() => {
+                              setVideoThumbnailUrl("");
+                              setIsCustomVideoThumbnail(false);
+                            }}
+                          >
+                            <Trash2 className="h-3 w-3" aria-hidden="true" />
+                            <span>Remove</span>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="font-mono-custom text-xs text-[#aaa]">
+                      Active Ratio: <strong className="text-white">{aspectRatio}</strong>
+                      {videoId && (
+                        <span className="ml-2 text-[#777]">
+                          (ID: <span className="text-white">{videoId}</span>)
+                        </span>
+                      )}
+                    </div>
+
+                    {videoThumbnailUrl && (
+                      <p className="font-mono-custom text-xs text-[#888] truncate">
+                        {videoThumbnailUrl}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <Label
+                  htmlFor="project-video-thumbnail-url"
+                  className="text-[11px] text-[#777] mb-1.5"
+                >
+                  Or Paste Thumbnail Image URL / Path Directly
+                </Label>
+                <Input
+                  id="project-video-thumbnail-url"
+                  type="text"
+                  value={videoThumbnailUrl}
+                  onChange={(e) => {
+                    const nextVal = e.target.value;
+                    setVideoThumbnailUrl(nextVal);
+                    setIsCustomVideoThumbnail(
+                      Boolean(nextVal.trim()) && nextVal.trim() !== autoDetectedThumbnail
+                    );
+                  }}
+                  placeholder="https://i.ytimg.com/... or /images/projects/... or https://..."
+                  className="py-2.5 text-xs font-mono-custom"
+                />
+              </div>
             </div>
           </Card>
         ) : (
@@ -645,9 +978,9 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
               </div>
             </div>
 
-            {/* Homepage Screenshot Upload & Static Preview */}
+            {/* Homepage Screenshot Upload, Drag & Drop, Clipboard Paste & Static Preview */}
             <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <Label>Homepage Screenshot (Static Card View) *</Label>
                 <span className="font-mono-custom text-[11px] text-emerald-400 flex items-center gap-1">
                   {webPreviewImageUrl ? (
@@ -656,47 +989,87 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                       <span>Screenshot Ready</span>
                     </>
                   ) : (
-                    <span>Upload PNG / JPG / WebP</span>
+                    <span className="text-[#888]">
+                      Drag &amp; Drop, Paste (Ctrl+V), or Upload PNG / JPG / WebP
+                    </span>
                   )}
                 </span>
               </div>
 
-              <div className="p-5 rounded-xl bg-[#18181b] border border-dashed border-white/20 hover:border-white/40 transition-colors flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="space-y-1 text-center sm:text-left">
-                  <p className="font-sans text-sm font-medium text-white">
-                    Upload Homepage Screenshot Image
-                  </p>
-                  <p className="font-mono-custom text-[11px] text-[#888]">
-                    Displayed statically on the project card for instant loading. Supports PNG, JPG, WebP, or AVIF (max 8 MB).
-                  </p>
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!isDraggingOver) setIsDraggingOver(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingOver(false);
+                }}
+                onDrop={(e) => handleDropImage(e, "web")}
+                className={`p-5 rounded-xl border border-dashed transition-all flex flex-col lg:flex-row items-center justify-between gap-4 ${
+                  isDraggingOver
+                    ? "bg-purple-500/10 border-purple-400 ring-2 ring-purple-400/25"
+                    : "bg-[#18181b] border-white/20 hover:border-white/40"
+                }`}
+              >
+                <div className="flex items-start gap-3.5 text-center sm:text-left">
+                  <div className="hidden sm:flex w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 items-center justify-center text-purple-400 shrink-0 mt-0.5">
+                    <ImagePlus className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-sans text-sm font-medium text-white">
+                      {isDraggingOver
+                        ? "Drop Screenshot Image Here to Upload"
+                        : "Drag & Drop, Paste (Ctrl+V / Win+V), or Upload Homepage Screenshot"}
+                    </p>
+                    <p className="font-mono-custom text-[11px] text-[#888]">
+                      Displayed statically on the project card for instant loading. Copy any screenshot and press `Ctrl+V` (or `Win+V`) anywhere, or drop/upload PNG, JPG, WebP, AVIF (max 8 MB).
+                    </p>
+                  </div>
                 </div>
 
-                <label className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-2 shrink-0 shadow-sm">
-                  {uploadingScreenshot ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                      <span>Uploading...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>Upload Image</span>
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp,image/avif"
+                <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
+                  <Button
+                    type="button"
+                    variant="secondary"
                     disabled={uploadingScreenshot}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleUploadScreenshot(file);
-                        e.target.value = "";
-                      }
-                    }}
-                    className="hidden"
-                  />
-                </label>
+                    onClick={() => handleClipboardButtonPaste("web")}
+                    className="h-auto px-3.5 py-2.5 text-xs"
+                    title="Paste copied screenshot from clipboard (or press Ctrl+V anywhere)"
+                  >
+                    <ClipboardPaste className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Paste (Ctrl+V)</span>
+                  </Button>
+
+                  <label className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-sans font-medium text-xs cursor-pointer transition-all flex items-center gap-2 shrink-0 shadow-sm">
+                    {uploadingScreenshot ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Upload Image</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/avif"
+                      disabled={uploadingScreenshot}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          void handleUploadImage(file, "web");
+                          e.target.value = "";
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
               </div>
 
               {screenshotError && (
@@ -722,6 +1095,7 @@ export function ProjectEditorForm({ mode, initialProject }: ProjectEditorFormPro
                         Active Static Card Screenshot
                       </Badge>
                       <Button
+                        type="button"
                         variant="destructive"
                         size="xs"
                         onClick={() => setWebPreviewImageUrl("")}

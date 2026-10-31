@@ -7,6 +7,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Film, Play } from "lucide-react";
 import { PortfolioProject, PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { isNextImageOptimizedUrl } from "@/lib/url-utils";
 import { compareProjectsByPriorityAndRecency } from "@/types/project";
 import { VideoPlayerModal } from "./VideoPlayerModal";
 import { ProjectPreviewModal } from "./ProjectPreviewModal";
@@ -278,6 +279,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                         src={project.thumbnail}
                         alt={project.title}
                         fill
+                        unoptimized={!isNextImageOptimizedUrl(project.thumbnail)}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                       />
