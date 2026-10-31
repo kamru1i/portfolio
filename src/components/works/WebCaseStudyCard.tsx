@@ -101,9 +101,9 @@ export function WebCaseStudyCard({
         </div>
       )}
 
-      {/* Top-Left: Liquid Glass Effect Card (Project Name -> URL -> Brand Identity) */}
+      {/* Top-Left: Liquid Glass Effect Card (Project Name -> URL) */}
       <div className="relative z-10 p-3.5 sm:p-4 flex items-start justify-between pointer-events-none">
-        <div className="max-w-[85%] rounded-2xl px-3.5 py-2.5 bg-black/35 bg-linear-to-br from-white/18 via-white/8 to-white/4 backdrop-blur-md border border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] transition-all duration-300 group-hover:border-white/35 group-hover:bg-black/45">
+        <div className="max-w-[85%] rounded-2xl px-3.5 py-2 bg-black/35 bg-linear-to-br from-white/18 via-white/8 to-white/4 backdrop-blur-md border border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] transition-all duration-300 group-hover:border-white/35 group-hover:bg-black/45">
           <h3 className="font-sans text-sm sm:text-base font-medium tracking-tight text-white leading-snug truncate">
             {project.title}
           </h3>
@@ -114,10 +114,6 @@ export function WebCaseStudyCard({
               {displayDomain}
             </span>
           </div>
-
-          <p className="font-sans text-[10px] sm:text-[11px] text-white/70 mt-0.5 font-normal truncate">
-            {project.category || "Brand Identity • Website Design"}
-          </p>
         </div>
       </div>
 
