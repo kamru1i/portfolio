@@ -14,7 +14,6 @@ import {
   FileText,
   Menu,
   X,
-  ArrowUpRight,
   type LucideIcon,
 } from "lucide-react";
 import type { ProjectType } from "@/types/project";
@@ -561,10 +560,11 @@ export function AdminSidebarShell({
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 hover:text-white font-mono-custom text-xs border border-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              title="Visit Live Site"
+              aria-label="Visit Live Site"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 text-white/85 hover:text-white border border-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             >
-              <span>Live Site</span>
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+              <Globe className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </header>
