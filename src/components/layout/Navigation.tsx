@@ -6,7 +6,6 @@ import Link from "next/link";
 import { LayoutDashboard, Menu, X } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { useDhakaClock } from "@/hooks/useDhakaClock";
-import { createClient } from "@/lib/supabase/client";
 import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
 import { FullScreenMenu } from "./FullScreenMenu";
 
@@ -32,38 +31,30 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+    if (typeof document === "undefined") return;
+    const hasAdminCookieHint =
+      document.cookie.includes("admin_ui_hint=1") ||
+      document.cookie.includes("sb-");
+    if (!hasAdminCookieHint) return;
+
     let isMounted = true;
-    const supabase = createClient();
-
-    const checkAdminStatus = async (userId?: string) => {
-      if (!userId) {
+    fetch("/api/admin/auth/session", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+    })
+      .then((res) => (res.ok ? res.json() : { isAdmin: false }))
+      .then((data: { isAdmin?: boolean }) => {
+        if (isMounted) {
+          setIsAdmin(Boolean(data?.isAdmin));
+        }
+      })
+      .catch(() => {
         if (isMounted) setIsAdmin(false);
-        return;
-      }
-      const { data: adminRecord } = await supabase
-        .from("admin_users")
-        .select("id")
-        .eq("id", userId)
-        .maybeSingle();
-      if (isMounted) {
-        setIsAdmin(Boolean(adminRecord));
-      }
-    };
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      checkAdminStatus(session?.user?.id);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      checkAdminStatus(session?.user?.id);
-    });
+      });
 
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
     };
   }, []);
 

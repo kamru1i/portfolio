@@ -14,7 +14,9 @@ export default function GlobalErrorPage({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("[Application Runtime Error]:", error);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[Application Runtime Error]:", error);
+    }
   }, [error]);
 
   return (

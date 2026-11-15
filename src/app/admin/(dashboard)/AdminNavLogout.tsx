@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
 interface AdminNavLogoutProps {
@@ -17,9 +16,13 @@ export function AdminNavLogout({ fullWidth = false }: AdminNavLogoutProps) {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-      await fetch("/api/admin/auth/logout", { method: "POST" });
+      await fetch("/api/admin/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      if (typeof document !== "undefined") {
+        document.cookie = "admin_ui_hint=; Path=/; Max-Age=0; SameSite=Lax";
+      }
     } catch {
       // ignore
     } finally {

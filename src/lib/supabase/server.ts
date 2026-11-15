@@ -14,7 +14,15 @@ export async function createClient() {
 
   const cookieStore = await cookies();
 
+  const isProd = process.env.NODE_ENV === "production";
+
   return createServerClient<Database>(supabaseUrl, supabaseKey, {
+    cookieOptions: {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax",
+      path: "/",
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -22,7 +30,13 @@ export async function createClient() {
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
+            cookieStore.set(name, value, {
+              ...options,
+              httpOnly: true,
+              secure: isProd,
+              sameSite: options?.sameSite ?? "lax",
+              path: options?.path ?? "/",
+            });
           });
         } catch {
           // Can be safely ignored if called from a Server Component

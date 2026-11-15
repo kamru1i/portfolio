@@ -15,7 +15,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { ProjectRecord } from "@/types/project";
-import { ContactInquiryRecord } from "@/lib/inquiries-service";
+import type { ContactInquiryRecord } from "@/lib/inquiries-service";
 import type { CvDocumentRecord } from "@/lib/document-categories";
 import { getDisplayDomain } from "@/lib/url-utils";
 import { Badge } from "@/components/ui/badge";

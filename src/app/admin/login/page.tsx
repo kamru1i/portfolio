@@ -4,7 +4,6 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Lock, ShieldAlert } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ function LoginForm() {
     errorParam === "unauthorized"
       ? "Your account does not have administrator privileges."
       : errorParam === "missing_config"
-      ? "Supabase credentials are not configured yet. Please check .env.local."
+      ? "Authentication service is temporarily unavailable."
       : null
   );
 
@@ -34,31 +33,23 @@ function LoginForm() {
     setErrorMessage(null);
 
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const res = await fetch("/api/admin/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
       });
 
-      if (error || !data?.user) {
-        setErrorMessage(
-          error?.message || "Authentication failed. Please check your credentials."
-        );
-        setLoading(false);
-        return;
-      }
+      const data = await res.json().catch(() => ({}));
 
-      // Verify that this user is in the admin_users allowlist
-      const { data: adminRecord, error: adminErr } = await supabase
-        .from("admin_users")
-        .select("id")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      if (adminErr || !adminRecord) {
-        await supabase.auth.signOut();
+      if (!res.ok) {
         setErrorMessage(
-          "Access Denied: Your account does not have administrator privileges."
+          typeof data.error === "string" && data.error
+            ? data.error
+            : "Invalid email or password."
         );
         setLoading(false);
         return;
@@ -66,11 +57,9 @@ function LoginForm() {
 
       router.push("/admin");
       router.refresh();
-    } catch (err: unknown) {
+    } catch {
       setErrorMessage(
-        err instanceof Error
-          ? err.message
-          : "Unable to reach authentication server. Please check your connection and try again."
+        "Unable to reach authentication server. Please check your connection and try again."
       );
       setLoading(false);
     }

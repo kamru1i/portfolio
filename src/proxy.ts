@@ -16,7 +16,26 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
+  const isProd = process.env.NODE_ENV === "production";
+
+  const applyUiHintCookie = (res: NextResponse, isAdminSession: boolean) => {
+    res.cookies.set("admin_ui_hint", isAdminSession ? "1" : "", {
+      path: "/",
+      maxAge: isAdminSession ? 60 * 60 * 24 * 30 : 0,
+      sameSite: "lax",
+      secure: isProd,
+      httpOnly: false,
+    });
+    return res;
+  };
+
   const supabase = createServerClient<Database>(supabaseUrl, supabaseKey, {
+    cookieOptions: {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax",
+      path: "/",
+    },
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -29,7 +48,13 @@ export async function proxy(request: NextRequest) {
           request,
         });
         cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
+          response.cookies.set(name, value, {
+            ...options,
+            httpOnly: true,
+            secure: isProd,
+            sameSite: options?.sameSite ?? "lax",
+            path: options?.path ?? "/",
+          });
         });
       },
     },
@@ -45,7 +70,7 @@ export async function proxy(request: NextRequest) {
     if (!user) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/admin/login";
-      return NextResponse.redirect(loginUrl);
+      return applyUiHintCookie(NextResponse.redirect(loginUrl), false);
     }
 
     const { data: adminRecord } = await supabase
@@ -57,8 +82,10 @@ export async function proxy(request: NextRequest) {
     if (!adminRecord) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/admin/login";
-      return NextResponse.redirect(loginUrl);
+      return applyUiHintCookie(NextResponse.redirect(loginUrl), false);
     }
+
+    return applyUiHintCookie(response, true);
   }
 
   // If already logged in as a verified admin and visiting /admin/login, redirect to /admin
@@ -73,11 +100,15 @@ export async function proxy(request: NextRequest) {
     if (adminRecord) {
       const adminUrl = request.nextUrl.clone();
       adminUrl.pathname = "/admin";
-      return NextResponse.redirect(adminUrl);
+      const adminRedirect = NextResponse.redirect(adminUrl);
+      response.cookies.getAll().forEach((c) => {
+        adminRedirect.cookies.set(c);
+      });
+      return applyUiHintCookie(adminRedirect, true);
     }
   }
 
-  return response;
+  return applyUiHintCookie(response, false);
 }
 
 export const config = {

@@ -162,7 +162,7 @@ export async function getAllProjectsForAdmin(
   } = options;
 
   const safePage = Math.max(1, Math.floor(Number(page) || 1));
-  const safePageSize = Math.min(100, Math.max(1, Math.floor(Number(pageSize) || 25)));
+  const safePageSize = Math.min(500, Math.max(1, Math.floor(Number(pageSize) || 25)));
   // Strip PostgREST filter delimiters to prevent filter syntax injection in .or()
   const cleanSearch = search
     ? search.trim().replace(/[(),\\"%_]/g, " ").replace(/\s+/g, " ").trim().slice(0, 100)
@@ -775,11 +775,13 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
     );
   }
 
-  if (updates.is_published === true && !updates.published_at) {
-    const existing = await getProjectById(id);
-    if (existing && !existing.published_at) {
-      updatePayload.published_at = new Date().toISOString();
-    }
+  const needsExistingCheck =
+    (updates.is_published === true && !updates.published_at) ||
+    Boolean(updatePayload.video_url);
+  const existingRecord = needsExistingCheck ? await getProjectById(id) : null;
+
+  if (updates.is_published === true && !updates.published_at && existingRecord && !existingRecord.published_at) {
+    updatePayload.published_at = new Date().toISOString();
   }
 
   // If manual priority is specified, normalize and mirror to sort_order
@@ -803,13 +805,31 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
     updatePayload.preview_mode = updates.can_embed ? "iframe" : "fallback";
   }
 
-  // If updating video_url, re-resolve metadata if needed
-  if (updates.type === "video" && updatePayload.video_url) {
-    const meta = await resolveVideoMetadata(updatePayload.video_url, updates.title || "");
-    updatePayload.video_provider = meta.provider;
-    updatePayload.video_id = meta.videoId;
-    if (!updatePayload.preview_image_url) {
-      updatePayload.preview_image_url = meta.thumbnailUrl;
+  // Re-resolve video metadata automatically if URL changed or metadata/thumbnail is missing
+  const effectiveType = updates.type ?? existingRecord?.type;
+  if (effectiveType === "video" && updatePayload.video_url) {
+    const urlChanged =
+      !existingRecord || existingRecord.video_url !== updatePayload.video_url;
+    const missingMeta =
+      !updatePayload.video_id ||
+      !updatePayload.video_provider ||
+      updatePayload.video_provider === "other" ||
+      !updatePayload.preview_image_url;
+
+    if (urlChanged || missingMeta) {
+      const meta = await resolveVideoMetadata(
+        updatePayload.video_url,
+        updates.title || existingRecord?.title || ""
+      );
+      if (urlChanged || !updatePayload.video_provider || updatePayload.video_provider === "other") {
+        updatePayload.video_provider = meta.provider;
+      }
+      if (urlChanged || !updatePayload.video_id) {
+        updatePayload.video_id = meta.videoId;
+      }
+      if (!updatePayload.preview_image_url) {
+        updatePayload.preview_image_url = meta.thumbnailUrl;
+      }
     }
   }
 

@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { setCookie, deleteCookie } from "hono/cookie";
 import type { User } from "@supabase/supabase-js";
 import { verifyAdminSession } from "@/lib/supabase/admin-auth";
 import { createClient } from "@/lib/supabase/server";
@@ -147,6 +148,56 @@ app.get("/cv/pdf", async (c) => {
 });
 
 const MAX_ADMIN_JSON_BYTES = 64 * 1024;
+const LOGIN_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const MAX_LOGIN_FAILURES_PER_WINDOW = 8;
+const ADMIN_UI_HINT_COOKIE = "admin_ui_hint";
+const loginFailuresByIp = new Map<string, number[]>();
+
+function getClientIp(headers: Headers): string {
+  const nfIp = headers.get("x-nf-client-connection-ip");
+  if (nfIp) return nfIp.trim();
+  const forwardedFor = headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    const first = forwardedFor.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return "unknown-ip";
+}
+
+function isLoginRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = loginFailuresByIp.get(ip);
+  if (!timestamps || timestamps.length === 0) return false;
+  const recent = timestamps.filter((t) => now - t < LOGIN_RATE_LIMIT_WINDOW_MS);
+  if (recent.length === 0) {
+    loginFailuresByIp.delete(ip);
+    return false;
+  }
+  loginFailuresByIp.set(ip, recent);
+  return recent.length >= MAX_LOGIN_FAILURES_PER_WINDOW;
+}
+
+function recordFailedLoginAttempt(ip: string): void {
+  const now = Date.now();
+  if (loginFailuresByIp.size > 500) {
+    for (const [key, timestamps] of loginFailuresByIp.entries()) {
+      const recent = timestamps.filter((t) => now - t < LOGIN_RATE_LIMIT_WINDOW_MS);
+      if (recent.length === 0) {
+        loginFailuresByIp.delete(key);
+      } else {
+        loginFailuresByIp.set(key, recent);
+      }
+    }
+  }
+  const existing = loginFailuresByIp.get(ip) || [];
+  const recent = existing.filter((t) => now - t < LOGIN_RATE_LIMIT_WINDOW_MS);
+  recent.push(now);
+  loginFailuresByIp.set(ip, recent);
+}
+
+function clearFailedLoginAttempts(ip: string): void {
+  loginFailuresByIp.delete(ip);
+}
 
 function isTrustedAdminOrigin(originHeader: string | undefined, hostHeader: string | undefined): boolean {
   if (!originHeader) return false;
@@ -154,6 +205,11 @@ function isTrustedAdminOrigin(originHeader: string | undefined, hostHeader: stri
   try {
     originUrl = new URL(originHeader);
   } catch {
+    return false;
+  }
+
+  const isProd = process.env.NODE_ENV === "production";
+  if (isProd && originUrl.protocol !== "https:") {
     return false;
   }
 
@@ -181,7 +237,7 @@ function isTrustedAdminOrigin(originHeader: string | undefined, hostHeader: stri
   }
 
   if (
-    process.env.NODE_ENV !== "production" &&
+    !isProd &&
     (originUrl.hostname === "localhost" || originUrl.hostname === "127.0.0.1")
   ) {
     return true;
@@ -228,7 +284,10 @@ app.use("/admin/*", async (c, next) => {
         candidateOrigin = undefined;
       }
     }
-    const hostHeader = c.req.header("x-forwarded-host") || c.req.header("host");
+    const hostHeader =
+      process.env.NODE_ENV === "production"
+        ? c.req.header("host")
+        : c.req.header("x-forwarded-host") || c.req.header("host");
     if (!isTrustedAdminOrigin(candidateOrigin, hostHeader)) {
       return c.json(
         { error: "Forbidden: Untrusted or missing request origin." },
@@ -238,16 +297,17 @@ app.use("/admin/*", async (c, next) => {
   }
 
   if (
+    c.req.path === "/api/admin/auth/session" ||
     c.req.path === "/api/admin/auth/logout" ||
     c.req.path === "/api/admin/auth/login"
   ) {
     return next();
   }
 
-  const { user, isAdmin, error } = await verifyAdminSession();
+  const { user, isAdmin } = await verifyAdminSession();
   if (!user || !isAdmin) {
     return c.json(
-      { error: error || "Unauthorized: Admin privileges required" },
+      { error: "Unauthorized: Admin privileges required." },
       401
     );
   }
@@ -256,12 +316,42 @@ app.use("/admin/*", async (c, next) => {
   await next();
 });
 
-// Admin Login (protected by CSRF origin guard above)
+// Admin Session Status Probe (never leaks user UUID, email, or table details)
+app.get("/admin/auth/session", async (c) => {
+  try {
+    const { user, isAdmin } = await verifyAdminSession();
+    if (user && isAdmin) {
+      setCookie(c, ADMIN_UI_HINT_COOKIE, "1", {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30,
+        sameSite: "Lax",
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: false,
+      });
+      return c.json({ isAdmin: true });
+    }
+    deleteCookie(c, ADMIN_UI_HINT_COOKIE, { path: "/" });
+    return c.json({ isAdmin: false });
+  } catch {
+    deleteCookie(c, ADMIN_UI_HINT_COOKIE, { path: "/" });
+    return c.json({ isAdmin: false });
+  }
+});
+
+// Admin Login (protected by CSRF origin guard & IP brute-force rate limiter)
 app.post("/admin/auth/login", async (c) => {
+  const clientIp = getClientIp(c.req.raw.headers);
+  if (isLoginRateLimited(clientIp)) {
+    return c.json(
+      { error: "Too many sign-in attempts. Please wait 15 minutes before trying again." },
+      429
+    );
+  }
+
   try {
     const supabase = await createClient();
     if (!supabase) {
-      return c.json({ error: "Supabase is not configured." }, 500);
+      return c.json({ error: "Authentication service is temporarily unavailable." }, 500);
     }
 
     const body = await readBoundedJson<{ email?: unknown; password?: unknown }>(
@@ -280,10 +370,8 @@ app.post("/admin/auth/login", async (c) => {
     });
 
     if (error || !data?.user) {
-      return c.json(
-        { error: error?.message || "Invalid email or password." },
-        401
-      );
+      recordFailedLoginAttempt(clientIp);
+      return c.json({ error: "Invalid email or password." }, 401);
     }
 
     const { data: adminRecord, error: adminErr } = await supabase
@@ -293,6 +381,7 @@ app.post("/admin/auth/login", async (c) => {
       .maybeSingle();
 
     if (adminErr || !adminRecord) {
+      recordFailedLoginAttempt(clientIp);
       await supabase.auth.signOut();
       return c.json(
         {
@@ -303,11 +392,25 @@ app.post("/admin/auth/login", async (c) => {
       );
     }
 
+    clearFailedLoginAttempts(clientIp);
+    setCookie(c, ADMIN_UI_HINT_COOKIE, "1", {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: "Lax",
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: false,
+    });
+
     return c.json({ ok: true });
   } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Authentication failed.";
-    return c.json({ error: message }, 400);
+    const isClientJsonError =
+      err instanceof Error &&
+      (err.message === "Request JSON payload exceeds the 64 KB limit." ||
+        err.message === "Malformed JSON request body.");
+    if (isClientJsonError) {
+      return c.json({ error: err.message }, 400);
+    }
+    return c.json({ error: "Authentication failed." }, 500);
   }
 });
 
@@ -317,6 +420,7 @@ app.post("/admin/auth/logout", async (c) => {
   if (supabase) {
     await supabase.auth.signOut();
   }
+  deleteCookie(c, ADMIN_UI_HINT_COOKIE, { path: "/" });
   return c.json({ success: true });
 });
 
@@ -326,7 +430,7 @@ app.get("/admin/projects", async (c) => {
     const rawPage = parseInt(c.req.query("page") || "1", 10);
     const rawPageSize = parseInt(c.req.query("pageSize") || "50", 10);
     const page = Number.isFinite(rawPage) ? Math.max(1, rawPage) : 1;
-    const pageSize = Number.isFinite(rawPageSize) ? Math.min(100, Math.max(1, rawPageSize)) : 50;
+    const pageSize = Number.isFinite(rawPageSize) ? Math.min(500, Math.max(1, rawPageSize)) : 50;
     const rawType = c.req.query("type") || "all";
     const type: "all" | "video" | "web" =
       rawType === "video" || rawType === "web" ? rawType : "all";
@@ -348,9 +452,8 @@ app.get("/admin/projects", async (c) => {
     });
 
     return c.json(result);
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to fetch projects";
-    return c.json({ error: message }, 500);
+  } catch {
+    return c.json({ error: "Failed to load projects." }, 500);
   }
 });
 
@@ -375,9 +478,8 @@ app.get("/admin/projects/:id", async (c) => {
       return c.json({ error: "Project not found" }, 404);
     }
     return c.json({ project });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to fetch project";
-    return c.json({ error: message }, 500);
+  } catch {
+    return c.json({ error: "Failed to load project." }, 500);
   }
 });
 
@@ -469,9 +571,8 @@ app.get("/admin/cv", async (c) => {
         (doc) => getDocumentCategory(doc) === activeCategory && doc.is_published
       ) || null;
     return c.json({ documents, activeDocument });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to load documents";
-    return c.json({ error: message }, 500);
+  } catch {
+    return c.json({ error: "Failed to load documents." }, 500);
   }
 });
 
@@ -562,9 +663,8 @@ app.get("/admin/inquiries", async (c) => {
   try {
     const result = await getAllInquiriesForAdmin();
     return c.json(result);
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to load inquiries";
-    return c.json({ error: message }, 500);
+  } catch {
+    return c.json({ error: "Failed to load inquiries." }, 500);
   }
 });
 

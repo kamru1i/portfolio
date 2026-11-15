@@ -15,7 +15,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { ProjectRecord } from "@/types/project";
-import { ContactInquiryRecord } from "@/lib/inquiries-service";
+import type { ContactInquiryRecord } from "@/lib/inquiries-service";
 import type { CvDocumentRecord } from "@/lib/document-categories";
 import { getDisplayDomain } from "@/lib/url-utils";
 import { Badge } from "@/components/ui/badge";
@@ -226,7 +226,7 @@ export default function AdminDashboardPage() {
 
       try {
         const [projectsRes, inquiriesRes, cvRes] = await Promise.all([
-          fetch("/api/admin/projects"),
+          fetch("/api/admin/projects?pageSize=500"),
           fetch("/api/admin/inquiries").catch(() => null),
           fetch("/api/admin/cv").catch(() => null),
         ]);

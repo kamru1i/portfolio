@@ -403,8 +403,8 @@ https://kamrulislam.me
       savedToInbox: backupResult.saved,
       providerAccepted,
     });
-  } catch (error: unknown) {
-    console.error("[Contact API Internal Error]:", error);
+  } catch {
+    console.error("[Contact API Internal Error]: Unexpected failure processing submission.");
     return c.json({ error: "Internal server error processing contact submission." }, 500);
   }
 });

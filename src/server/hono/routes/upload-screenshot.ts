@@ -124,8 +124,8 @@ uploadScreenshotRoute.post("/", async (c) => {
 
     if (uploadError) {
       return c.json(
-        { error: `Failed to upload screenshot to storage: ${uploadError.message}` },
-        400
+        { error: "Failed to upload image to storage. Please try again." },
+        500
       );
     }
 
@@ -142,8 +142,7 @@ uploadScreenshotRoute.post("/", async (c) => {
       },
       201
     );
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to upload screenshot";
-    return c.json({ error: message }, 400);
+  } catch {
+    return c.json({ error: "Failed to process uploaded screenshot." }, 400);
   }
 });

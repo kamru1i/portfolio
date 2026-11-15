@@ -15,7 +15,7 @@ import {
   EyeOff,
   Loader2,
 } from "lucide-react";
-import { ContactInquiryRecord } from "@/lib/inquiries-service";
+import type { ContactInquiryRecord } from "@/lib/inquiries-service";
 import { InquiryStatus } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
