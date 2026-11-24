@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { HairlineRule } from "@/components/common/HairlineRule";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { BRAND_CONFIG, FOOTER_CONFIG } from "@/lib/brand-config";
 import { useDhakaClock } from "@/hooks/useDhakaClock";
 import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
 
@@ -19,13 +19,46 @@ export function CurtainFooter() {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
+    let isDisposed = false;
     let animationFrameId: number | null = null;
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let prefersReducedMotion = reducedMotionQuery.matches;
+    const mainEl = document.querySelector("main");
+    let isRevealed = true;
 
     const getDpr = () => Math.min(window.devicePixelRatio || 1, 2);
-    let width = (canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * getDpr())));
-    let height = (canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * getDpr())));
+    let width = Math.max(1, Math.floor(canvas.offsetWidth * getDpr()));
+    let height = Math.max(1, Math.floor(canvas.offsetHeight * getDpr()));
+    canvas.width = width;
+    canvas.height = height;
+
+    let cachedFontFamily = getComputedStyle(canvas).fontFamily || "Gambarino, serif";
+    let cachedFontSize = 16;
+    let cachedGrad = ctx.createLinearGradient(0, 0, width, height);
+
+    const recomputeMetrics = () => {
+      if (!canvas) return;
+      cachedFontFamily = getComputedStyle(canvas).fontFamily || "Gambarino, serif";
+      const refSize = 100;
+      ctx.font = `400 ${refSize}px ${cachedFontFamily}`;
+      const measuredRefWidth = ctx.measureText("KAMRUL ISLAM").width;
+      const safeRefWidth = measuredRefWidth > 10 ? measuredRefWidth : refSize * 6.5;
+      cachedFontSize = Math.max(
+        16,
+        Math.floor(Math.min(height * 0.82, refSize * ((width * 0.96) / safeRefWidth)))
+      );
+
+      const grad = ctx.createLinearGradient(0, 0, width, height);
+      grad.addColorStop(0, "#f0f0f4");
+      grad.addColorStop(0.2, "#8c8c96");
+      grad.addColorStop(0.4, "#ffffff");
+      grad.addColorStop(0.6, "#5a5a62");
+      grad.addColorStop(0.8, "#d5d5dc");
+      grad.addColorStop(1, "#9e9ea8");
+      cachedGrad = grad;
+    };
+
+    recomputeMetrics();
 
     let t = 0;
 
@@ -35,40 +68,25 @@ export function CurtainFooter() {
       }
       const w = width;
       const h = height;
+      const fontSize = cachedFontSize;
+      const fontSpec = `400 ${fontSize}px ${cachedFontFamily}`;
 
       ctx.clearRect(0, 0, w, h);
-
-      // Measure "KAMRUL ISLAM" safely at a 100px reference size (always < WebKit 256px glyph limit)
-      const refSize = 100;
-      ctx.font = `400 ${refSize}px Gambarino, serif`;
-      const measuredRefWidth = ctx.measureText("KAMRUL ISLAM").width;
-      const safeRefWidth = measuredRefWidth > 10 ? measuredRefWidth : refSize * 6.5;
-      const fontSize = Math.max(
-        16,
-        Math.floor(Math.min(h * 0.82, refSize * ((w * 0.96) / safeRefWidth)))
-      );
 
       // Step 1: Draw the "KAMRUL ISLAM" glyph mask FIRST onto the cleared canvas (alpha = 1 inside letters, 0 outside)
       ctx.save();
       ctx.globalCompositeOperation = "source-over";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = `400 ${fontSize}px Gambarino, serif`;
+      ctx.font = fontSpec;
       ctx.fillStyle = "#ffffff";
       ctx.fillText("KAMRUL ISLAM", w * 0.5, h * 0.52);
       ctx.restore();
 
-      // Step 2: Paint base silver / chrome metallic gradient ONLY where glyph alpha > 0 (source-atop)
+      // Step 2: Paint cached base silver / chrome metallic gradient ONLY where glyph alpha > 0 (source-atop)
       ctx.save();
       ctx.globalCompositeOperation = "source-atop";
-      const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, "#f0f0f4");
-      grad.addColorStop(0.2, "#8c8c96");
-      grad.addColorStop(0.4, "#ffffff");
-      grad.addColorStop(0.6, "#5a5a62");
-      grad.addColorStop(0.8, "#d5d5dc");
-      grad.addColorStop(1, "#9e9ea8");
-      ctx.fillStyle = grad;
+      ctx.fillStyle = cachedGrad;
       ctx.fillRect(0, 0, w, h);
 
       // Chromatic dispersion ripples locked strictly inside the glyph alpha mask
@@ -113,21 +131,15 @@ export function CurtainFooter() {
       ctx.globalCompositeOperation = "source-over";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = `400 ${fontSize}px Gambarino, serif`;
+      ctx.font = fontSpec;
       ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
       ctx.lineWidth = Math.max(1, fontSize * 0.007);
       ctx.strokeText("KAMRUL ISLAM", w * 0.5, h * 0.52);
       ctx.restore();
     };
 
-    const isFooterRevealed = (): boolean => {
-      const mainEl = document.querySelector("main");
-      if (!mainEl) return true;
-      return mainEl.getBoundingClientRect().bottom < window.innerHeight + 60;
-    };
-
     const shouldAnimate = (): boolean => {
-      return !prefersReducedMotion && !document.hidden && isFooterRevealed();
+      return !prefersReducedMotion && !document.hidden && isRevealed;
     };
 
     const loop = () => {
@@ -150,11 +162,22 @@ export function CurtainFooter() {
       }
     };
 
+    const updateRevealStatus = () => {
+      isRevealed = mainEl
+        ? mainEl.getBoundingClientRect().bottom < window.innerHeight + 60
+        : true;
+      syncLoopState();
+    };
+
     const handleResize = () => {
-      if (!canvas) return;
+      if (!canvas || isDisposed) return;
       const dpr = getDpr();
       width = canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * dpr));
       height = canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * dpr));
+      recomputeMetrics();
+      isRevealed = mainEl
+        ? mainEl.getBoundingClientRect().bottom < window.innerHeight + 60
+        : true;
       drawFrame(false);
       syncLoopState();
     };
@@ -166,28 +189,31 @@ export function CurtainFooter() {
     };
 
     // Always paint an initial crisp frame immediately so reveal has zero blank flash
+    updateRevealStatus();
     drawFrame(false);
-    syncLoopState();
 
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", syncLoopState, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("scroll", updateRevealStatus, { passive: true });
     document.addEventListener("visibilitychange", syncLoopState);
     reducedMotionQuery.addEventListener("change", handleMotionPreferenceChange);
 
     if (typeof document !== "undefined" && "fonts" in document) {
       document.fonts.ready
         .then(() => {
-          handleResize();
+          if (!isDisposed) {
+            handleResize();
+          }
         })
         .catch(() => {});
     }
 
     return () => {
+      isDisposed = true;
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", syncLoopState);
+      window.removeEventListener("scroll", updateRevealStatus);
       document.removeEventListener("visibilitychange", syncLoopState);
       reducedMotionQuery.removeEventListener("change", handleMotionPreferenceChange);
     };
@@ -236,17 +262,17 @@ export function CurtainFooter() {
           </div>
 
           <a
-            href={`mailto:${PORTFOLIO_DATA.brand.email}`}
+            href={`mailto:${BRAND_CONFIG.email}`}
             className="hover-underline-link text-white/90 hover:text-white transition-colors hidden md:inline whitespace-nowrap"
           >
-            {PORTFOLIO_DATA.brand.email}
+            {BRAND_CONFIG.email}
           </a>
         </div>
       </div>
 
       {/* Giant Iridescent Chromatic Wordmark: Full Width Scale */}
       <div className="relative w-full h-[80px] sm:h-[140px] md:h-[240px] lg:h-[290px] flex items-center justify-center my-auto">
-        <canvas ref={canvasRef} className="w-full h-full block" />
+        <canvas ref={canvasRef} aria-hidden="true" className="w-full h-full block font-gambarino" />
       </div>
 
       {/* Giant Central Navigation Links (Editorial Hierarchy) */}
@@ -283,7 +309,7 @@ export function CurtainFooter() {
       <div className="relative z-10 w-full pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono-custom text-xs text-[#a1a1a1]">
         {/* Left: Social Links in Gambarino */}
         <div className="flex items-center gap-5 font-gambarino text-lg sm:text-xl text-white">
-          {PORTFOLIO_DATA.brand.socials.map((social) => (
+          {BRAND_CONFIG.socials.map((social) => (
             <a
               key={social.name}
               href={social.url}
@@ -299,12 +325,12 @@ export function CurtainFooter() {
 
         {/* Center: Copyright */}
         <div className="text-center">
-          <span>{PORTFOLIO_DATA.footer.copyright}</span>
+          <span>{FOOTER_CONFIG.copyright}</span>
         </div>
 
         {/* Right: Location & Availability Note */}
         <div className="text-center sm:text-right">
-          <span>{PORTFOLIO_DATA.footer.locationNote}</span>
+          <span>{FOOTER_CONFIG.locationNote}</span>
         </div>
       </div>
     </footer>

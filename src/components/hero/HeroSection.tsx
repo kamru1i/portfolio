@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { m } from "motion/react";
+import { HERO_CONFIG } from "@/lib/home-sections-data";
 import { HeroTitle } from "./HeroTitle";
 import { Rotating3DCylinder } from "./Rotating3DCylinder";
 import { ScrambleRevealText } from "@/components/common/ScrambleRevealText";
@@ -17,13 +17,13 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
       <div className="w-full flex flex-col items-center my-auto">
         {/* Massive Editorial Display Wordmark with Typographic Scramble-Resolution Reveal */}
         <div className="w-full text-center select-none">
-          <HeroTitle text={PORTFOLIO_DATA.hero.wordmark} isRevealed={isRevealed} />
+          <HeroTitle text={HERO_CONFIG.wordmark} isRevealed={isRevealed} />
         </div>
 
       {/* Subtitle Statement: Coordinated Scramble-Resolution Sequence */}
       <div className="mt-6 sm:mt-7 md:mt-8 max-w-[680px] px-1 sm:px-4 text-center select-none">
         <ScrambleRevealText
-          text={PORTFOLIO_DATA.hero.subtitle}
+          text={HERO_CONFIG.subtitle}
           isRevealed={isRevealed}
           tag="p"
           delay={0.4}
@@ -37,7 +37,7 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
       </div>
 
       {/* 3D Rotating Cylinder Carousel: Smooth Rise & Scale into Active Stage */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 35, scale: 0.96 }}
         animate={
           isRevealed
@@ -52,7 +52,7 @@ export function HeroSection({ isRevealed = true }: HeroSectionProps) {
         className="w-full mt-9 md:mt-11 flex justify-center"
       >
         <Rotating3DCylinder />
-      </motion.div>
+      </m.div>
       </div>
     </section>
   );

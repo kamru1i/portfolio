@@ -19,6 +19,10 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (!window.matchMedia("(pointer: fine)").matches) {
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -32,16 +36,39 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     lenisRef.current = lenis;
     (window as unknown as { lenis?: Lenis }).lenis = lenis;
 
-    let rafId = 0;
+    let rafId: number | null = null;
     function raf(time: number) {
       lenis.raf(time);
       rafId = requestAnimationFrame(raf);
     }
 
-    rafId = requestAnimationFrame(raf);
+    const startRaf = () => {
+      if (rafId === null && !document.hidden) {
+        rafId = requestAnimationFrame(raf);
+      }
+    };
+
+    const stopRaf = () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopRaf();
+      } else {
+        startRaf();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    startRaf();
 
     return () => {
-      cancelAnimationFrame(rafId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      stopRaf();
       lenisRef.current = null;
       delete (window as unknown as { lenis?: Lenis }).lenis;
       lenis.destroy();

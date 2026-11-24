@@ -1,4 +1,6 @@
+import { cache } from "react";
 import { createClient } from "./supabase/server";
+import { createPublicClient } from "./supabase/public";
 import { PORTFOLIO_DATA, PortfolioProject } from "./portfolio-data";
 import {
   ProjectInsert,
@@ -10,7 +12,7 @@ import {
   encodeCaseStudyIntoDescription,
 } from "@/types/project";
 import { resolveVideoMetadata } from "./video-metadata";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 export { compareProjectsByPriorityAndRecency };
 
@@ -26,13 +28,9 @@ export function generateSlug(title: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-/**
- * Retrieves all published projects for the public website.
- * Falls back safely to PORTFOLIO_DATA.showcaseProjects if Supabase is unconfigured or empty.
- */
-export async function getPublishedProjects(): Promise<PortfolioProject[]> {
+async function fetchPublishedProjectsUncached(): Promise<PortfolioProject[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     if (!supabase) {
       return [...PORTFOLIO_DATA.showcaseProjects].sort(compareProjectsByPriorityAndRecency);
     }
@@ -72,6 +70,23 @@ export async function getPublishedProjects(): Promise<PortfolioProject[]> {
     return [...PORTFOLIO_DATA.showcaseProjects].sort(compareProjectsByPriorityAndRecency);
   }
 }
+
+const getCachedPublishedProjects = unstable_cache(
+  fetchPublishedProjectsUncached,
+  ["published-projects"],
+  {
+    revalidate: 60,
+    tags: ["projects"],
+  }
+);
+
+/**
+ * Retrieves all published projects for the public website using cookie-less ISR cache + React.cache().
+ * Falls back safely to PORTFOLIO_DATA.showcaseProjects if Supabase is unconfigured or empty.
+ */
+export const getPublishedProjects = cache(async (): Promise<PortfolioProject[]> => {
+  return getCachedPublishedProjects();
+});
 
 export interface AdminProjectsQueryOptions {
   page?: number;
@@ -259,7 +274,7 @@ function revalidateProjectRoutes(slug?: string | null) {
     revalidatePath(`/projects/web/${slug}`);
   }
   try {
-    revalidateTag("projects", "default");
+    revalidateTag("projects", { expire: 0 });
   } catch {
     // tag revalidation fallback
   }
@@ -438,11 +453,9 @@ export async function getProjectById(id: string): Promise<ProjectRecord | null> 
 }
 
 /**
- * Retrieves a single published project by its slug or UUID.
- * Checks remote database first, falling back to static PORTFOLIO_DATA.showcaseProjects
- * only when Supabase is unconfigured, unreachable, or has zero published rows.
+ * Retrieves a single published project by its slug or UUID using the shared cached published list.
  */
-export async function getProjectBySlugOrId(slugOrId: string): Promise<PortfolioProject | null> {
+export const getProjectBySlugOrId = cache(async (slugOrId: string): Promise<PortfolioProject | null> => {
   const trimmedKey = slugOrId.trim();
   const normalizedKey = trimmedKey.toLowerCase();
   const isUuid = UUID_REGEX.test(trimmedKey);
@@ -452,7 +465,6 @@ export async function getProjectBySlugOrId(slugOrId: string): Promise<PortfolioP
     return null;
   }
 
-  // Find in local showcase projects (matches slug, id, or generated slug)
   const fallbackProject = PORTFOLIO_DATA.showcaseProjects.find((p) => {
     const pSlug = (p.slug || "").toLowerCase();
     const pId = p.id.toLowerCase();
@@ -460,83 +472,43 @@ export async function getProjectBySlugOrId(slugOrId: string): Promise<PortfolioP
     return pSlug === normalizedKey || pId === normalizedKey || generatedSlug === normalizedKey;
   });
 
-  try {
-    const supabase = await createClient();
-    if (supabase) {
-      // 1. Query remote DB by either UUID or case-insensitive slug (SAFE_SLUG_REGEX prevents %/_ wildcards)
-      let query = supabase.from("projects").select("*").eq("is_published", true);
-      if (isUuid) {
-        query = query.eq("id", normalizedKey);
-      } else {
-        query = query.ilike("slug", trimmedKey);
-      }
+  const publishedProjects = await getPublishedProjects();
 
-      const { data, error } = await query.maybeSingle();
+  const matchesKey = (p: PortfolioProject, key: string) =>
+    p.id.toLowerCase() === key ||
+    (p.slug || "").toLowerCase() === key ||
+    generateSlug(p.title) === key;
 
-      if (!error && data) {
-        const mapped = mapProjectRecordToPortfolio(data as ProjectRecord);
-        if (fallbackProject) {
-          return {
-            ...fallbackProject,
-            ...mapped,
-            role: mapped.role || fallbackProject.role,
-            tools: mapped.tools && mapped.tools.length > 0 ? mapped.tools : fallbackProject.tools,
-            deliverables:
-              mapped.deliverables && mapped.deliverables.length > 0
-                ? mapped.deliverables
-                : fallbackProject.deliverables,
-            overview: mapped.overview || fallbackProject.overview,
-          };
-        }
-        return mapped;
-      }
+  const directMatch =
+    publishedProjects.find((p) => matchesKey(p, normalizedKey)) ||
+    (fallbackProject?.slug &&
+    SAFE_SLUG_REGEX.test(fallbackProject.slug) &&
+    fallbackProject.slug.toLowerCase() !== normalizedKey
+      ? publishedProjects.find((p) =>
+          matchesKey(p, fallbackProject.slug!.toLowerCase())
+        )
+      : undefined);
 
-      // 2. If fallbackProject has an alias slug in DB, check that published record as well
-      if (
-        fallbackProject?.slug &&
-        SAFE_SLUG_REGEX.test(fallbackProject.slug) &&
-        fallbackProject.slug.toLowerCase() !== normalizedKey
-      ) {
-        const { data: slugMatch } = await supabase
-          .from("projects")
-          .select("*")
-          .eq("is_published", true)
-          .ilike("slug", fallbackProject.slug)
-          .maybeSingle();
-
-        if (slugMatch) {
-          const mapped = mapProjectRecordToPortfolio(slugMatch as ProjectRecord);
-          return {
-            ...fallbackProject,
-            ...mapped,
-            role: mapped.role || fallbackProject.role,
-            tools: mapped.tools && mapped.tools.length > 0 ? mapped.tools : fallbackProject.tools,
-            deliverables:
-              mapped.deliverables && mapped.deliverables.length > 0
-                ? mapped.deliverables
-                : fallbackProject.deliverables,
-            overview: mapped.overview || fallbackProject.overview,
-          };
-        }
-      }
-
-      // 3. Do NOT fall back to static projects if Supabase is active and already holds published rows
-      // (prevents unpublished/deleted DB records from staying accessible via static fallback)
-      const { count, error: countError } = await supabase
-        .from("projects")
-        .select("id", { count: "exact", head: true })
-        .eq("is_published", true);
-
-      if (!countError && (count ?? 0) > 0) {
-        return null;
-      }
-    }
-  } catch {
-    // Database query failed, continue to fallback
+  if (!directMatch) {
+    return null;
   }
 
-  return fallbackProject || null;
-}
+  if (fallbackProject) {
+    return {
+      ...fallbackProject,
+      ...directMatch,
+      role: directMatch.role || fallbackProject.role,
+      tools: directMatch.tools && directMatch.tools.length > 0 ? directMatch.tools : fallbackProject.tools,
+      deliverables:
+        directMatch.deliverables && directMatch.deliverables.length > 0
+          ? directMatch.deliverables
+          : fallbackProject.deliverables,
+      overview: directMatch.overview || fallbackProject.overview,
+    };
+  }
+
+  return directMatch;
+});
 
 /**
  * Creates a new project in the database and triggers cache revalidation.
@@ -777,7 +749,8 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
 
   const needsExistingCheck =
     (updates.is_published === true && !updates.published_at) ||
-    Boolean(updatePayload.video_url);
+    Boolean(updatePayload.video_url) ||
+    updates.manual_priority !== undefined;
   const existingRecord = needsExistingCheck ? await getProjectById(id) : null;
 
   if (updates.is_published === true && !updates.published_at && existingRecord && !existingRecord.published_at) {
@@ -899,7 +872,16 @@ export async function updateProject(id: string, updates: ProjectUpdate): Promise
   }
 
   const normalizedUpdated = normalizeProjectRecord(data as ProjectRecord);
-  if (updatedManualPriority !== undefined && updatedManualPriority !== null && updatedManualPriority > 0) {
+  const priorityOrTypeChanged =
+    !existingRecord ||
+    existingRecord.manual_priority !== updatedManualPriority ||
+    existingRecord.type !== normalizedUpdated.type;
+  if (
+    updatedManualPriority !== undefined &&
+    updatedManualPriority !== null &&
+    updatedManualPriority > 0 &&
+    priorityOrTypeChanged
+  ) {
     await shiftCompetingProjectPriorities(
       supabase,
       normalizedUpdated.type,

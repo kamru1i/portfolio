@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 
 interface SectionBadgeProps {
   label: string;
@@ -14,7 +14,7 @@ export function SectionBadge({
   showIndicator = true,
 }: SectionBadgeProps) {
   return (
-    <motion.div
+    <m.div
       data-section-badge="true"
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -29,6 +29,6 @@ export function SectionBadge({
         />
       )}
       <span>{label}</span>
-    </motion.div>
+    </m.div>
   );
 }

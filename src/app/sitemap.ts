@@ -3,6 +3,8 @@ import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { getPublishedProjects } from "@/lib/projects-service";
 import { getPublishedCvDocument } from "@/lib/cv-service";
 
+export const revalidate = 60;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kamrulislam.me";
   const now = new Date();

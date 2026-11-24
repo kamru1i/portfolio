@@ -1,6 +1,17 @@
 import { HERO_GALLERY_IMAGES, HeroGalleryItem } from "./hero-gallery-config";
+import { BRAND_CONFIG, FOOTER_CONFIG } from "./brand-config";
+import {
+  HERO_CONFIG,
+  WORKS_HEADER,
+  MANIFESTO_DATA,
+  HOME_COUNTERS,
+  HOME_FAQ_DATA,
+  type StatItem,
+  type FaqItem,
+} from "./home-sections-data";
+
 export { HERO_GALLERY_IMAGES };
-export type { HeroGalleryItem };
+export type { HeroGalleryItem, StatItem, FaqItem };
 
 export interface ProjectItem {
   id: string;
@@ -131,46 +142,11 @@ export interface MilestoneItem {
   };
 }
 
-export interface StatItem {
-  target: number;
-  suffix: string;
-  label: string;
-}
-
-export interface FaqItem {
-  id: string;
-  question: string;
-  answer: string;
-}
-
 export const PORTFOLIO_DATA = {
-  brand: {
-    fullName: "Kamrul Islam",
-    displayName: "KAMRUL",
-    curtainName: "KAMRUL ISLAM",
-    domain: "kamrulislam.me",
-    title: "Video Editor | AI Content Creator | Web Developer | IT Professional",
-    location: "Chittagong, Bangladesh",
-    timezone: "Asia/Dhaka", // UTC+6
-    email: "hello@kamrulislam.me",
-    phone: "(+880) 1839 00 6867",
-    whatsapp: "(+880) 1839 00 6867",
-    whatsappUrl: "https://wa.me/8801839006867",
-    socials: [
-      { label: "LI", name: "LinkedIn", url: "https://www.linkedin.com/in/kamru1i/" },
-      { label: "GH", name: "GitHub", url: "https://github.com/kamru1i" },
-      { label: "X", name: "X", url: "https://x.com/kamru1i" },
-      { label: "YT", name: "YouTube", url: "https://www.youtube.com/@kamru1iYT" },
-      { label: "FB", name: "Facebook", url: "https://www.facebook.com/kamru1i/" },
-      { label: "IG", name: "Instagram", url: "https://www.instagram.com/kamru1i/" },
-      { label: "TT", name: "TikTok", url: "https://www.tiktok.com/@kamru1i" },
-    ],
-  },
+  brand: BRAND_CONFIG,
 
   hero: {
-    wordmark: "KAMRUL ISLAM",
-    subtitle:
-      "Crafting high-impact video edits, AI-assisted visual narratives, modern web platforms, and resilient IT infrastructure.",
+    ...HERO_CONFIG,
     cards: [
       {
         id: "hero-1",
@@ -217,10 +193,7 @@ export const PORTFOLIO_DATA = {
   },
   heroGallery: HERO_GALLERY_IMAGES,
 
-  worksHeader: {
-    title: "Projects & Works",
-    statementHtml: `A <strong>curated body</strong> of <strong>high-impact video edits</strong>, <strong>AI-assisted productions</strong>, <strong>full-stack web interfaces</strong>, and <strong>enterprise IT systems</strong> engineered for <strong>clarity</strong>, <strong>rhythm</strong>, and <strong>dependability</strong>.`,
-  },
+  worksHeader: WORKS_HEADER,
 
   projects: [
     {
@@ -448,7 +421,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "High-performance editorial portfolio engineered with Next.js, Framer Motion, and Supabase integration.",
-      thumbnail: "/images/web-projects/web-project-1.png",
+      thumbnail: "/images/web-projects/web-project-1.webp",
       githubUrl: "https://github.com/kamru1i/portfolio",
       liveUrl: "https://kamrulislam.me",
       canEmbed: true,
@@ -472,7 +445,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Interactive photocard customization platform with dynamic layout tools and responsive canvas rendering.",
-      thumbnail: "/images/web-projects/web-project-2.png",
+      thumbnail: "/images/web-projects/web-project-2.webp",
       githubUrl: "https://github.com/kamru1i/photocard",
       liveUrl: "https://photocard-five.vercel.app/",
       canEmbed: true,
@@ -497,7 +470,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Digital agency platform featuring scalable design architecture, performance optimization, and client management.",
-      thumbnail: "/images/web-projects/web-project-3.png",
+      thumbnail: "/images/web-projects/web-project-3.webp",
       liveUrl: "https://webwing.co.uk/",
       canEmbed: false,
       previewMode: "fallback",
@@ -521,7 +494,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Interactive culinary showcase featuring traditional recipes, dynamic chef profiles, and custom ordering flow.",
-      thumbnail: "/images/web-projects/web-project-4.png",
+      thumbnail: "/images/web-projects/web-project-4.webp",
       liveUrl: "https://japanese-master-chef.web.app/",
       canEmbed: true,
       tags: ["React.js", "Firebase", "Tailwind CSS", "REST API"],
@@ -544,7 +517,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Comprehensive dance academy management portal featuring class bookings, student portals, and schedule calendars.",
-      thumbnail: "/images/web-projects/web-project-5.png",
+      thumbnail: "/images/web-projects/web-project-5.webp",
       liveUrl: "https://rhythmverse-dance-school.web.app/",
       canEmbed: true,
       tags: ["React.js", "Firebase", "Tailwind CSS", "Express.js"],
@@ -567,7 +540,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Modern job search and candidate pipeline platform engineered for rapid recruitment matches and resume tracking.",
-      thumbnail: "/images/web-projects/web-project-6.png",
+      thumbnail: "/images/web-projects/web-project-6.webp",
       liveUrl: "https://talent-hub-assignment-09.netlify.app/",
       canEmbed: true,
       tags: ["React.js", "Tailwind CSS", "Netlify", "Job Engine"],
@@ -590,7 +563,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "Full-featured toy marketplace web application with product listings, user authentication, and shopping cart management.",
-      thumbnail: "/images/web-projects/web-project-1.png",
+      thumbnail: "/images/web-projects/web-project-1.webp",
       liveUrl: "https://babys-toy-out.web.app/",
       canEmbed: true,
       tags: ["React.js", "Firebase", "Tailwind CSS", "MongoDB"],
@@ -613,7 +586,7 @@ export const PORTFOLIO_DATA = {
       year: "2026",
       description:
         "High-density responsive news portal featuring categorization by region, real-time article feeds, and reader authentication.",
-      thumbnail: "/images/web-projects/web-project-2.png",
+      thumbnail: "/images/web-projects/web-project-2.webp",
       liveUrl: "https://the-news-dragon-fad1b.web.app/",
       canEmbed: true,
       tags: ["React.js", "Express.js", "Bootstrap", "Firebase"],
@@ -627,20 +600,7 @@ export const PORTFOLIO_DATA = {
     },
   ] as PortfolioProject[],
 
-  manifesto: {
-    statement:
-      "I craft digital media and systems that balance precision, visual rhythm and resilience. Every video edit is approached with storytelling instinct, every line of code with architectural rigor, and every technical operation with dependable craftsmanship.",
-    lines: [
-      "I craft digital media and systems that balance precision, visual rhythm and resilience.",
-      "Every video edit is approached with storytelling instinct, every line of code with architectural rigor,",
-      "and every technical operation with dependable craftsmanship.",
-    ],
-    bio1Html: `Through previous corporate roles and <strong>ongoing projects with local clients</strong>, I spend time <strong>exploring</strong> visual storytelling and generative workflows that help me <strong>sharpen</strong> and <strong>evolve</strong>. Whether shaping <strong>narrative cuts</strong>, refining audio and color, or integrating <strong>AI-assisted scenes</strong>, I focus on craft that brings <strong>clarity</strong> and purpose to every timeline and web interface.`,
-    bio2Html: `I <strong>believe</strong> dependable creative and technical work begins with disciplined execution. <strong>Problem-solving</strong>, <strong>adaptability</strong>, and continuous <strong>learning</strong> guide how I approach <strong>video post-production</strong>, <strong>modern web development</strong>, and <strong>IT infrastructure</strong>—delivering practical, polished solutions tailored to each brief.`,
-    ctaText: "Let's Talk",
-    ctaHref: "/contact-us",
-    portraitSrc: "/images/Kamrul-I.png",
-  },
+  manifesto: MANIFESTO_DATA,
 
   services: [
     {
@@ -1594,98 +1554,9 @@ export const PORTFOLIO_DATA = {
     },
   ] as MilestoneItem[],
 
-  counters: [
-    { target: 13, suffix: "+", label: "Published Portfolio Works" },
-    { target: 4, suffix: "+", label: "Years in Web, IT & Media" },
-    { target: 4, suffix: "", label: "Core Practice Pillars" },
-  ] as StatItem[],
+  counters: HOME_COUNTERS,
 
-  faq: {
-    badge: "FAQ",
-    title: "Have Questions?",
-    subtitle:
-      "Direct insights into my post-production pipeline, technical toolchains, AI workflows, and project collaboration.",
-    contactCard: {
-      name: "Talk with Kamrul",
-      role: "Video Editor, AI-Assisted Content Creator, Web Developer & IT Professional",
-      ctaText: "Get in touch",
-      ctaHref: "/contact-us",
-      email: "hello@kamrulislam.me",
-      status: "Collaborating on client briefs & open to new opportunities",
-      avatarSrc: "/images/Kamrul-I.png",
-    },
-    items: [
-      {
-        id: "faq-video-editing",
-        question: "What types of video editing can you handle?",
-        answer:
-          "I handle end-to-end commercial, brand, and social media video editing—including promotional reels, automotive showcases, talking-head edits, YouTube narratives, and short-form social content. My workflow covers storytelling, pacing, cutting and sequencing, motion graphics, color correction and grading, captions, and multi-platform delivery using Adobe Premiere Pro, After Effects, DaVinci Resolve, CapCut, and Final Cut Pro.",
-      },
-      {
-        id: "faq-audio-enhancement",
-        question: "Do you provide audio enhancement and noise reduction?",
-        answer:
-          "Yes. Clean, balanced audio is a core part of my post-production workflow. I perform noise cancellation, background noise reduction, voice cleanup, sound synchronization, volume balancing, SFX and music integration, and basic sound mixing using Adobe Podcast, Audacity, Adobe Premiere Pro, and DaVinci Resolve.",
-      },
-      {
-        id: "faq-ai-content",
-        question: "Can you create AI-assisted video and visual content?",
-        answer:
-          "Yes. I develop creative concepts, scripts, scene structures, and prompts for AI-assisted production—generating video scenes, visual assets, backgrounds, and voiceovers with Gemini Omni Flash, Google Veo, ChatGPT Sora, Kling 3.0, Google Nano Banana, ChatGPT Image 2, and Higgsfield Soul, then editing and refining everything on the timeline for continuity and visual quality.",
-      },
-      {
-        id: "faq-social-media",
-        question: "Can you prepare videos for social media platforms?",
-        answer:
-          "Yes. I optimize videos for YouTube, TikTok, Instagram Reels, Facebook, and YouTube Shorts across 16:9, 9:16, 1:1, 4:3, and 5:4 formats—covering pacing, aspect-ratio framing, subtitles and captions, animated lower thirds, thumbnail design, and platform-ready export settings.",
-      },
-      {
-        id: "faq-web-dev",
-        question: "What web development technologies do you work with?",
-        answer:
-          "I build responsive web interfaces and full-stack applications using HTML5, CSS3, JavaScript (ES6), React.js, Next.js, TypeScript, Tailwind CSS, DaisyUI, Shadcn/UI, and Bootstrap, paired with Node.js, Express.js, MongoDB, Supabase (PostgreSQL), Firebase, and JWT, plus desktop/app work with Rust and Tauri v2.",
-      },
-      {
-        id: "faq-wordpress",
-        question: "Do you also work with WordPress websites?",
-        answer:
-          "Yes. I develop, customize, and maintain WordPress websites using Elementor and Elementor Pro—handling WordPress setup, theme customization, plugin installation and updates, backups, performance optimization, troubleshooting, and basic security and malware cleanup.",
-      },
-      {
-        id: "faq-it-support",
-        question: "What kind of IT support can you provide?",
-        answer:
-          "I provide practical office IT and website infrastructure support, including Windows setup and troubleshooting, Microsoft Word/Excel/PowerPoint and Outlook configuration, employee VPN access, LAN/Wi-Fi and printer troubleshooting, cPanel and GoDaddy domain/DNS/SSL and Webmail management, website malware cleanup, and basic CCTV setup and monitoring.",
-      },
-      {
-        id: "faq-end-to-end",
-        question: "Can you work on a project from concept to final delivery?",
-        answer:
-          "Yes. Depending on the project brief, I can take work from initial concept, script or UI planning, and asset preparation through editing or development, quality review, revisions, and final platform delivery or deployment.",
-      },
-      {
-        id: "faq-footage-ai",
-        question: "Can you work with existing footage as well as AI-generated assets?",
-        answer:
-          "Yes. I regularly combine client-supplied camera footage and custom graphics in Photoshop and Illustrator with AI-generated scenes, backgrounds, and audio assets, harmonizing color, timing, and sound so the final video feels cohesive.",
-      },
-      {
-        id: "faq-focus",
-        question: "What kind of projects are you most focused on?",
-        answer:
-          "My primary focus is Video Editing & Post-Production and AI-Assisted Content Creation, alongside responsive Web Development (MERN, Next.js, WordPress) and dependable IT & website operations for local and remote clients.",
-      },
-    ] as FaqItem[],
-  },
+  faq: HOME_FAQ_DATA,
 
-  footer: {
-    navLinks: [
-      { label: "WORK", href: "#works" },
-      { label: "ABOUT", href: "#about" },
-      { label: "EXPERTISE", href: "#expertise" },
-      { label: "CONTACT", href: "/contact-us" },
-    ],
-    copyright: "© 2026 Kamrul Islam. All rights reserved.",
-    locationNote: "Based in Chittagong, Bangladesh · Available Worldwide",
-  },
+  footer: FOOTER_CONFIG,
 };

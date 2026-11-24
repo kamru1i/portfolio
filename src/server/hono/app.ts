@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { setCookie, deleteCookie } from "hono/cookie";
 import type { User } from "@supabase/supabase-js";
+import { z } from "zod";
 import { verifyAdminSession } from "@/lib/supabase/admin-auth";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -32,6 +33,11 @@ import {
   updateInquiryStatus,
 } from "@/lib/inquiries-service";
 import { InquiryStatus } from "@/types/database";
+import {
+  clearFailedLoginAttempts,
+  isLoginRateLimited,
+  recordFailedLoginAttempt,
+} from "@/lib/rate-limit";
 import { contactRoute } from "./routes/contact";
 import { uploadScreenshotRoute } from "./routes/upload-screenshot";
 
@@ -148,10 +154,30 @@ app.get("/cv/pdf", async (c) => {
 });
 
 const MAX_ADMIN_JSON_BYTES = 64 * 1024;
-const LOGIN_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const MAX_LOGIN_FAILURES_PER_WINDOW = 8;
+
+const adminLoginSchema = z.object({
+  email: z.string({ error: "Email and password are required." }).trim().min(1, "Email and password are required.").max(200),
+  password: z.string({ error: "Email and password are required." }).min(1, "Email and password are required.").max(500),
+});
+
+const resolveVideoSchema = z.object({
+  url: z.string({ error: "Valid video URL is required" }).trim().min(1, "Valid video URL is required").max(2000),
+  title: z.string().max(200).optional(),
+});
+
+const cvPatchSchema = z.object({
+  id: z.string({ error: "CV document ID is required." }).trim().min(1, "CV document ID is required."),
+  is_published: z.boolean().optional(),
+  title: z.string().max(140).optional(),
+  version_label: z.string().max(60).nullable().optional(),
+});
+
+const inquiryStatusPatchSchema = z.object({
+  status: z.enum(["unread", "read", "replied", "archived"], {
+    error: "Invalid inquiry status value.",
+  }),
+});
 const ADMIN_UI_HINT_COOKIE = "admin_ui_hint";
-const loginFailuresByIp = new Map<string, number[]>();
 
 function getClientIp(headers: Headers): string {
   const nfIp = headers.get("x-nf-client-connection-ip");
@@ -162,41 +188,6 @@ function getClientIp(headers: Headers): string {
     if (first) return first;
   }
   return "unknown-ip";
-}
-
-function isLoginRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const timestamps = loginFailuresByIp.get(ip);
-  if (!timestamps || timestamps.length === 0) return false;
-  const recent = timestamps.filter((t) => now - t < LOGIN_RATE_LIMIT_WINDOW_MS);
-  if (recent.length === 0) {
-    loginFailuresByIp.delete(ip);
-    return false;
-  }
-  loginFailuresByIp.set(ip, recent);
-  return recent.length >= MAX_LOGIN_FAILURES_PER_WINDOW;
-}
-
-function recordFailedLoginAttempt(ip: string): void {
-  const now = Date.now();
-  if (loginFailuresByIp.size > 500) {
-    for (const [key, timestamps] of loginFailuresByIp.entries()) {
-      const recent = timestamps.filter((t) => now - t < LOGIN_RATE_LIMIT_WINDOW_MS);
-      if (recent.length === 0) {
-        loginFailuresByIp.delete(key);
-      } else {
-        loginFailuresByIp.set(key, recent);
-      }
-    }
-  }
-  const existing = loginFailuresByIp.get(ip) || [];
-  const recent = existing.filter((t) => now - t < LOGIN_RATE_LIMIT_WINDOW_MS);
-  recent.push(now);
-  loginFailuresByIp.set(ip, recent);
-}
-
-function clearFailedLoginAttempts(ip: string): void {
-  loginFailuresByIp.delete(ip);
 }
 
 function isTrustedAdminOrigin(originHeader: string | undefined, hostHeader: string | undefined): boolean {
@@ -341,7 +332,7 @@ app.get("/admin/auth/session", async (c) => {
 // Admin Login (protected by CSRF origin guard & IP brute-force rate limiter)
 app.post("/admin/auth/login", async (c) => {
   const clientIp = getClientIp(c.req.raw.headers);
-  if (isLoginRateLimited(clientIp)) {
+  if (await isLoginRateLimited(clientIp)) {
     return c.json(
       { error: "Too many sign-in attempts. Please wait 15 minutes before trying again." },
       429
@@ -354,15 +345,15 @@ app.post("/admin/auth/login", async (c) => {
       return c.json({ error: "Authentication service is temporarily unavailable." }, 500);
     }
 
-    const body = await readBoundedJson<{ email?: unknown; password?: unknown }>(
-      c.req.raw
-    );
-    const email = typeof body.email === "string" ? body.email.trim() : "";
-    const password = typeof body.password === "string" ? body.password : "";
-
-    if (!email || !password) {
-      return c.json({ error: "Email and password are required." }, 400);
+    const rawBody = await readBoundedJson<unknown>(c.req.raw);
+    const parsedLogin = adminLoginSchema.safeParse(rawBody);
+    if (!parsedLogin.success) {
+      return c.json(
+        { error: parsedLogin.error.issues[0]?.message || "Email and password are required." },
+        400
+      );
     }
+    const { email, password } = parsedLogin.data;
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -370,7 +361,7 @@ app.post("/admin/auth/login", async (c) => {
     });
 
     if (error || !data?.user) {
-      recordFailedLoginAttempt(clientIp);
+      await recordFailedLoginAttempt(clientIp);
       return c.json({ error: "Invalid email or password." }, 401);
     }
 
@@ -381,7 +372,7 @@ app.post("/admin/auth/login", async (c) => {
       .maybeSingle();
 
     if (adminErr || !adminRecord) {
-      recordFailedLoginAttempt(clientIp);
+      await recordFailedLoginAttempt(clientIp);
       await supabase.auth.signOut();
       return c.json(
         {
@@ -392,7 +383,7 @@ app.post("/admin/auth/login", async (c) => {
       );
     }
 
-    clearFailedLoginAttempts(clientIp);
+    await clearFailedLoginAttempts(clientIp);
     setCookie(c, ADMIN_UI_HINT_COOKIE, "1", {
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
@@ -537,18 +528,22 @@ app.delete("/admin/projects/:id", async (c) => {
 // 6. POST /api/admin/resolve-video
 app.post("/admin/resolve-video", async (c) => {
   try {
-    const { url, title } = await readBoundedJson<{ url?: unknown; title?: unknown }>(c.req.raw);
-
-    if (!url || typeof url !== "string") {
-      return c.json({ error: "Valid video URL is required" }, 400);
+    const rawBody = await readBoundedJson<unknown>(c.req.raw);
+    const parsed = resolveVideoSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return c.json(
+        { error: parsed.error.issues[0]?.message || "Valid video URL is required" },
+        400
+      );
     }
+
+    const { url, title } = parsed.data;
 
     if (!isSafePublicUrl(url)) {
       return c.json({ error: "Invalid or restricted URL format" }, 400);
     }
 
-    const safeTitle = typeof title === "string" ? title.slice(0, 200) : "";
-    const meta = await resolveVideoMetadata(url, safeTitle);
+    const meta = await resolveVideoMetadata(url, title || "");
     return c.json({ meta });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to resolve video metadata";
@@ -611,19 +606,20 @@ app.post("/admin/cv", async (c) => {
 
 app.patch("/admin/cv", async (c) => {
   try {
-    const body = await readBoundedJson<Record<string, unknown>>(c.req.raw);
-    const id = typeof body.id === "string" ? body.id.trim() : "";
-    if (!id) {
-      return c.json({ error: "CV document ID is required." }, 400);
+    const rawBody = await readBoundedJson<unknown>(c.req.raw);
+    const parsed = cvPatchSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return c.json(
+        { error: parsed.error.issues[0]?.message || "CV document ID is required." },
+        400
+      );
     }
 
+    const { id, is_published, title, version_label } = parsed.data;
     const document = await updateCvDocumentState(id, {
-      is_published: typeof body.is_published === "boolean" ? body.is_published : undefined,
-      title: typeof body.title === "string" ? body.title : undefined,
-      version_label:
-        body.version_label === null || typeof body.version_label === "string"
-          ? body.version_label
-          : undefined,
+      is_published,
+      title,
+      version_label,
     });
 
     return c.json({ document });
@@ -671,9 +667,15 @@ app.get("/admin/inquiries", async (c) => {
 app.patch("/admin/inquiries/:id", async (c) => {
   const id = c.req.param("id");
   try {
-    const body = await readBoundedJson<{ status?: InquiryStatus }>(c.req.raw);
-    const status = body.status as InquiryStatus;
-    const inquiry = await updateInquiryStatus(id, status);
+    const rawBody = await readBoundedJson<unknown>(c.req.raw);
+    const parsed = inquiryStatusPatchSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return c.json(
+        { error: parsed.error.issues[0]?.message || "Invalid inquiry status value." },
+        400
+      );
+    }
+    const inquiry = await updateInquiryStatus(id, parsed.data.status as InquiryStatus);
     return c.json({ inquiry });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to update inquiry";

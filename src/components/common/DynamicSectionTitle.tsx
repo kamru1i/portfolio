@@ -20,6 +20,7 @@ const SECTIONS: SectionConfig[] = [
 export function DynamicSectionTitle() {
   useEffect(() => {
     let ticking = false;
+    let rafId: number | null = null;
 
     const updateTitle = () => {
       // 1. If at or near the very top of the page, default immediately to Portfolio
@@ -64,11 +65,12 @@ export function DynamicSectionTitle() {
 
     const handleScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(() => {
+        ticking = true;
+        rafId = window.requestAnimationFrame(() => {
+          rafId = null;
           updateTitle();
           ticking = false;
         });
-        ticking = true;
       }
     };
 
@@ -80,6 +82,10 @@ export function DynamicSectionTitle() {
     window.addEventListener("resize", handleScroll, { passive: true });
 
     return () => {
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+      }
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("hashchange", updateTitle);
       window.removeEventListener("resize", handleScroll);

@@ -44,3 +44,44 @@ export function isNextImageOptimizedUrl(src?: string | null): boolean {
     return false;
   }
 }
+
+/**
+ * Validates external URLs rendered in `<a href>` on the client so legacy or
+ * malformed records cannot introduce `javascript:`, `data:`, or `vbscript:` links.
+ */
+export function toSafeExternalUrl(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+  if (!trimmed) return undefined;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString();
+    }
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Ensures OpenGraph/Twitter and JSON-LD image URLs are valid absolute HTTP(S) URLs,
+ * never emitting malformed URLs from `data:image/svg+xml;...` fallbacks.
+ */
+export function toSafeOgImageUrl(
+  url?: string | null,
+  fallbackPath = "/opengraph-image.jpg"
+): string {
+  const baseUrl = "https://kamrulislam.me";
+  const raw = (url || "").trim();
+  if (!raw || raw.startsWith("//")) {
+    return `${baseUrl}${fallbackPath}`;
+  }
+  if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) {
+    return toSafeExternalUrl(raw) || `${baseUrl}${fallbackPath}`;
+  }
+  if (raw.startsWith("/")) {
+    return `${baseUrl}${raw}`;
+  }
+  return `${baseUrl}/${raw}`;
+}

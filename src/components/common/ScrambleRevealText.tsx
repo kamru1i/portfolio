@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { useReducedMotion } from "framer-motion";
+import React, { useEffect, useRef, useState, useCallback, useSyncExternalStore } from "react";
+import { useReducedMotion } from "motion/react";
+
+const emptySubscribe = () => () => {};
 
 export interface ScrambleRevealTextProps {
   text: string;
@@ -49,6 +51,7 @@ export function ScrambleRevealText({
   onComplete,
 }: ScrambleRevealTextProps) {
   const shouldReduceMotion = useReducedMotion();
+  const isClient = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [resolvedIndex, setResolvedIndex] = useState<number>(-1);
   const [activeGlyphs, setActiveGlyphs] = useState<string[]>(() =>
     Array.from({ length: text.length }, (_, i) =>
@@ -155,8 +158,8 @@ export function ScrambleRevealText({
     getRandomGlyph,
   ]);
 
-  // Reduced motion fallback: instantly render final text
-  if (shouldReduceMotion) {
+  // Post-mount reduced motion fallback: guarantees identical SSR & initial client hydration
+  if (isClient && shouldReduceMotion) {
     return (
       <Tag className={`select-none ${className}`} style={{ color: resolvedColor }}>
         {text}
@@ -164,9 +167,14 @@ export function ScrambleRevealText({
     );
   }
 
-  // Pre-split text into words to guarantee 100% natural and responsive word wrapping
+  // Pre-split text into words while preserving exact character offsets across spaces
   const words = text.split(" ");
-  let globalCharIndex = 0;
+  const wordEntries: Array<{ word: string; startIndex: number }> = [];
+  let offset = 0;
+  for (let i = 0; i < words.length; i++) {
+    wordEntries.push({ word: words[i], startIndex: offset });
+    offset += words[i].length + (i < words.length - 1 ? 1 : 0);
+  }
 
   return (
     <Tag
@@ -179,18 +187,18 @@ export function ScrambleRevealText({
     >
       <span className="sr-only">{text}</span>
       <span aria-hidden="true" className="contents">
-        {words.map((word, wordIndex) => {
+        {wordEntries.map(({ word, startIndex }, wordIndex) => {
           const wordChars = word.split("");
           return (
             <span
               key={wordIndex}
               className="inline-block whitespace-nowrap"
               style={{
-                marginRight: wordIndex < words.length - 1 ? "0.28em" : "0",
+                marginRight: wordIndex < wordEntries.length - 1 ? "0.28em" : "0",
               }}
             >
-              {wordChars.map((targetChar) => {
-                const charIdx = globalCharIndex++;
+              {wordChars.map((targetChar, cIdx) => {
+                const charIdx = startIndex + cIdx;
                 const isResolved = resolvedIndex >= charIdx;
                 const displayChar = isResolved ? targetChar : activeGlyphs[charIdx] || targetChar;
 

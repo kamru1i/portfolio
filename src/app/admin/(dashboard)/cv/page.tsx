@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import Link from "next/link";
+import useSWR from "swr";
+import { toast } from "sonner";
 import {
   ArrowUpRight,
   X,
@@ -21,6 +23,7 @@ import {
   getDocumentCategory,
   normalizeDocumentCategory,
 } from "@/lib/document-categories";
+import { swrJsonFetcher } from "@/lib/swr-fetcher";
 import {
   ADMIN_DOC_EVENT,
   AdminDocEventDetail,
@@ -65,11 +68,22 @@ function formatDateTime(iso: string | null | undefined): string {
 
 export default function AdminCvManagementPage() {
   const [activeCategory, setActiveCategory] = useState<DocumentCategory>("cv");
-  const [documents, setDocuments] = useState<CvDocumentRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    data: swrData,
+    error: swrError,
+    isLoading: loading,
+    mutate,
+  } = useSWR<{ documents?: CvDocumentRecord[] }>(
+    "/api/admin/cv",
+    swrJsonFetcher,
+    { revalidateOnFocus: true }
+  );
+  const documents = useMemo(() => swrData?.documents ?? [], [swrData?.documents]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [fileWarning, setFileWarning] = useState<string | null>(null);
+  const displayErrorMsg =
+    errorMsg || (swrError instanceof Error ? swrError.message : null);
 
   // Upload form state (Title starts empty as requested so admin types it on upload)
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -86,21 +100,6 @@ export default function AdminCvManagementPage() {
   const [previewDoc, setPreviewDoc] = useState<CvDocumentRecord | null>(null);
 
   const categoryMeta = DOCUMENT_CATEGORIES[activeCategory];
-
-  const loadDocuments = async () => {
-    try {
-      const res = await fetch("/api/admin/cv", { cache: "no-store" });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to load documents");
-      }
-      setDocuments(data.documents || []);
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Unable to load documents");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     const syncFromUrl = () => {
@@ -130,33 +129,6 @@ export default function AdminCvManagementPage() {
     return () => {
       window.removeEventListener("popstate", syncFromUrl);
       window.removeEventListener(ADMIN_DOC_EVENT, handleDocEvent);
-    };
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/admin/cv", { cache: "no-store" });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to load documents");
-        }
-        if (isMounted) {
-          setDocuments(data.documents || []);
-        }
-      } catch (err: unknown) {
-        if (isMounted) {
-          setErrorMsg(err instanceof Error ? err.message : "Unable to load documents");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      isMounted = false;
     };
   }, []);
 
@@ -238,14 +210,16 @@ export default function AdminCvManagementPage() {
         fileInputRef.current.value = "";
       }
 
-      setSuccessMsg(
-        publishImmediately
-          ? `${categoryMeta.label} PDF uploaded and published.`
-          : `${categoryMeta.label} PDF uploaded as a draft version.`
-      );
-      await loadDocuments();
+      const uploadMsg = publishImmediately
+        ? `${categoryMeta.label} PDF uploaded and published.`
+        : `${categoryMeta.label} PDF uploaded as a draft version.`;
+      setSuccessMsg(uploadMsg);
+      toast.success(uploadMsg);
+      await mutate();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to upload document");
+      const msg = err instanceof Error ? err.message : "Failed to upload document";
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setUploading(false);
     }
@@ -271,14 +245,16 @@ export default function AdminCvManagementPage() {
         throw new Error(data.error || "Failed to update publish status");
       }
 
-      setSuccessMsg(
-        !doc.is_published
-          ? `"${doc.file_name}" is now published as the active ${categoryMeta.label}.`
-          : `"${doc.file_name}" has been unpublished.`
-      );
-      await loadDocuments();
+      const toggleMsg = !doc.is_published
+        ? `"${doc.file_name}" is now published as the active ${categoryMeta.label}.`
+        : `"${doc.file_name}" has been unpublished.`;
+      setSuccessMsg(toggleMsg);
+      toast.success(toggleMsg);
+      await mutate();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to update status");
+      const msg = err instanceof Error ? err.message : "Failed to update status";
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setUpdatingId(null);
     }
@@ -304,10 +280,14 @@ export default function AdminCvManagementPage() {
         setPreviewDoc(null);
       }
       setConfirmDeleteDoc(null);
-      setSuccessMsg(`${categoryMeta.label} document deleted permanently.`);
-      await loadDocuments();
+      const deleteMsg = `${categoryMeta.label} document deleted permanently.`;
+      setSuccessMsg(deleteMsg);
+      toast.success(deleteMsg);
+      await mutate();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to delete document");
+      const msg = err instanceof Error ? err.message : "Failed to delete document";
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setDeletingId(null);
     }
@@ -343,10 +323,10 @@ export default function AdminCvManagementPage() {
       </div>
 
       {/* Feedback Alerts */}
-      {errorMsg && (
+      {displayErrorMsg && (
         <div className="p-4 rounded-xl bg-red-950/40 border border-red-800/40 text-red-200 text-xs font-mono-custom flex items-start gap-2.5">
           <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
-          <span>{errorMsg}</span>
+          <span>{displayErrorMsg}</span>
         </div>
       )}
 

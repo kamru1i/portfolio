@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "motion/react";
 import { ArrowRight, ArrowUpRight, Check, Loader2 } from "lucide-react";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { BRAND_CONFIG } from "@/lib/brand-config";
 import { TalkWithKamrulCard } from "@/components/common/TalkWithKamrulCard";
 
 interface FormDataState {
@@ -147,7 +147,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
       `Timeline: ${formData.timeline}\n\n` +
       `Project Brief / Details:\n${formData.details}\n`
     );
-    return `mailto:${PORTFOLIO_DATA.brand.email}?subject=${subject}&body=${body}`;
+    return `mailto:${BRAND_CONFIG.email}?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -156,7 +156,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
       className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-28 md:mb-36 scroll-mt-28"
     >
       {/* Left Column: Get In Touch Title & Profile Badge */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, x: -30 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, amount: 0.05 }}
@@ -178,10 +178,10 @@ export function ContactFormSection({ initialService }: { initialService?: string
 
         {/* Talk with Kamrul Profile Card matching reference (without CTA button) */}
         <TalkWithKamrulCard showButton={false} />
-      </motion.div>
+      </m.div>
 
       {/* Right Column: Interactive Form */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, amount: 0.05 }}
@@ -190,7 +190,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
       >
         <AnimatePresence mode="wait">
           {isSubmitted ? (
-            <motion.div
+            <m.div
               key="submitted-state"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -240,7 +240,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
                   Send another message
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           ) : (
             <form onSubmit={handleSubmit} noValidate className="space-y-6 sm:space-y-7">
               {/* Visually hidden honeypot field for automated spam bot filtering */}
@@ -440,7 +440,7 @@ export function ContactFormSection({ initialService }: { initialService?: string
             </form>
           )}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

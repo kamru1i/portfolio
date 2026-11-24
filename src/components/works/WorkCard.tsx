@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { PortfolioProject, ProjectItem } from "@/lib/portfolio-data";
+import { useScroll, useTransform } from "motion/react";
+import type { PortfolioProject, ProjectItem } from "@/lib/portfolio-data";
 import { ProjectMedia } from "./ProjectMedia";
 
 interface WorkCardProps {
@@ -51,14 +51,25 @@ export function WorkCard({
   const isVideo = normalizedProject.type === "video";
   const isPortraitLarge = normalizedProject.format === "9:16" && isLarge;
 
+  const handleActivate = () => {
+    if (isVideo) onPlayVideo?.(normalizedProject);
+    else if (normalizedProject.liveUrl) onPreviewWeb?.(normalizedProject);
+  };
+
   return (
     <div
       ref={containerRef}
+      role="button"
+      tabIndex={0}
+      aria-label={isVideo ? `Play ${normalizedProject.title}` : `Preview ${normalizedProject.title}`}
       data-project-id={normalizedProject.id}
-      className={`relative group flex flex-col w-full ${isPortraitLarge ? "max-w-[380px] sm:max-w-[420px] mx-auto" : ""} cursor-pointer select-none ${className}`}
-      onClick={() => {
-        if (isVideo) onPlayVideo?.(normalizedProject);
-        else if (normalizedProject.liveUrl) onPreviewWeb?.(normalizedProject);
+      className={`relative group flex flex-col w-full ${isPortraitLarge ? "max-w-[380px] sm:max-w-[420px] mx-auto" : ""} cursor-pointer select-none rounded-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${className}`}
+      onClick={handleActivate}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleActivate();
+        }
       }}
     >
       {/* Square Media Frame (352x352 small, 704x704 large) */}

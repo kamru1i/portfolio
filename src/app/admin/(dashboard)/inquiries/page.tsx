@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
+import useSWR from "swr";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -16,54 +18,45 @@ import {
   Loader2,
 } from "lucide-react";
 import type { ContactInquiryRecord } from "@/lib/inquiries-service";
+import { swrJsonFetcher } from "@/lib/swr-fetcher";
 import { InquiryStatus } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
 type FilterTab = "all" | InquiryStatus;
 
 export default function AdminInquiriesPage() {
-  const [inquiries, setInquiries] = useState<ContactInquiryRecord[]>([]);
-  const [tableMissing, setTableMissing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const {
+    data: swrData,
+    error: swrError,
+    isLoading: loading,
+    mutate,
+  } = useSWR<{ inquiries?: ContactInquiryRecord[]; tableMissing?: boolean }>(
+    "/api/admin/inquiries",
+    swrJsonFetcher,
+    { revalidateOnFocus: true }
+  );
+
+  const inquiries = useMemo(() => swrData?.inquiries ?? [], [swrData?.inquiries]);
+  const tableMissing = Boolean(swrData?.tableMissing);
+  const errorMsg = swrError instanceof Error ? swrError.message : null;
 
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/admin/inquiries");
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to load inquiries");
-        }
-        if (isMounted) {
-          setInquiries(data.inquiries || []);
-          setTableMissing(Boolean(data.tableMissing));
-        }
-      } catch (err: unknown) {
-        if (isMounted) {
-          setErrorMsg(
-            err instanceof Error ? err.message : "Error loading inquiries"
-          );
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const [confirmDeleteInquiry, setConfirmDeleteInquiry] =
+    useState<ContactInquiryRecord | null>(null);
 
   const stats = useMemo(() => {
     const total = inquiries.length;
@@ -102,30 +95,46 @@ export default function AdminInquiriesPage() {
       if (!res.ok) {
         throw new Error(data.error || "Failed to update status");
       }
-      setInquiries((prev) =>
-        prev.map((item) => (item.id === id ? data.inquiry : item))
+      await mutate(
+        (curr) => ({
+          ...curr,
+          inquiries: (curr?.inquiries ?? []).map((item) =>
+            item.id === id ? data.inquiry : item
+          ),
+        }),
+        { revalidate: false }
       );
+      toast.success(`Inquiry marked as ${status}.`);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to update status");
+      toast.error(err instanceof Error ? err.message : "Failed to update status");
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Delete this inquiry permanently?")) return;
+  const handleDeleteConfirm = async () => {
+    if (!confirmDeleteInquiry) return;
+    const targetId = confirmDeleteInquiry.id;
     try {
-      setDeletingId(id);
-      const res = await fetch(`/api/admin/inquiries/${id}`, {
+      setDeletingId(targetId);
+      const res = await fetch(`/api/admin/inquiries/${targetId}`, {
         method: "DELETE",
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Failed to delete inquiry");
       }
-      setInquiries((prev) => prev.filter((item) => item.id !== id));
+      await mutate(
+        (curr) => ({
+          ...curr,
+          inquiries: (curr?.inquiries ?? []).filter((item) => item.id !== targetId),
+        }),
+        { revalidate: false }
+      );
+      setConfirmDeleteInquiry(null);
+      toast.success("Inquiry deleted permanently.");
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to delete inquiry");
+      toast.error(err instanceof Error ? err.message : "Failed to delete inquiry");
     } finally {
       setDeletingId(null);
     }
@@ -406,7 +415,7 @@ export default function AdminInquiriesPage() {
                       variant="destructive"
                       size="sm"
                       disabled={deletingId === inquiry.id}
-                      onClick={() => handleDelete(inquiry.id)}
+                      onClick={() => setConfirmDeleteInquiry(inquiry)}
                       className="flex-1 sm:flex-initial justify-center"
                     >
                       <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
@@ -459,6 +468,57 @@ export default function AdminInquiriesPage() {
           })}
         </div>
       )}
+
+      {/* Base UI Delete Confirmation Dialog */}
+      <Dialog
+        open={Boolean(confirmDeleteInquiry)}
+        onOpenChange={(open) => {
+          if (!open && !deletingId) {
+            setConfirmDeleteInquiry(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Client Inquiry</DialogTitle>
+            <DialogDescription>
+              Permanently remove the inquiry from{" "}
+              <strong className="text-white font-medium">
+                {confirmDeleteInquiry?.name}
+              </strong>{" "}
+              ({confirmDeleteInquiry?.email})? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={Boolean(deletingId)}
+              onClick={() => setConfirmDeleteInquiry(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={Boolean(deletingId)}
+              onClick={handleDeleteConfirm}
+            >
+              {deletingId ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Delete Permanently</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -7,12 +7,6 @@
 export const MODAL_BACKDROP_CLASSES =
   "fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 pt-16 sm:pt-20 md:pt-24 pb-3 sm:pb-6 bg-black/85 backdrop-blur-md overflow-hidden";
 
-export const MODAL_OUTER_SHELL_CLASSES =
-  "relative w-full max-w-5xl xl:max-w-6xl h-[80vh] h-[80dvh] sm:h-[76vh] sm:h-[76dvh] max-h-[calc(100dvh-5rem)] sm:max-h-[720px] min-h-[280px] sm:min-h-[420px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto";
-
-export const MODAL_VIDEO_SHELL_CLASSES =
-  "relative w-full max-w-5xl h-[80vh] h-[80dvh] sm:h-[76vh] sm:h-[76dvh] max-h-[calc(100dvh-5rem)] sm:max-h-[720px] min-h-[280px] sm:min-h-[420px] rounded-2xl bg-[#141414] border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col my-auto";
-
 /**
  * Truncates title to approximately maxWords (default: 5) words with an ellipsis.
  * Preserves the original title string intact for accessible title and aria-label attributes.

@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { m, useScroll, useTransform, type MotionValue } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { HairlineRule } from "@/components/common/HairlineRule";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { MANIFESTO_DATA } from "@/lib/home-sections-data";
 
 export function ManifestoSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,7 +18,7 @@ export function ManifestoSection() {
     offset: ["start 85%", "end 40%"],
   });
 
-  const statement = PORTFOLIO_DATA.manifesto.statement;
+  const statement = MANIFESTO_DATA.statement;
   const words = statement.split(/\s+/).filter(Boolean);
 
   return (
@@ -49,7 +49,7 @@ export function ManifestoSection() {
       {/* Dual Column Lower Block: Portrait (Left) + Bio Narrative (Right with generous gap) */}
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-0 items-start">
         {/* Creator Portrait: Full-color, naturally blended into page background & global grain without container box */}
-        <motion.div
+        <m.div
           ref={portraitRef}
           initial={{ opacity: 0, scale: 0.98, y: 20 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -58,38 +58,37 @@ export function ManifestoSection() {
           className="col-span-1 md:col-span-5 min-w-0 relative w-full aspect-square max-w-[300px] sm:max-w-[360px] md:max-w-[420px] select-none mx-auto md:mx-0 flex items-center justify-center"
         >
           <Image
-            src={PORTFOLIO_DATA.manifesto.portraitSrc}
+            src={MANIFESTO_DATA.portraitSrc}
             alt="Kamrul Islam (Kamrul I) — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist"
             width={420}
             height={420}
             className="w-full h-auto max-h-[440px] object-contain"
             sizes="(max-width: 640px) 300px, (max-width: 768px) 360px, 420px"
-            priority
           />
-        </motion.div>
+        </m.div>
 
         {/* Bio Paragraphs & Contact CTA (Right, col-start-7 for exact 563px width) */}
         <div className="col-span-1 md:col-span-6 md:col-start-7 min-w-0 w-full flex flex-col justify-start space-y-6 sm:space-y-8 font-mono-custom text-[15px] sm:text-[16px] leading-[1.65] text-[#a1a1a1] wrap-break-word">
           <p
             className="[&_strong]:text-white [&_strong]:font-medium"
             dangerouslySetInnerHTML={{
-              __html: PORTFOLIO_DATA.manifesto.bio1Html,
+              __html: MANIFESTO_DATA.bio1Html,
             }}
           />
 
           <p
             className="[&_strong]:text-white [&_strong]:font-medium"
             dangerouslySetInnerHTML={{
-              __html: PORTFOLIO_DATA.manifesto.bio2Html,
+              __html: MANIFESTO_DATA.bio2Html,
             }}
           />
 
           <div className="pt-2">
             <Link
-              href={PORTFOLIO_DATA.manifesto.ctaHref}
+              href={MANIFESTO_DATA.ctaHref}
               className="text-white hover-underline-link tracking-wider font-mono-custom text-[16px]"
             >
-              {PORTFOLIO_DATA.manifesto.ctaText}
+              {MANIFESTO_DATA.ctaText}
             </Link>
           </div>
         </div>
@@ -110,18 +109,13 @@ function ManifestoWord({
   end: number;
 }) {
   const opacity = useTransform(scrollProgress, [start, end], [0.35, 1]);
-  const color = useTransform(
-    scrollProgress,
-    [start, end],
-    ["rgb(115, 115, 115)", "rgb(255, 255, 255)"]
-  );
 
   return (
-    <motion.span
-      style={{ opacity, color }}
-      className="inline-block transition-colors duration-150 mr-[0.26em]"
+    <m.span
+      style={{ opacity }}
+      className="inline-block text-white mr-[0.26em]"
     >
       {word}
-    </motion.span>
+    </m.span>
   );
 }

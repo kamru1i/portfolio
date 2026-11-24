@@ -9,6 +9,8 @@ const eslintConfig = [
       "node_modules/**",
       "scripts/**",
       ".qa/**",
+      "playwright-report/**",
+      "test-results/**",
       "*.log",
     ],
   },

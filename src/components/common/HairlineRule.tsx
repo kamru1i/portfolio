@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 
 interface HairlineRuleProps {
   className?: string;
@@ -10,7 +10,7 @@ interface HairlineRuleProps {
 export function HairlineRule({ className = "", delay = 0 }: HairlineRuleProps) {
   return (
     <div className={`relative w-full overflow-hidden py-1 ${className}`}>
-      <motion.div
+      <m.div
         initial={{ scaleX: 0, opacity: 0 }}
         whileInView={{ scaleX: 1, opacity: 1 }}
         viewport={{ once: true, margin: "-10% 0px" }}

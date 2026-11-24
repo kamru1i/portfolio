@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo } from "react";
+import { m, AnimatePresence } from "motion/react";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { SectionBadge } from "@/components/common/SectionBadge";
-import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
-import { compareProjectsByPriorityAndRecency } from "@/types/project";
+import { WORKS_HEADER } from "@/lib/home-sections-data";
+import type { PortfolioProject } from "@/lib/portfolio-data";
+import { compareProjectsByPriorityAndRecency } from "@/lib/project-sort";
 import { VideoSelectedWorks } from "./VideoSelectedWorks";
 import { WebCaseStudies } from "./WebCaseStudies";
 import { VideoPlayerModal } from "./VideoPlayerModal";
@@ -20,11 +21,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
   const [activeVideoProject, setActiveVideoProject] = useState<PortfolioProject | null>(null);
   const [activeWebProject, setActiveWebProject] = useState<PortfolioProject | null>(null);
 
-  const [projects, setProjects] = useState<PortfolioProject[]>(
-    initialProjects !== undefined
-      ? initialProjects
-      : PORTFOLIO_DATA.showcaseProjects || []
-  );
+  const [projects, setProjects] = useState<PortfolioProject[]>(initialProjects ?? []);
 
   // Only fetch client-side if initialProjects was not supplied by a Server Component
   useEffect(() => {
@@ -47,12 +44,23 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
   }, [initialProjects]);
 
   // Filter dynamically by type, sort by priority/recency, and enforce strict homepage overview limits (max 5 videos, max 8 web)
-  const videoProjects = [...projects.filter((p) => p.type === "video")]
-    .sort(compareProjectsByPriorityAndRecency)
-    .slice(0, 5);
-  const webProjects = [...projects.filter((p) => p.type === "web")]
-    .sort(compareProjectsByPriorityAndRecency)
-    .slice(0, 8);
+  const videoProjects = useMemo(
+    () =>
+      projects
+        .filter((p) => p.type === "video")
+        .sort(compareProjectsByPriorityAndRecency)
+        .slice(0, 5),
+    [projects]
+  );
+
+  const webProjects = useMemo(
+    () =>
+      projects
+        .filter((p) => p.type === "web")
+        .sort(compareProjectsByPriorityAndRecency)
+        .slice(0, 8),
+    [projects]
+  );
 
   return (
     <section
@@ -68,7 +76,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
       {/* Section Header: Title (Left) + Subtitle (Right) — SHARED for both Video & Web */}
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-8 sm:mb-10">
         {/* Left: Section Badge + Headline */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: 60 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
@@ -77,12 +85,12 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
         >
           <SectionBadge label="PROJECTS" />
           <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.08] font-normal uppercase">
-            {PORTFOLIO_DATA.worksHeader.title}
+            {WORKS_HEADER.title}
           </h2>
-        </motion.div>
+        </m.div>
 
         {/* Right: Editorial Narrative Statement */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: 60 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
@@ -92,10 +100,10 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
           <p
             className="font-mono-custom text-[15px] sm:text-[16px] leading-[1.6] text-[#a1a1a1] [&_strong]:text-white [&_strong]:font-medium"
             dangerouslySetInnerHTML={{
-              __html: PORTFOLIO_DATA.worksHeader.statementHtml,
+              __html: WORKS_HEADER.statementHtml,
             }}
           />
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Category Tabs: Video | Web — Positioned AFTER Projects & Works and subtitle */}
@@ -115,7 +123,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
             }`}
           >
             {activeTab === "video" && (
-              <motion.div
+              <m.div
                 layoutId="activeWorksTab"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 className="absolute inset-0 bg-white/15 border border-white/20 rounded-full z-[-1] shadow-sm"
@@ -134,7 +142,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
             }`}
           >
             {activeTab === "web" && (
-              <motion.div
+              <m.div
                 layoutId="activeWorksTab"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 className="absolute inset-0 bg-white/15 border border-white/20 rounded-full z-[-1] shadow-sm"
@@ -148,7 +156,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
       {/* Tab Content: Video (Selected Works) vs Web (Web Case Studies) */}
       <AnimatePresence mode="wait">
         {activeTab === "video" ? (
-          <motion.div
+          <m.div
             key="video-tab-content"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -161,9 +169,9 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
               projects={videoProjects}
               onPlayVideo={(p) => setActiveVideoProject(p)}
             />
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div
+          <m.div
             key="web-tab-content"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -176,7 +184,7 @@ export function ProjectsAndWorksSection({ initialProjects }: ProjectsAndWorksSec
               projects={webProjects}
               onPreviewWeb={(p) => setActiveWebProject(p)}
             />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

@@ -1,13 +1,21 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Metadata } from "next";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Globe } from "lucide-react";
 import { GitHubBrandIcon } from "@/components/common/BrandIcons";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
-import { serializeJsonLd } from "@/lib/url-utils";
+import {
+  isNextImageOptimizedUrl,
+  serializeJsonLd,
+  toSafeExternalUrl,
+  toSafeOgImageUrl,
+} from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
+
+export const revalidate = 60;
 
 interface WebProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -36,6 +44,7 @@ export async function generateMetadata({
 
   const canonicalSlug = project.slug || project.id;
   const canonicalUrl = `https://kamrulislam.me/projects/web/${canonicalSlug}`;
+  const ogImageUrl = toSafeOgImageUrl(project.previewImageUrl || project.thumbnail);
 
   return {
     title: `${project.title} — Web Development Case Study`,
@@ -49,13 +58,13 @@ export async function generateMetadata({
       description: project.description,
       url: canonicalUrl,
       type: "website",
-      images: project.thumbnail ? [{ url: project.thumbnail }] : [],
+      images: [{ url: ogImageUrl }],
     },
     twitter: {
       card: "summary_large_image",
       title: `Kamrul Islam — ${project.title} (Web)`,
       description: project.description,
-      images: project.thumbnail ? [project.thumbnail] : undefined,
+      images: [ogImageUrl],
     },
   };
 }
@@ -77,12 +86,13 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
     webProjects[(currentIndex + 1) % webProjects.length] || webProjects[0];
 
   const heroScreenshot = project.previewImageUrl || project.thumbnail;
+  const safeLiveUrl = toSafeExternalUrl(project.liveUrl);
+  const safeGithubUrl = toSafeExternalUrl(project.githubUrl);
   const canonicalSlug = project.slug || project.id;
   const canonicalUrl = `https://kamrulislam.me/projects/web/${canonicalSlug}`;
-  const rawThumb = project.previewImageUrl || project.thumbnail || "/opengraph-image.jpg";
-  const absoluteThumbnailUrl = rawThumb.startsWith("http")
-    ? rawThumb
-    : `https://kamrulislam.me${rawThumb.startsWith("/") ? "" : "/"}${rawThumb}`;
+  const absoluteThumbnailUrl = toSafeOgImageUrl(
+    project.previewImageUrl || project.thumbnail
+  );
 
   const webProjectJsonLd = {
     "@context": "https://schema.org",
@@ -190,9 +200,9 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
 
             {/* Primary Action Links: Live Site & GitHub */}
             <div className="flex flex-wrap items-center gap-3">
-              {project.liveUrl && (
+              {safeLiveUrl && (
                 <a
-                  href={project.liveUrl}
+                  href={safeLiveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-2.5 rounded-full bg-white text-black font-sans font-medium text-xs sm:text-sm hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"
@@ -202,9 +212,9 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                 </a>
               )}
 
-              {project.githubUrl && (
+              {safeGithubUrl && (
                 <a
-                  href={project.githubUrl}
+                  href={safeGithubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 font-mono-custom text-xs sm:text-sm border border-white/10 transition-colors flex items-center gap-2"
@@ -229,12 +239,12 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block shrink-0" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block shrink-0" />
                   <span className="ml-2 text-white/70 truncate hidden sm:inline">
-                    {project.liveUrl || "Web Application Preview"}
+                    {safeLiveUrl || "Web Application Preview"}
                   </span>
                 </div>
-                {project.liveUrl && (
+                {safeLiveUrl && (
                   <a
-                    href={project.liveUrl}
+                    href={safeLiveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[11px] text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 shrink-0 transition-colors"
@@ -248,11 +258,14 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
               {/* Viewport Content (Exact Screenshot Dimensions without Black Bars or Cropping) */}
               <div className="relative w-full bg-[#0a0b10] overflow-hidden">
                 {heroScreenshot ? (
-                  /* eslint-disable-next-line @next/next/no-img-element -- Renders local or external screenshot cleanly */
-                  <img
+                  <Image
                     src={heroScreenshot}
                     alt={`${project.title} hero section screenshot`}
-                    decoding="async"
+                    width={1920}
+                    height={1080}
+                    priority
+                    unoptimized={!isNextImageOptimizedUrl(heroScreenshot)}
+                    sizes="(max-width: 1440px) 100vw, 1440px"
                     className="w-full h-auto block"
                   />
                 ) : (
@@ -266,9 +279,9 @@ export default async function WebProjectDetailPage({ params }: WebProjectPagePro
                     <p className="font-mono-custom text-xs sm:text-sm text-[#888] max-w-md mx-auto mb-6 leading-relaxed">
                       {project.description}
                     </p>
-                    {project.liveUrl && (
+                    {safeLiveUrl && (
                       <a
-                        href={project.liveUrl}
+                        href={safeLiveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-6 py-2.5 rounded-full bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2"

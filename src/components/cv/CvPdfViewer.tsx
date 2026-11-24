@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowDown, ArrowUpRight, Download, FileText, Loader2 } from "lucide-react";
+import { normalizeDocumentCategory } from "@/lib/document-categories";
 
 export type ViewerDocumentCategory = "cv" | "resume" | "portfolio" | "cover-letter";
 
@@ -48,16 +50,31 @@ export function CvPdfViewer({
   publishedDocuments = [],
   initialCategory = "cv",
 }: CvPdfViewerProps) {
-  const defaultSelectedCategory: ViewerDocumentCategory =
-    publishedDocuments.some((d) => d.category === initialCategory)
-      ? initialCategory
-      : publishedDocuments[0]?.category || "cv";
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlParam = searchParams.get("doc") || searchParams.get("type");
+  const normalizedUrlCategory = urlParam
+    ? normalizeDocumentCategory(urlParam)
+    : initialCategory;
 
-  const [selectedCategory, setSelectedCategory] = useState<ViewerDocumentCategory>(
-    defaultSelectedCategory
-  );
-  const [viewerLoaded, setViewerLoaded] = useState(false);
-  const [viewerError, setViewerError] = useState(false);
+  const urlSelectedCategory: ViewerDocumentCategory =
+    publishedDocuments.some((d) => d.category === normalizedUrlCategory)
+      ? normalizedUrlCategory
+      : publishedDocuments.find((d) => d.category === "cv")?.category ||
+        publishedDocuments[0]?.category ||
+        "cv";
+
+  const [categoryOverride, setCategoryOverride] = useState<{
+    urlKey: string;
+    category: ViewerDocumentCategory;
+  } | null>(null);
+  const selectedCategory =
+    categoryOverride && categoryOverride.urlKey === (urlParam || "")
+      ? categoryOverride.category
+      : urlSelectedCategory;
+
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<string | null>(null);
 
   const activeDoc: PublishedDocumentItem | null =
     publishedDocuments.find((d) => d.category === selectedCategory) ||
@@ -77,15 +94,15 @@ export function CvPdfViewer({
         }
       : null);
 
+  const activeDocKey = activeDoc ? `${activeDoc.category}:${activeDoc.pdfUrl}` : "none";
+  const viewerLoaded = loadedKey === activeDocKey;
+  const viewerError = errorKey === activeDocKey;
+
   const handleSelectCategory = (category: ViewerDocumentCategory) => {
     if (category === selectedCategory) return;
-    setSelectedCategory(category);
-    setViewerLoaded(false);
-    setViewerError(false);
-    if (typeof window !== "undefined") {
-      const nextUrl = category === "cv" ? "/cv" : `/cv?doc=${category}`;
-      window.history.replaceState(null, "", nextUrl);
-    }
+    setCategoryOverride({ urlKey: urlParam || "", category });
+    const nextUrl = category === "cv" ? "/cv" : `/cv?doc=${category}`;
+    router.replace(nextUrl, { scroll: false });
   };
 
   if (!hasPublishedPdf || !activeDoc) {
@@ -284,8 +301,8 @@ export function CvPdfViewer({
             key={activeDoc.category}
             src={`${activeDoc.pdfUrl}#view=FitH`}
             title={activeDoc.title}
-            onLoad={() => setViewerLoaded(true)}
-            onError={() => setViewerError(true)}
+            onLoad={() => setLoadedKey(activeDocKey)}
+            onError={() => setErrorKey(activeDocKey)}
             className="w-full h-full border-0"
           />
         </div>

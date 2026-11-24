@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { KamrulBrandWordmark } from "@/components/layout/KamrulBrandWordmark";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { BRAND_CONFIG, DEFAULT_CONTACT_CARD } from "@/lib/brand-config";
 
 export interface TalkWithKamrulCardProps {
   contactCard?: {
@@ -26,7 +26,7 @@ export function TalkWithKamrulCard({
   className = "",
 }: TalkWithKamrulCardProps) {
   const cardData = {
-    ...PORTFOLIO_DATA.faq.contactCard,
+    ...DEFAULT_CONTACT_CARD,
     ...contactCard,
   };
 
@@ -67,13 +67,13 @@ export function TalkWithKamrulCard({
       {/* Direct Phone & WhatsApp Icon Row */}
       <div className="flex items-center gap-2.5 pt-3 border-t border-white/10 font-mono-custom text-xs">
         <a
-          href={`tel:${PORTFOLIO_DATA.brand.phone.replace(/[^0-9+]/g, "")}`}
+          href={`tel:${BRAND_CONFIG.phone.replace(/[^0-9+]/g, "")}`}
           className="text-white/90 hover:text-white transition-colors"
         >
-          {PORTFOLIO_DATA.brand.phone}
+          {BRAND_CONFIG.phone}
         </a>
         <a
-          href={PORTFOLIO_DATA.brand.whatsappUrl}
+          href={BRAND_CONFIG.whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"

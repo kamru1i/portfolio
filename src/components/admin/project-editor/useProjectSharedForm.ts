@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { AspectRatio, ProjectRecord, ProjectType, VideoProvider } from "@/types/project";
 
 const SLUG_PATTERN = /^[A-Za-z0-9-]+$/;
@@ -222,6 +223,13 @@ export function useProjectSharedForm({
       const savedProjectId = resData.project?.id || initialProject?.id;
       const destinationTab = isPublished ? discipline : "drafts";
       const targetUrl = `/admin?tab=${destinationTab}`;
+      toast.success(
+        isEdit
+          ? `"${title.trim()}" updated${isPublished ? "" : " (draft)"}.`
+          : isPublished
+          ? `"${title.trim()}" published.`
+          : `"${title.trim()}" saved as draft.`
+      );
       try {
         window.sessionStorage.setItem(
           ADMIN_RETURN_STATE_KEY,
@@ -242,9 +250,10 @@ export function useProjectSharedForm({
       router.push(targetUrl);
       router.refresh();
     } catch (err: unknown) {
-      setErrorMessage(
-        err instanceof Error ? err.message : "An unexpected error occurred"
-      );
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+      setErrorMessage(message);
+      toast.error(message);
       setSubmitting(false);
     }
   };

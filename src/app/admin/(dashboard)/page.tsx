@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import useSWR from "swr";
+import { toast } from "sonner";
 import {
   Plus,
   Search,
@@ -17,6 +19,7 @@ import {
 import { ProjectRecord } from "@/types/project";
 import type { ContactInquiryRecord } from "@/lib/inquiries-service";
 import type { CvDocumentRecord } from "@/lib/document-categories";
+import { swrJsonFetcher } from "@/lib/swr-fetcher";
 import { getDisplayDomain } from "@/lib/url-utils";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -118,13 +121,40 @@ function readInitialAdminViewState(): {
 }
 
 export default function AdminDashboardPage() {
-  const [projects, setProjects] = useState<ProjectRecord[]>([]);
-  const [inquiries, setInquiries] = useState<ContactInquiryRecord[]>([]);
-  const [cvDocuments, setCvDocuments] = useState<CvDocumentRecord[]>([]);
-  const [activeCvDocument, setActiveCvDocument] =
-    useState<CvDocumentRecord | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const {
+    data: projectsData,
+    error: projectsError,
+    isLoading: loading,
+    mutate: mutateProjects,
+  } = useSWR<{ projects?: ProjectRecord[] }>(
+    "/api/admin/projects?pageSize=500",
+    swrJsonFetcher,
+    { revalidateOnFocus: true }
+  );
+  const { data: inquiriesData } = useSWR<{ inquiries?: ContactInquiryRecord[] }>(
+    "/api/admin/inquiries",
+    swrJsonFetcher,
+    { revalidateOnFocus: true }
+  );
+  const { data: cvData } = useSWR<{
+    documents?: CvDocumentRecord[];
+    activeDocument?: CvDocumentRecord | null;
+  }>("/api/admin/cv", swrJsonFetcher, { revalidateOnFocus: true });
+
+  const projects = useMemo(
+    () => projectsData?.projects ?? [],
+    [projectsData?.projects]
+  );
+  const inquiries = useMemo(
+    () => inquiriesData?.inquiries ?? [],
+    [inquiriesData?.inquiries]
+  );
+  const cvDocuments = useMemo(
+    () => cvData?.documents ?? [],
+    [cvData?.documents]
+  );
+  const activeCvDocument = cvData?.activeDocument ?? null;
+  const errorMsg = projectsError instanceof Error ? projectsError.message : null;
 
   // Deterministic initial states so SSR and client hydration match 100%
   const [viewMode, setViewMode] = useState<"dashboard" | "projects">(
@@ -137,6 +167,7 @@ export default function AdminDashboardPage() {
     null
   );
   const hasRestoredViewRef = useRef(false);
+  const appliedHighlightPageRef = useRef<string | null>(null);
   const pageSize = 12;
 
   const [togglingId, setTogglingId] = useState<string | null>(null);
@@ -162,6 +193,64 @@ export default function AdminDashboardPage() {
     return () =>
       window.removeEventListener(ADMIN_VIEW_EVENT, handleSidebarViewChange);
   }, []);
+
+  // Restore saved admin view/tab/search state once on mount
+  useEffect(() => {
+    let isMounted = true;
+    Promise.resolve().then(() => {
+      if (!isMounted) return;
+      const restored = readInitialAdminViewState();
+      hasRestoredViewRef.current = true;
+      setViewMode(restored.mode);
+      setActiveTab(restored.tab);
+      setSearchQuery(restored.searchQuery);
+      setCurrentPage(restored.page);
+      setHighlightedProjectId(restored.highlightedProjectId);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Ensure the page containing the edited project is selected once SWR projects load
+  useEffect(() => {
+    if (
+      !highlightedProjectId ||
+      viewMode !== "projects" ||
+      projects.length === 0 ||
+      appliedHighlightPageRef.current === highlightedProjectId
+    ) {
+      return;
+    }
+
+    appliedHighlightPageRef.current = highlightedProjectId;
+    const filtered = projects.filter((p) => {
+      if (activeTab === "video" && (p.type !== "video" || !p.is_published)) return false;
+      if (activeTab === "web" && (p.type !== "web" || !p.is_published)) return false;
+      if (activeTab === "published" && !p.is_published) return false;
+      if (activeTab === "drafts" && p.is_published) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchTitle = p.title.toLowerCase().includes(q);
+        const matchClient = p.client_name?.toLowerCase().includes(q) || false;
+        const matchTags = p.tags?.some((t) => t.toLowerCase().includes(q)) || false;
+        return matchTitle || matchClient || matchTags;
+      }
+      return true;
+    });
+
+    const idx = filtered.findIndex((p) => p.id === highlightedProjectId);
+    if (idx !== -1) {
+      const targetPage = Math.floor(idx / pageSize) + 1;
+      let isMounted = true;
+      queueMicrotask(() => {
+        if (isMounted) setCurrentPage(targetPage);
+      });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [highlightedProjectId, viewMode, activeTab, searchQuery, projects, pageSize]);
 
   // Sync URL query params and sessionStorage whenever viewMode, tab, page, or searchQuery changes
   useEffect(() => {
@@ -209,89 +298,6 @@ export default function AdminDashboardPage() {
       // Ignore storage write errors
     }
   }, [viewMode, activeTab, currentPage, searchQuery]);
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      await Promise.resolve();
-      if (!isMounted) return;
-
-      const restored = readInitialAdminViewState();
-      hasRestoredViewRef.current = true;
-      setViewMode(restored.mode);
-      setActiveTab(restored.tab);
-      setSearchQuery(restored.searchQuery);
-      setCurrentPage(restored.page);
-      setHighlightedProjectId(restored.highlightedProjectId);
-
-      try {
-        const [projectsRes, inquiriesRes, cvRes] = await Promise.all([
-          fetch("/api/admin/projects?pageSize=500"),
-          fetch("/api/admin/inquiries").catch(() => null),
-          fetch("/api/admin/cv").catch(() => null),
-        ]);
-
-        if (!projectsRes.ok) {
-          const data = await projectsRes.json().catch(() => ({}));
-          throw new Error(data.error || "Failed to load projects");
-        }
-
-        const [projectsData, inquiriesData, cvData] = await Promise.all([
-          projectsRes.json(),
-          inquiriesRes && inquiriesRes.ok
-            ? inquiriesRes.json().catch(() => ({}))
-            : Promise.resolve({}),
-          cvRes && cvRes.ok ? cvRes.json().catch(() => ({})) : Promise.resolve({}),
-        ]);
-
-        if (isMounted) {
-          const loadedProjects: ProjectRecord[] = projectsData.projects || [];
-          setProjects(loadedProjects);
-          setInquiries(inquiriesData.inquiries || []);
-          setCvDocuments(cvData.documents || []);
-          setActiveCvDocument(cvData.activeDocument || null);
-
-          // Ensure the page containing the edited project is selected if priority changed
-          if (restored.highlightedProjectId && restored.mode === "projects") {
-            const filtered = loadedProjects.filter((p) => {
-              if (restored.tab === "video" && (p.type !== "video" || !p.is_published)) return false;
-              if (restored.tab === "web" && (p.type !== "web" || !p.is_published)) return false;
-              if (restored.tab === "published" && !p.is_published) return false;
-              if (restored.tab === "drafts" && p.is_published) return false;
-              if (restored.searchQuery.trim()) {
-                const q = restored.searchQuery.toLowerCase();
-                const matchTitle = p.title.toLowerCase().includes(q);
-                const matchClient =
-                  p.client_name?.toLowerCase().includes(q) || false;
-                const matchTags =
-                  p.tags?.some((t) => t.toLowerCase().includes(q)) || false;
-                return matchTitle || matchClient || matchTags;
-              }
-              return true;
-            });
-            const idx = filtered.findIndex(
-              (p) => p.id === restored.highlightedProjectId
-            );
-            if (idx !== -1) {
-              const targetPage = Math.floor(idx / pageSize) + 1;
-              setCurrentPage(targetPage);
-            }
-          }
-        }
-      } catch (err: unknown) {
-        if (isMounted) {
-          setErrorMsg(err instanceof Error ? err.message : "Error fetching projects");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Compute stats
   const stats = useMemo(() => {
@@ -438,11 +444,22 @@ export default function AdminDashboardPage() {
       }
 
       const { project: updated } = await res.json();
-      setProjects((prev) =>
-        prev.map((p) => (p.id === updated.id ? updated : p))
+      await mutateProjects(
+        (curr) => ({
+          ...curr,
+          projects: (curr?.projects ?? []).map((p) =>
+            p.id === updated.id ? updated : p
+          ),
+        }),
+        { revalidate: false }
+      );
+      toast.success(
+        updated.is_published
+          ? `"${project.title}" published.`
+          : `"${project.title}" moved to drafts.`
       );
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Error toggling publish state");
+      toast.error(err instanceof Error ? err.message : "Error toggling publish state");
     } finally {
       setTogglingId(null);
     }
@@ -451,9 +468,10 @@ export default function AdminDashboardPage() {
   // Delete project
   const handleDelete = async () => {
     if (!confirmDeleteProject) return;
+    const targetProject = confirmDeleteProject;
     try {
-      setDeletingId(confirmDeleteProject.id);
-      const res = await fetch(`/api/admin/projects/${confirmDeleteProject.id}`, {
+      setDeletingId(targetProject.id);
+      const res = await fetch(`/api/admin/projects/${targetProject.id}`, {
         method: "DELETE",
       });
 
@@ -461,10 +479,19 @@ export default function AdminDashboardPage() {
         throw new Error("Failed to delete project");
       }
 
-      setProjects((prev) => prev.filter((p) => p.id !== confirmDeleteProject.id));
+      await mutateProjects(
+        (curr) => ({
+          ...curr,
+          projects: (curr?.projects ?? []).filter(
+            (p) => p.id !== targetProject.id
+          ),
+        }),
+        { revalidate: false }
+      );
       setConfirmDeleteProject(null);
+      toast.success(`"${targetProject.title}" deleted permanently.`);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Error deleting project");
+      toast.error(err instanceof Error ? err.message : "Error deleting project");
     } finally {
       setDeletingId(null);
     }

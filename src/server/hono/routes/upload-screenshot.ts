@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { Hono } from "hono";
 import { createClient } from "@/lib/supabase/server";
 
@@ -111,7 +112,7 @@ uploadScreenshotRoute.post("/", async (c) => {
         ? fileEntry.name
         : defaultStem;
     const sanitizedFileName = sanitizeImageFilename(rawName, ext);
-    const uniqueKey = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const uniqueKey = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
     const storagePath = `${folderPrefix}/${uniqueKey}-${sanitizedFileName}`;
 
     const { error: uploadError } = await supabase.storage

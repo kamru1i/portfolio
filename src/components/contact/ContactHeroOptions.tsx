@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -9,7 +9,7 @@ import {
   Send,
   Zap,
 } from "lucide-react";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { BRAND_CONFIG } from "@/lib/brand-config";
 
 interface ContactOption {
   id: string;
@@ -38,9 +38,9 @@ export function ContactHeroOptions() {
       title: "Start a conversation",
       description:
         "Reach out directly by phone or WhatsApp for quick questions, project inquiries, or collaboration.",
-      actionText: PORTFOLIO_DATA.brand.phone,
-      actionHref: `tel:${PORTFOLIO_DATA.brand.phone.replace(/[^0-9+]/g, "")}`,
-      whatsappHref: PORTFOLIO_DATA.brand.whatsappUrl,
+      actionText: BRAND_CONFIG.phone,
+      actionHref: `tel:${BRAND_CONFIG.phone.replace(/[^0-9+]/g, "")}`,
+      whatsappHref: BRAND_CONFIG.whatsappUrl,
       isExternal: true,
       icon: <MessageSquare className="h-5 w-5 text-neutral-300" strokeWidth={1.75} />,
     },
@@ -49,8 +49,8 @@ export function ContactHeroOptions() {
       title: "Send an email",
       description:
         "Prefer email? Send your project brief directly and I'll respond within 24–48 hours.",
-      actionText: PORTFOLIO_DATA.brand.email,
-      actionHref: `mailto:${PORTFOLIO_DATA.brand.email}`,
+      actionText: BRAND_CONFIG.email,
+      actionHref: `mailto:${BRAND_CONFIG.email}`,
       isExternal: true,
       icon: <Send className="h-5 w-5 text-neutral-300" strokeWidth={1.75} />,
     },
@@ -68,7 +68,7 @@ export function ContactHeroOptions() {
   return (
     <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-24 md:mb-32">
       {options.map((opt, index) => (
-        <motion.div
+        <m.div
           key={opt.id}
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -146,7 +146,7 @@ export function ContactHeroOptions() {
               </a>
             )}
           </div>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   );

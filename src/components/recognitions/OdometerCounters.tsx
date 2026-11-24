@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { StatItem } from "@/lib/portfolio-data";
+import { m, useInView, useReducedMotion } from "motion/react";
+import type { StatItem } from "@/lib/home-sections-data";
 
 export function OdometerCounters({ stats }: { stats: StatItem[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ function DigitReel({
 
   return (
     <div className="relative inline-block overflow-hidden h-[1em] leading-[1em]">
-      <motion.div
+      <m.div
         className="flex flex-col will-change-transform"
         initial={{ y: shouldReduceMotion ? `-${targetDigit}em` : "0em" }}
         animate={{ y: triggered || shouldReduceMotion ? `-${targetDigit}em` : "0em" }}
@@ -94,7 +94,7 @@ function DigitReel({
             {n}
           </span>
         ))}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

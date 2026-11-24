@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 import { Plus } from "lucide-react";
 import { HairlineRule } from "@/components/common/HairlineRule";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { HOME_FAQ_DATA } from "@/lib/home-sections-data";
 import { SectionBadge } from "@/components/common/SectionBadge";
 import { TalkWithKamrulCard } from "@/components/common/TalkWithKamrulCard";
 
 export function FaqSection() {
-  const faqData = PORTFOLIO_DATA.faq;
+  const faqData = HOME_FAQ_DATA;
   // Default to first item expanded for immediate discovery
   const [openIds, setOpenIds] = useState<string[]>([faqData.items[0]?.id || ""]);
 
@@ -25,7 +25,7 @@ export function FaqSection() {
 
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         {/* Left Column: Pill, Title, Subtitle, and Desktop Profile Card */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
@@ -52,7 +52,7 @@ export function FaqSection() {
           <div className="hidden lg:block mt-14 xl:mt-18">
             <TalkWithKamrulCard contactCard={faqData.contactCard} showButton={true} />
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Right Column: 10 Accordion Cards */}
         <div className="lg:col-span-7 flex flex-col gap-3.5 sm:gap-4">
@@ -60,7 +60,7 @@ export function FaqSection() {
             const isOpen = openIds.includes(item.id);
 
             return (
-              <motion.div
+              <m.div
                 key={item.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -97,18 +97,18 @@ export function FaqSection() {
                         : "bg-white/4 text-white/70 border-white/10 group-hover:border-white/30 group-hover:text-white"
                     }`}
                   >
-                    <motion.span
+                    <m.span
                       animate={{ rotate: isOpen ? 45 : 0 }}
                       transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
                       className="inline-flex items-center justify-center select-none"
                     >
                       <Plus className="h-4 w-4" />
-                    </motion.span>
+                    </m.span>
                   </div>
                 </button>
 
                 {/* Smooth Animated Height & Opacity Collapsible Answer (always in DOM for SEO crawlability) */}
-                <motion.div
+                <m.div
                   id={`faq-panel-${item.id}`}
                   role="region"
                   aria-labelledby={`faq-btn-${item.id}`}
@@ -131,8 +131,8 @@ export function FaqSection() {
                       </p>
                     </div>
                   </div>
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             );
           })}
 

@@ -1,9 +1,9 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- Uses raw <img> with onError fallback for arbitrary external favicons and screenshots */
 
 import { useState } from "react";
-import { PortfolioProject } from "@/lib/portfolio-data";
-import { getDisplayDomain } from "@/lib/url-utils";
+import Image from "next/image";
+import type { PortfolioProject } from "@/lib/portfolio-data";
+import { getDisplayDomain, isNextImageOptimizedUrl } from "@/lib/url-utils";
 
 interface WebCaseStudyCardProps {
   project: PortfolioProject;
@@ -19,24 +19,35 @@ export function WebCaseStudyCard({
 
   const displayDomain = getDisplayDomain(project.liveUrl, "live-deployment.site");
   const previewImage = project.previewImageUrl || project.thumbnail;
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${displayDomain}&sz=64`;
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(displayDomain)}&sz=64`;
   const hasValidScreenshot = Boolean(previewImage) && !imageError;
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Preview ${project.title}`}
       data-project-id={project.id}
       onClick={() => {
         onPreviewWeb(project);
       }}
-      className="relative group w-full aspect-video rounded-2xl border border-white/10 hover:border-white/25 bg-[#0e0e0e] overflow-hidden select-none cursor-pointer transition-all duration-500 shadow-[0_12px_40px_rgba(0,0,0,0.5)] flex flex-col justify-between"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onPreviewWeb(project);
+        }
+      }}
+      className="relative group w-full aspect-video rounded-2xl border border-white/10 hover:border-white/25 bg-[#0e0e0e] overflow-hidden select-none cursor-pointer transition-all duration-500 shadow-[0_12px_40px_rgba(0,0,0,0.5)] flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
     >
       {/* Background: Static 16:9 Homepage Screenshot (Zero iframe lag on card grid) */}
       {hasValidScreenshot ? (
         <div className="absolute inset-0 z-0 overflow-hidden bg-[#0a0b0e] rounded-2xl">
-          <img
+          <Image
             src={previewImage}
             alt={`${project.title} homepage screenshot`}
-            loading="lazy"
+            fill
+            unoptimized={!isNextImageOptimizedUrl(previewImage)}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onLoad={(e) => {
               const { naturalWidth, naturalHeight } = e.currentTarget;
               if (naturalWidth > 0 && naturalHeight > 0) {
@@ -44,7 +55,7 @@ export function WebCaseStudyCard({
               }
             }}
             onError={() => setImageError(true)}
-            className={`w-full h-full ${
+            className={`${
               isLandscapeScreenshot
                 ? "object-fill"
                 : "object-cover object-top"
@@ -77,9 +88,12 @@ export function WebCaseStudyCard({
                 <span className="w-2 h-2 rounded-full bg-[#27c93f]/70" />
               </div>
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 max-w-[170px]">
-                <img
+                <Image
                   src={faviconUrl}
                   alt=""
+                  width={12}
+                  height={12}
+                  unoptimized
                   className="w-3 h-3 rounded-xs object-contain shrink-0"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";

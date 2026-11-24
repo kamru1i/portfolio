@@ -5,10 +5,17 @@ import { Metadata } from "next";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Film } from "lucide-react";
 import { getProjectBySlugOrId, getPublishedProjects } from "@/lib/projects-service";
 import { resolvePlayableEmbedUrl } from "@/lib/video-metadata";
-import { isNextImageOptimizedUrl, serializeJsonLd } from "@/lib/url-utils";
+import {
+  isNextImageOptimizedUrl,
+  serializeJsonLd,
+  toSafeExternalUrl,
+  toSafeOgImageUrl,
+} from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
+
+export const revalidate = 60;
 
 interface VideoProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -37,6 +44,7 @@ export async function generateMetadata({
 
   const canonicalSlug = project.slug || project.id;
   const canonicalUrl = `https://kamrulislam.me/projects/video/${canonicalSlug}`;
+  const ogImageUrl = toSafeOgImageUrl(project.previewImageUrl || project.thumbnail);
 
   return {
     title: `${project.title} — Video Editing & Post-Production Case Study`,
@@ -50,13 +58,13 @@ export async function generateMetadata({
       description: project.description,
       url: canonicalUrl,
       type: "video.other",
-      images: project.thumbnail ? [{ url: project.thumbnail }] : [],
+      images: [{ url: ogImageUrl }],
     },
     twitter: {
       card: "summary_large_image",
       title: `Kamrul Islam — ${project.title} (Video)`,
       description: project.description,
-      images: project.thumbnail ? [project.thumbnail] : undefined,
+      images: [ogImageUrl],
     },
   };
 }
@@ -92,23 +100,30 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
   const nextProject =
     videoProjects[(currentIndex + 1) % videoProjects.length] || videoProjects[0];
 
-  const embedUrl = resolvePlayableEmbedUrl(project.videoUrl, {
+  const safeVideoUrl =
+    toSafeExternalUrl(project.videoUrl) ||
+    (project.videoUrl &&
+    project.videoUrl.startsWith("/") &&
+    !project.videoUrl.startsWith("//")
+      ? project.videoUrl
+      : undefined);
+
+  const embedUrl = resolvePlayableEmbedUrl(safeVideoUrl || project.videoUrl, {
     autoplay: false,
     privacyEnhanced: true,
   });
-  const isDirectVideo =
-    project.videoUrl &&
-    (project.videoUrl.endsWith(".mp4") ||
-      project.videoUrl.endsWith(".webm") ||
-      project.videoType === "local");
+  const isDirectVideo = Boolean(
+    safeVideoUrl &&
+      (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(safeVideoUrl) ||
+        project.videoType === "local")
+  );
   const format = project.format || "16:9";
   const playerContainerClasses = getVideoPlayerContainerClasses(format);
   const canonicalSlug = project.slug || project.id;
   const canonicalUrl = `https://kamrulislam.me/projects/video/${canonicalSlug}`;
-  const rawThumb = project.previewImageUrl || project.thumbnail || "/opengraph-image.jpg";
-  const absoluteThumbnailUrl = rawThumb.startsWith("http")
-    ? rawThumb
-    : `https://kamrulislam.me${rawThumb.startsWith("/") ? "" : "/"}${rawThumb}`;
+  const absoluteThumbnailUrl = toSafeOgImageUrl(
+    project.previewImageUrl || project.thumbnail
+  );
 
   const videoPageJsonLd = {
     "@context": "https://schema.org",
@@ -121,7 +136,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
         thumbnailUrl: [absoluteThumbnailUrl],
         uploadDate: project.publishedAt || "2025-01-01T00:00:00Z",
         ...(embedUrl ? { embedUrl } : {}),
-        contentUrl: project.videoUrl || canonicalUrl,
+        contentUrl: safeVideoUrl || canonicalUrl,
         creator: {
           "@id": "https://kamrulislam.me/#person",
         },
@@ -231,16 +246,16 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                   allowFullScreen
                   className="w-full h-full block border-0"
                 />
-              ) : isDirectVideo && project.videoUrl ? (
+              ) : isDirectVideo && safeVideoUrl ? (
                 /* Direct HTML5 Video Player */
                 <video
-                  src={project.videoUrl}
+                  src={safeVideoUrl}
                   poster={project.thumbnail}
                   controls
                   playsInline
                   className="w-full h-full block object-contain"
                 />
-              ) : project.videoUrl ? (
+              ) : safeVideoUrl ? (
                 /* External Video Link Stage (TikTok / Facebook / Drive) */
                 <div className="relative w-full h-full flex flex-col items-center justify-center p-6 text-center">
                   <Image
@@ -262,7 +277,7 @@ export default async function VideoProjectDetailPage({ params }: VideoProjectPag
                       This production is hosted on an external social network platform. Open directly to stream in original fidelity.
                     </p>
                     <a
-                      href={project.videoUrl}
+                      href={safeVideoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-6 py-2.5 rounded-xl bg-white text-black font-sans font-medium text-xs hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm"

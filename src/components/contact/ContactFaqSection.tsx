@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 import { Minus, Plus } from "lucide-react";
 import { SectionBadge } from "@/components/common/SectionBadge";
 
@@ -93,7 +93,7 @@ export function ContactFaqSection() {
           const isOpen = openIds.includes(item.id);
 
           return (
-            <motion.div
+            <m.div
               key={item.id}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ export function ContactFaqSection() {
               </button>
 
               {/* Answer Content Animated (always in DOM for SEO crawlability) */}
-              <motion.div
+              <m.div
                 id={`contact-faq-panel-${item.id}`}
                 role="region"
                 aria-labelledby={`contact-faq-btn-${item.id}`}
@@ -144,8 +144,8 @@ export function ContactFaqSection() {
                     </p>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           );
         })}
       </div>

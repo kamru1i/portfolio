@@ -1,27 +1,18 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+import { m, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { HairlineRule } from "@/components/common/HairlineRule";
-import { PORTFOLIO_DATA, ServiceItem } from "@/lib/portfolio-data";
+import { HOME_SERVICES_SUMMARY } from "@/lib/home-sections-data";
 import { EditorialListCard } from "@/components/common/EditorialListCard";
 import { SectionBadge } from "@/components/common/SectionBadge";
 
 export function ServicesSection() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [mouseRelativeX, setMouseRelativeX] = useState<number>(0);
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const services = PORTFOLIO_DATA.services;
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const xRatio = (e.clientX - rect.left) / rect.width; // 0 to 1
-    // Map to a smooth subtle parallax offset: -60px to +60px
-    setMouseRelativeX((xRatio - 0.5) * 120);
-  };
+  const services = HOME_SERVICES_SUMMARY;
 
   return (
     <section
@@ -35,7 +26,7 @@ export function ServicesSection() {
       {/* Header: Editorial Title (Left) + Supporting Subtitle (Right) */}
       <div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
         {/* Left: Editorial Title */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
@@ -46,10 +37,10 @@ export function ServicesSection() {
           <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
             Expertise &amp; Services
           </h2>
-        </motion.div>
+        </m.div>
 
         {/* Right: Supporting Subtitle */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
@@ -59,16 +50,13 @@ export function ServicesSection() {
           <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed">
             Crafting high-impact visual narratives, AI-augmented media workflows, modern web platforms, and resilient IT infrastructure.
           </p>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Stacked Service Cards */}
       <div
         className="w-full flex flex-col gap-3.5 sm:gap-4"
-        onMouseLeave={() => {
-          setHoveredId(null);
-          setMouseRelativeX(0);
-        }}
+        onMouseLeave={() => setHoveredId(null)}
       >
         {services.map((service) => {
           const isHovered = hoveredId === service.id;
@@ -85,7 +73,6 @@ export function ServicesSection() {
                   setHoveredId(service.id);
                 }
               }}
-              onMouseMove={handleMouseMove}
               ariaLabel={`${service.title} - View details`}
               className="min-h-[96px] sm:min-h-[116px] md:min-h-[130px] flex items-center"
             >
@@ -117,7 +104,7 @@ export function ServicesSection() {
               {/* Active State: Pill Image + Title Sliding Marquee Ribbon */}
               <AnimatePresence>
                 {isHovered && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scaleY: 0.94 }}
                     animate={{ opacity: 1, scaleY: 1 }}
                     exit={{ opacity: 0, scaleY: 0.94 }}
@@ -125,7 +112,7 @@ export function ServicesSection() {
                     className="absolute inset-0 z-20 bg-[#1e1e1e] border border-white/20 rounded-[14px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.7)] flex items-center pointer-events-auto"
                   >
                     {/* Animated Horizontal Track */}
-                    <motion.div
+                    <m.div
                       animate={{
                         x: ["0%", "-50%"],
                       }}
@@ -136,9 +123,6 @@ export function ServicesSection() {
                           duration: 16,
                           ease: "linear",
                         },
-                      }}
-                      style={{
-                        transform: `translateX(${mouseRelativeX}px)`,
                       }}
                       className="flex items-center gap-6 sm:gap-10 whitespace-nowrap will-change-transform py-2 pl-4"
                     >
@@ -153,7 +137,6 @@ export function ServicesSection() {
                               fill
                               sizes="(max-width: 768px) 240px, 280px"
                               className="object-cover"
-                              priority
                             />
                           </div>
 
@@ -163,8 +146,8 @@ export function ServicesSection() {
                           </span>
                         </div>
                       ))}
-                    </motion.div>
-                  </motion.div>
+                    </m.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </EditorialListCard>

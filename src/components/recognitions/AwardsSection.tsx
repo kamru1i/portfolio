@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { HairlineRule } from "@/components/common/HairlineRule";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { HOME_MILESTONES_SUMMARY, HOME_COUNTERS } from "@/lib/home-sections-data";
 import { EditorialListCard } from "@/components/common/EditorialListCard";
 import { SectionBadge } from "@/components/common/SectionBadge";
 import { OdometerCounters } from "./OdometerCounters";
 
 export function AwardsSection() {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const milestones = PORTFOLIO_DATA.milestones;
-  const counters = PORTFOLIO_DATA.counters;
+  const milestones = HOME_MILESTONES_SUMMARY;
+  const counters = HOME_COUNTERS;
 
   return (
     <section id="recognitions" className="w-full pt-20 md:pt-28 pb-32 md:pb-48 select-none">
@@ -22,7 +22,7 @@ export function AwardsSection() {
       {/* Header: Editorial Title (Left) + Supporting Subtitle (Right) */}
       <div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
         {/* Left: Editorial Title */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
@@ -33,10 +33,10 @@ export function AwardsSection() {
           <h2 className="font-gambarino text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-white tracking-tight leading-[1.08] font-normal uppercase">
             Milestones &amp; Recognitions
           </h2>
-        </motion.div>
+        </m.div>
 
         {/* Right: Supporting Subtitle */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10% 0px" }}
@@ -46,7 +46,7 @@ export function AwardsSection() {
           <p className="font-mono-custom text-sm sm:text-base text-[#a1a1a1] leading-relaxed">
             Career progression, academic milestones, and operational achievements across enterprise IT, web systems, and digital production.
           </p>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Stacked Milestone Cards */}

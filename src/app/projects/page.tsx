@@ -6,6 +6,8 @@ import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { ProjectsPageContent } from "@/components/works/ProjectsPageContent";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Projects & Works Archive — Video Editing, AI Content & Web Development",
   description:

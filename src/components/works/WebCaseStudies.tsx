@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import { PortfolioProject } from "@/lib/portfolio-data";
+import type { PortfolioProject } from "@/lib/portfolio-data";
 import { WebCaseStudyCard } from "./WebCaseStudyCard";
 
 interface WebCaseStudiesProps {
@@ -25,7 +25,7 @@ export function WebCaseStudies({
       {/* Web Case Study Cards Grid Setup (16:9 widescreen cards) */}
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-stretch">
         {displayedProjects.map((project, index) => (
-          <motion.div
+          <m.div
             key={project.id}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -41,7 +41,7 @@ export function WebCaseStudies({
               project={project}
               onPreviewWeb={onPreviewWeb}
             />
-          </motion.div>
+          </m.div>
         ))}
       </div>
 

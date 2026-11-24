@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import Image from "next/image";
 import { HERO_GALLERY_IMAGES, HeroGalleryItem } from "@/lib/hero-gallery-config";
 
 interface Rotating3DCylinderProps {
@@ -46,14 +47,25 @@ export function Rotating3DCylinder({
   const cards = items && items.length > 0 ? items : HERO_GALLERY_IMAGES;
 
   useEffect(() => {
-    const handleResize = () => {
+    let resizeRaf: number | null = null;
+    const applyResize = () => {
       const vw = window.innerWidth;
       setViewportWidth(vw);
       setSpacing(vw < 768 ? 1 : 2);
     };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const handleResize = () => {
+      if (resizeRaf !== null) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        applyResize();
+      });
+    };
+    applyResize();
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      if (resizeRaf !== null) cancelAnimationFrame(resizeRaf);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const activeWidth =
@@ -77,6 +89,16 @@ export function Rotating3DCylinder({
       : 0;
   const autoRotateSpeed = speed * 6; // 12 deg/sec clockwise
 
+  const radiusRef = useRef<number>(radius);
+  const syncLoopRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    radiusRef.current = radius;
+    if (cylinderRef.current) {
+      cylinderRef.current.style.transform = `translateZ(${-radius}px) rotateY(${rotRef.current}deg)`;
+    }
+  }, [radius]);
+
   // Main RAF Physics & Render Loop matching exact reference implementation,
   // pausing offscreen or under prefers-reduced-motion while keeping manual drag responsive.
   useEffect(() => {
@@ -90,7 +112,7 @@ export function Rotating3DCylinder({
 
     const updateTransform = () => {
       if (!cylinder) return;
-      cylinder.style.transform = `translateZ(${-radius}px) rotateY(${rotRef.current}deg)`;
+      cylinder.style.transform = `translateZ(${-radiusRef.current}px) rotateY(${rotRef.current}deg)`;
     };
 
     updateTransform();
@@ -139,6 +161,8 @@ export function Rotating3DCylinder({
       }
     };
 
+    syncLoopRef.current = syncLoop;
+
     let observer: IntersectionObserver | null = null;
     if (container && typeof IntersectionObserver !== "undefined") {
       observer = new IntersectionObserver(
@@ -156,17 +180,13 @@ export function Rotating3DCylinder({
       syncLoop();
     };
 
-    const handlePointerWake = () => {
-      syncLoop();
-    };
-
     document.addEventListener("visibilitychange", syncLoop);
     reducedMotionQuery.addEventListener("change", handleMotionChange);
-    container?.addEventListener("pointerdown", handlePointerWake, { passive: true });
 
     syncLoop();
 
     return () => {
+      syncLoopRef.current = null;
       if (animFrameRef.current !== null) {
         cancelAnimationFrame(animFrameRef.current);
         animFrameRef.current = null;
@@ -174,9 +194,8 @@ export function Rotating3DCylinder({
       observer?.disconnect();
       document.removeEventListener("visibilitychange", syncLoop);
       reducedMotionQuery.removeEventListener("change", handleMotionChange);
-      container?.removeEventListener("pointerdown", handlePointerWake);
     };
-  }, [radius, autoRotateSpeed]);
+  }, [autoRotateSpeed]);
 
   // Pointer Event Handlers allowing vertical page scroll (pan-y) while supporting horizontal spin
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -186,6 +205,7 @@ export function Rotating3DCylinder({
     dragStateRef.current = { active: true, x: e.clientX };
     velocityRef.current = 0;
     setIsDragging(true);
+    syncLoopRef.current?.();
   }, []);
 
   const handlePointerMove = useCallback(
@@ -234,10 +254,10 @@ export function Rotating3DCylinder({
         aria-hidden="true"
       >
         <div
-          className="w-[300px] sm:w-[440px] h-[300px] sm:h-[440px] rounded-full blur-[100px] opacity-20"
+          className="w-[380px] sm:w-[560px] h-[380px] sm:h-[560px] rounded-full opacity-25"
           style={{
             background:
-              "radial-gradient(circle, rgba(30, 80, 200, 0.4) 0%, rgba(200, 90, 20, 0.15) 50%, transparent 75%)",
+              "radial-gradient(circle, rgba(30, 80, 200, 0.35) 0%, rgba(200, 90, 20, 0.12) 45%, transparent 72%)",
           }}
         />
       </div>
@@ -273,33 +293,48 @@ export function Rotating3DCylinder({
               >
                 {/* Front Face: High-fidelity image, 16px corner radius, soft depth shadow */}
                 <div
-                  className="absolute inset-0 overflow-hidden"
+                  className="absolute inset-0 overflow-hidden bg-[#111]"
                   style={{
                     borderRadius: `${cornerRadius}px`,
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundImage: `url(${card.src})`,
                     boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
                   }}
                   title={card.title || card.alt}
-                />
+                >
+                  <Image
+                    src={card.src}
+                    alt={card.alt}
+                    fill
+                    sizes="(max-width: 400px) 240px, (max-width: 640px) 272px, 320px"
+                    loading={idx === 0 ? "eager" : "lazy"}
+                    fetchPriority={idx === 0 ? "high" : "auto"}
+                    draggable={false}
+                    className="object-cover object-center select-none pointer-events-none"
+                  />
+                </div>
 
                 {/* Back Face: Mirrored interior facing cylinder center, dimmed brightness */}
                 <div
-                  className="absolute inset-0 overflow-hidden"
+                  className="absolute inset-0 overflow-hidden bg-[#0c0c0c]"
                   style={{
                     borderRadius: `${cornerRadius}px`,
                     backfaceVisibility: "hidden",
                     WebkitBackfaceVisibility: "hidden",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
                     transform: "rotateY(180deg)",
-                    backgroundImage: `url(${card.src})`,
                     filter: `brightness(${innerDim / 10})`,
                   }}
-                />
+                >
+                  <Image
+                    src={card.src}
+                    alt=""
+                    aria-hidden="true"
+                    fill
+                    sizes="(max-width: 400px) 240px, (max-width: 640px) 272px, 320px"
+                    draggable={false}
+                    className="object-cover object-center select-none pointer-events-none"
+                  />
+                </div>
               </div>
             );
           })}

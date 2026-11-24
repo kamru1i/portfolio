@@ -11,7 +11,8 @@ import { ServicesSection } from "@/components/expertise/ServicesSection";
 import { AwardsSection } from "@/components/recognitions/AwardsSection";
 import { FaqSection } from "@/components/faq/FaqSection";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
-import { PORTFOLIO_DATA, PortfolioProject } from "@/lib/portfolio-data";
+import { BRAND_CONFIG } from "@/lib/brand-config";
+import type { PortfolioProject } from "@/lib/portfolio-data";
 
 interface HomePageClientProps {
   initialProjects: PortfolioProject[];
@@ -29,7 +30,7 @@ export function HomePageClient({ initialProjects }: HomePageClientProps) {
       {/* Intro Curtain Loader */}
       {!isCurtainComplete && (
         <IntroCurtain
-          brandName={PORTFOLIO_DATA.brand.curtainName}
+          brandName={BRAND_CONFIG.curtainName}
           onReveal={() => setIsRevealed(true)}
           onComplete={() => setIsCurtainComplete(true)}
         />

@@ -4,6 +4,8 @@ import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import { serializeJsonLd } from "@/lib/url-utils";
 import { HomePageClient } from "@/components/home/HomePageClient";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title:
     "Kamrul Islam | Video Editor, AI Content Creator, Web Developer & IT Specialist",

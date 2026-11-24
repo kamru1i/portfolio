@@ -1,8 +1,33 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
 import { FilmGrain } from "@/components/common/FilmGrain";
 import { SmoothScroll } from "@/components/common/SmoothScroll";
+import { MotionProvider } from "@/components/common/MotionProvider";
 import { serializeJsonLd } from "@/lib/url-utils";
+
+const gambarino = localFont({
+  src: "../../public/fonts/gambarino.woff2",
+  weight: "400 900",
+  variable: "--font-gambarino-local",
+  display: "swap",
+});
+
+const robotoMono = localFont({
+  src: "../../public/fonts/roboto-mono-400.woff2",
+  weight: "400 700",
+  variable: "--font-mono-local",
+  display: "swap",
+});
+
+const inter = localFont({
+  src: [
+    { path: "../../public/fonts/inter-400.woff2", weight: "400", style: "normal" },
+    { path: "../../public/fonts/inter-500.woff2", weight: "500 700", style: "normal" },
+  ],
+  variable: "--font-sans-local",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   themeColor: "#000000",
@@ -127,14 +152,6 @@ export const metadata: Metadata = {
         type: "image/jpeg",
       },
       {
-        url: "https://kamrulislam.me/images/og-card-studio.png",
-        secureUrl: "https://kamrulislam.me/images/og-card-studio.png",
-        width: 1200,
-        height: 630,
-        alt: "Kamrul Islam — Video Editor, AI-Assisted Content Creator, Web Developer & IT Specialist",
-        type: "image/png",
-      },
-      {
         url: "https://kamrulislam.me/images/og-card-vibrant.jpg",
         secureUrl: "https://kamrulislam.me/images/og-card-vibrant.jpg",
         width: 1200,
@@ -179,8 +196,8 @@ const structuredData = {
     {
       "@type": "ImageObject",
       "@id": "https://kamrulislam.me/#portrait",
-      url: "https://kamrulislam.me/images/Kamrul-I.png",
-      contentUrl: "https://kamrulislam.me/images/Kamrul-I.png",
+      url: "https://kamrulislam.me/images/Kamrul-I.webp",
+      contentUrl: "https://kamrulislam.me/images/Kamrul-I.webp",
       name: "Kamrul Islam (Kamrul I) — Official Portrait",
       caption:
         "Kamrul Islam (Kamrul I) — Video Editor, AI-Assisted Content Creator, Web Developer & IT Professional",
@@ -394,7 +411,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-black relative">
+    <html
+      lang="en"
+      className={`${gambarino.variable} ${robotoMono.variable} ${inter.variable} bg-black relative`}
+    >
       <head>
         <script
           type="application/ld+json"
@@ -402,10 +422,12 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black min-h-screen">
-        <SmoothScroll>
-          <FilmGrain />
-          {children}
-        </SmoothScroll>
+        <MotionProvider>
+          <SmoothScroll>
+            <FilmGrain />
+            {children}
+          </SmoothScroll>
+        </MotionProvider>
       </body>
     </html>
   );

@@ -1,11 +1,11 @@
 "use client";
 
-import { motion, MotionValue } from "framer-motion";
+import { m, type MotionValue } from "motion/react";
 import Image from "next/image";
 import { Play, ArrowUpRight } from "lucide-react";
 import { GitHubBrandIcon } from "@/components/common/BrandIcons";
-import { PortfolioProject } from "@/lib/portfolio-data";
-import { isNextImageOptimizedUrl } from "@/lib/url-utils";
+import type { PortfolioProject } from "@/lib/portfolio-data";
+import { isNextImageOptimizedUrl, toSafeExternalUrl } from "@/lib/url-utils";
 
 interface ProjectMediaProps {
   project: PortfolioProject;
@@ -36,29 +36,30 @@ export function ProjectMedia({
   project,
   isLarge = false,
   parallaxY,
-  onPlayClick,
+  onPlayClick: _onPlayClick,
   onLivePreviewClick,
 }: ProjectMediaProps) {
+  void _onPlayClick;
   const isVideo = project.type === "video";
   const aspectClass = getProjectAspectClass(project.format, isLarge);
+  const safeGithubUrl = toSafeExternalUrl(project.githubUrl);
 
   return (
     <div className={`relative w-full ${aspectClass} overflow-hidden bg-black rounded-xl sm:rounded-2xl border border-white/10 select-none shadow-[0_12px_35px_rgba(0,0,0,0.5)]`}>
       {/* Parallax Image Frame */}
-      <motion.div
+      <m.div
         style={parallaxY ? { y: parallaxY } : undefined}
-        className="absolute inset-x-0 top-[-15%] h-[130%] w-full will-change-transform transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
+        className="absolute inset-x-0 top-[-15%] h-[130%] w-full will-change-transform"
       >
         <Image
           src={project.thumbnail}
           alt={project.title}
           fill
           unoptimized={!isNextImageOptimizedUrl(project.thumbnail)}
-          className="object-cover"
+          className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
           sizes={isLarge ? "(max-width: 768px) 100vw, 704px" : "(max-width: 768px) 100vw, 352px"}
-          priority={isLarge}
         />
-      </motion.div>
+      </m.div>
 
       {/* Video Hover Overlay with Sleek Play Button (always visible on mobile/touch, hover-revealed on desktop) */}
       {isVideo && (
@@ -72,9 +73,9 @@ export function ProjectMedia({
       {/* Web Desktop Hover Action Overlay */}
       {!isVideo && (
         <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 p-4 z-10">
-          {project.githubUrl && (
+          {safeGithubUrl && (
             <a
-              href={project.githubUrl}
+              href={safeGithubUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}

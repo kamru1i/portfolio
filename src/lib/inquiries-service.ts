@@ -67,11 +67,11 @@ export async function saveContactInquiry(input: {
         return { saved: true, source: "supabase" };
       }
       if (!isMissingTableError(error)) {
-        console.warn("[Inquiries Backup Warning]:", error.message);
+        console.warn("[Inquiries Backup Warning]: Unable to persist inquiry record to database.");
       }
     }
-  } catch (err: unknown) {
-    console.warn("[Inquiries Backup Exception]:", err);
+  } catch {
+    console.warn("[Inquiries Backup Exception]: Falling back to runtime inquiry memory store.");
   }
 
   // Fallback to runtime memory if Supabase table is not migrated yet

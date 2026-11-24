@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { m, AnimatePresence } from "motion/react";
 import Link from "next/link";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { BRAND_CONFIG, FOOTER_CONFIG } from "@/lib/brand-config";
 
 interface FullScreenMenuProps {
   isOpen: boolean;
@@ -29,28 +29,53 @@ const DOCUMENT_SUB_PILLS = [
 ];
 
 export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
-  // ESC key listener to dismiss
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Focus trap, ESC dismiss, and Lenis + body scroll lock while open
   useEffect(() => {
     if (!isOpen) return;
+
+    const prevFocus =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    menuRef.current?.focus();
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const lenis = (window as unknown as { lenis?: { stop?: () => void; start?: () => void } }).lenis;
+    lenis?.stop?.();
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+        return;
+      }
+      if (e.key === "Tab" && menuRef.current) {
+        const focusables = menuRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first || document.activeElement === menuRef.current) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
 
-  // Lock body scroll non-destructively
-  useEffect(() => {
-    if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [isOpen]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+      lenis?.start?.();
+      prevFocus?.focus({ preventScroll: true });
+    };
+  }, [isOpen, onClose]);
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     onClose();
@@ -73,7 +98,9 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
+          ref={menuRef}
+          tabIndex={-1}
           key="fullscreen-menu-overlay"
           role="dialog"
           aria-modal="true"
@@ -82,14 +109,14 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
-          className="fixed inset-0 z-40 bg-black/90 backdrop-blur-3xl overflow-y-auto text-white flex flex-col justify-between"
+          className="fixed inset-0 z-40 bg-black/90 backdrop-blur-3xl overflow-y-auto text-white flex flex-col justify-between outline-none"
         >
           {/* Main Content Area */}
           <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 pt-28 sm:pt-32 pb-8 flex-1 flex flex-col justify-between">
             {/* Grid Split: Links on Left, Direct Contact on Right */}
             <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center my-auto py-8">
               {/* Left Column: Oversized Editorial Navigation Links */}
-              <motion.div
+              <m.div
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
@@ -108,7 +135,7 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                 {MENU_LINKS.map((item, index) => {
                   const isExternal = item.href.startsWith("mailto:");
                   return (
-                    <motion.div
+                    <m.div
                       key={item.label}
                       variants={{
                         hidden: { opacity: 0, y: 24 },
@@ -167,13 +194,13 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                           )}
                         </div>
                       )}
-                    </motion.div>
+                    </m.div>
                   );
                 })}
-              </motion.div>
+              </m.div>
 
               {/* Right Column: Direct Contact Details & Status */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 1, 0.5, 1] }}
@@ -185,10 +212,10 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                     Email
                   </p>
                   <a
-                    href={`mailto:${PORTFOLIO_DATA.brand.email}`}
+                    href={`mailto:${BRAND_CONFIG.email}`}
                     className="text-lg sm:text-xl md:text-2xl text-white font-medium hover:text-white/80 transition-colors break-all"
                   >
-                    {PORTFOLIO_DATA.brand.email}
+                    {BRAND_CONFIG.email}
                   </a>
                 </div>
 
@@ -199,13 +226,13 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                   </p>
                   <div className="flex items-center gap-3">
                     <a
-                      href={`tel:${PORTFOLIO_DATA.brand.phone.replace(/[^0-9+]/g, "")}`}
+                      href={`tel:${BRAND_CONFIG.phone.replace(/[^0-9+]/g, "")}`}
                       className="text-lg sm:text-xl md:text-2xl text-white font-medium hover:text-white/80 transition-colors"
                     >
-                      {PORTFOLIO_DATA.brand.phone}
+                      {BRAND_CONFIG.phone}
                     </a>
                     <a
-                      href={PORTFOLIO_DATA.brand.whatsappUrl}
+                      href={BRAND_CONFIG.whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="Chat on WhatsApp"
@@ -231,7 +258,7 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                     Location
                   </p>
                   <p className="text-base sm:text-lg text-[#ccc]">
-                    {PORTFOLIO_DATA.brand.location}
+                    {BRAND_CONFIG.location}
                   </p>
                 </div>
 
@@ -243,19 +270,19 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                   </span>
                   <span>Available for Projects</span>
                 </div>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Bottom Bar: Copyright & Socials */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className="w-full pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono-custom text-[12px] text-[#777]"
             >
-              <span>{PORTFOLIO_DATA.footer.copyright}</span>
+              <span>{FOOTER_CONFIG.copyright}</span>
               <div className="flex items-center gap-6 font-gambarino text-[18px] text-white">
-                {PORTFOLIO_DATA.brand.socials.map((social) => (
+                {BRAND_CONFIG.socials.map((social) => (
                   <a
                     key={social.name}
                     href={social.url}
@@ -268,9 +295,9 @@ export function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps) {
                   </a>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

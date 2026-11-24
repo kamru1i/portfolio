@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { m, useScroll, useTransform, useSpring } from "motion/react";
 import Link from "next/link";
 import { LayoutDashboard, Menu, X } from "lucide-react";
-import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import { BRAND_CONFIG } from "@/lib/brand-config";
 import { useDhakaClock } from "@/hooks/useDhakaClock";
 import { KamrulBrandWordmark } from "./KamrulBrandWordmark";
 import { FullScreenMenu } from "./FullScreenMenu";
@@ -124,7 +124,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
 
   return (
     <>
-      <motion.header
+      <m.header
         initial={{ opacity: 0, y: -24 }}
         animate={{
           opacity: isRevealed ? 1 : 0,
@@ -153,10 +153,10 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
             <Link
               href="/"
               onClick={() => setIsMenuOpen(false)}
-              aria-label={`${PORTFOLIO_DATA.brand.displayName} Homepage`}
+              aria-label={`${BRAND_CONFIG.displayName} Homepage`}
               className="group inline-flex items-center select-none"
             >
-              <motion.div
+              <m.div
                 style={{
                   width: activeLogoWidth,
                   height: activeLogoHeight,
@@ -164,7 +164,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
                 className="flex items-center justify-start will-change-[width,height]"
               >
                 <KamrulBrandWordmark className="w-full h-full text-white group-hover:text-white/85 transition-colors" />
-              </motion.div>
+              </m.div>
             </Link>
           </div>
 
@@ -220,7 +220,7 @@ export function Navigation({ isRevealed = true }: NavigationProps) {
             </div>
           </div>
         </nav>
-      </motion.header>
+      </m.header>
 
       {/* Full-Screen Navigation Menu Overlay */}
       <FullScreenMenu

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
 interface EducationSlugProps {
@@ -17,7 +17,11 @@ export default async function EducationQualificationRedirect({
   params,
 }: EducationSlugProps) {
   const { slug } = await params;
-  // Gracefully redirect any individual qualification subroute to its designated
-  // anchor section on the consolidated Education qualifications page
-  redirect(`/milestones/education#${slug}`);
+  const matched = PORTFOLIO_DATA.milestones.find(
+    (m) => m.type === "education" && m.slug === slug
+  );
+  if (!matched) {
+    notFound();
+  }
+  redirect(`/milestones/education#${encodeURIComponent(matched.slug)}`);
 }

@@ -11,5 +11,7 @@ scripts/qa/*.png
 scripts/qa/*.json
 public/test-screenshots
 supabase/.temp
+playwright-report
+test-results
 AGENTS.md
 docs

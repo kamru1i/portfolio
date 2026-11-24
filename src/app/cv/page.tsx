@@ -1,20 +1,24 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Metadata } from "next";
-import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 import {
   DOCUMENT_CATEGORIES,
   DocumentCategory,
   getPublishedDocumentsByCategory,
-  normalizeDocumentCategory,
 } from "@/lib/cv-service";
 import { serializeJsonLd } from "@/lib/url-utils";
 import { Navigation } from "@/components/layout/Navigation";
 import { CurtainFooter } from "@/components/layout/CurtainFooter";
 import { HairlineRule } from "@/components/common/HairlineRule";
 import { CvPdfViewer, PublishedDocumentItem } from "@/components/cv/CvPdfViewer";
+import {
+  CvHeaderActions,
+  CvUpdatedBadge,
+} from "@/components/cv/CvHeaderActions";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Curriculum Vitae (CV) — Video Editor, AI Content Creator, Web Developer & IT Professional",
@@ -189,16 +193,7 @@ const ORDERED_DOCUMENT_CATEGORIES: DocumentCategory[] = [
   "cover-letter",
 ];
 
-export default async function CurriculumVitaePage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ doc?: string; type?: string }>;
-}) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const requestedCategory = normalizeDocumentCategory(
-    resolvedSearchParams?.doc || resolvedSearchParams?.type
-  );
-
+export default async function CurriculumVitaePage() {
   const publishedByCategory = await getPublishedDocumentsByCategory();
 
   const publishedDocuments: PublishedDocumentItem[] = [];
@@ -220,26 +215,6 @@ export default async function CurriculumVitaePage({
     });
   }
 
-  const publishedCv =
-    publishedByCategory[requestedCategory] ||
-    publishedByCategory.cv ||
-    publishedDocuments[0] ||
-    null;
-
-  const activeCategoryMeta =
-    publishedByCategory[requestedCategory]
-      ? DOCUMENT_CATEGORIES[requestedCategory]
-      : publishedByCategory.cv
-      ? DOCUMENT_CATEGORIES.cv
-      : publishedDocuments[0]
-      ? DOCUMENT_CATEGORIES[publishedDocuments[0].category]
-      : DOCUMENT_CATEGORIES.cv;
-
-  const updatedAtFormatted = formatCvUpdatedDate(
-    publishedByCategory[activeCategoryMeta.id]?.published_at ||
-      publishedByCategory[activeCategoryMeta.id]?.updated_at
-  );
-
   const employmentItems = (PORTFOLIO_DATA.milestones || []).filter(
     (m) => m.type === "experience"
   );
@@ -247,7 +222,12 @@ export default async function CurriculumVitaePage({
     (m) => m.type === "education"
   );
 
-  const primaryCvRecord = publishedByCategory[activeCategoryMeta.id];
+  const primaryCvRecord = publishedByCategory.cv || publishedDocuments[0] || null;
+  const primaryUpdatedIso =
+    publishedByCategory.cv?.updated_at ||
+    publishedByCategory.resume?.updated_at ||
+    publishedByCategory.portfolio?.updated_at ||
+    publishedByCategory["cover-letter"]?.updated_at;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -260,7 +240,7 @@ export default async function CurriculumVitaePage({
         description:
           "Official Curriculum Vitae of Kamrul Islam covering Video Editing & Post-Production, AI-Assisted Content Creation, Web Development, and IT Support.",
         inLanguage: "en-US",
-         ...(primaryCvRecord?.updated_at ? { dateModified: primaryCvRecord.updated_at } : {}),
+        ...(primaryUpdatedIso ? { dateModified: primaryUpdatedIso } : {}),
         mainEntity: {
           "@id": "https://kamrulislam.me/#person",
         },
@@ -324,11 +304,9 @@ export default async function CurriculumVitaePage({
                 Chittagong, Bangladesh • Remote Worldwide
               </div>
 
-              {updatedAtFormatted && (
-                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[#888] text-xs font-mono-custom">
-                  Updated {updatedAtFormatted}
-                </div>
-              )}
+              <Suspense fallback={null}>
+                <CvUpdatedBadge publishedDocuments={publishedDocuments} />
+              </Suspense>
             </div>
 
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
@@ -345,60 +323,39 @@ export default async function CurriculumVitaePage({
                 </p>
               </div>
 
-              {/* Primary Header Actions */}
-              <div className="flex flex-wrap items-center gap-3 shrink-0">
-                {publishedCv ? (
-                  <>
-                    <a
-                      href={`/api/cv/pdf?type=${activeCategoryMeta.id}&download=1`}
-                      download={activeCategoryMeta.downloadFilename}
-                      className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
+              {/* Primary Header Actions synced with selected document */}
+              <Suspense
+                fallback={
+                  <div className="flex flex-wrap items-center gap-3 shrink-0">
+                    <Link
+                      href="/contact-us"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/4 hover:bg-white/10 text-white/90 font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
                     >
-                      <span>Download {activeCategoryMeta.shortLabel} (PDF)</span>
-                      <Download className="h-3.5 w-3.5" />
-                    </a>
-                    <a
-                      href={`/api/cv/pdf?type=${activeCategoryMeta.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/6 hover:bg-white/15 text-white font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
-                    >
-                      <span>Open PDF</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </a>
-                  </>
-                ) : (
-                  <a
-                    href="mailto:hello@kamrulislam.me?subject=Request%20for%20Official%20CV%20PDF%20%E2%80%94%20Kamrul%20Islam"
-                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-white text-black hover:bg-neutral-200 font-mono-custom text-xs uppercase tracking-wider font-medium transition-all"
-                  >
-                    <span>Request PDF CV</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </a>
-                )}
-
-                <Link
-                  href="/contact-us"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/4 hover:bg-white/10 text-white/90 font-mono-custom text-xs uppercase tracking-wider border border-white/10 transition-all"
-                >
-                  <span>Inquire / Hire</span>
-                </Link>
-              </div>
+                      <span>Inquire / Hire</span>
+                    </Link>
+                  </div>
+                }
+              >
+                <CvHeaderActions publishedDocuments={publishedDocuments} />
+              </Suspense>
             </div>
           </header>
 
           {/* Interactive PDF Viewer / Controlled Fallback Section */}
           <section aria-label="Curriculum Vitae Document Viewer" className="mb-20 md:mb-28">
-            <CvPdfViewer
-              hasPublishedPdf={publishedDocuments.length > 0}
-              title={primaryCvRecord?.title}
-              fileName={primaryCvRecord?.file_name}
-              fileSize={primaryCvRecord?.file_size}
-              versionLabel={primaryCvRecord?.version_label}
-              updatedAtFormatted={updatedAtFormatted}
-              publishedDocuments={publishedDocuments}
-              initialCategory={activeCategoryMeta.id}
-            />
+            <Suspense
+              fallback={
+                <div className="w-full h-[520px] rounded-2xl bg-[#0e0e10] border border-white/10 flex items-center justify-center font-mono-custom text-xs text-[#888]">
+                  Loading document viewer...
+                </div>
+              }
+            >
+              <CvPdfViewer
+                hasPublishedPdf={publishedDocuments.length > 0}
+                publishedDocuments={publishedDocuments}
+                initialCategory={primaryCvRecord ? "cv" : "cv"}
+              />
+            </Suspense>
           </section>
 
           {/* ============================================================ */}

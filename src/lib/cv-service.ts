@@ -1,5 +1,8 @@
+import crypto from "node:crypto";
+import { cache } from "react";
 import { createClient } from "./supabase/server";
-import { revalidatePath } from "next/cache";
+import { createPublicClient } from "./supabase/public";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import {
   CvDocumentRecord,
   CvDocumentInsert,
@@ -118,16 +121,10 @@ export async function validateAndReadPdfBuffer(file: File): Promise<{
   };
 }
 
-/**
- * Retrieves the currently published document for a given category (defaults to "cv").
- * Returns null safely if none is published or if the database is unreachable.
- */
-export async function getPublishedCvDocument(
-  category: DocumentCategory = "cv"
-): Promise<CvDocumentRecord | null> {
+async function fetchAllPublishedCvRowsUncached(): Promise<CvDocumentRecord[]> {
   try {
-    const supabase = await createClient();
-    if (!supabase) return null;
+    const supabase = createPublicClient();
+    if (!supabase) return [];
 
     const { data, error } = await supabase
       .from("cv_documents")
@@ -135,46 +132,62 @@ export async function getPublishedCvDocument(
       .order("updated_at", { ascending: false });
 
     if (error || !data) {
-      return null;
+      return [];
     }
 
-    const rows = (data as CvDocumentRecord[]).map(normalizeRecord);
-    return (
-      rows.find(
-        (doc) => getDocumentCategory(doc) === category && doc.is_published
-      ) || null
-    );
+    return (data as CvDocumentRecord[]).map(normalizeRecord);
   } catch {
-    return null;
+    return [];
+  }
+}
+
+const getCachedPublishedCvRows = unstable_cache(
+  fetchAllPublishedCvRowsUncached,
+  ["published-cv-documents"],
+  {
+    revalidate: 60,
+    tags: ["cv-documents"],
+  }
+);
+
+function revalidateCvRoutes() {
+  revalidatePath("/cv");
+  revalidatePath("/sitemap.xml");
+  try {
+    revalidateTag("cv-documents", { expire: 0 });
+  } catch {
+    // tag revalidation fallback
   }
 }
 
 /**
+ * Retrieves the currently published document for a given category (defaults to "cv").
+ * Uses cookie-less ISR cache + React.cache() for static/edge caching.
+ */
+export const getPublishedCvDocument = cache(
+  async (category: DocumentCategory = "cv"): Promise<CvDocumentRecord | null> => {
+    const rows = await getCachedPublishedCvRows();
+    return (
+      rows.find((doc) => getDocumentCategory(doc) === category && doc.is_published) ||
+      null
+    );
+  }
+);
+
+/**
  * Retrieves the currently published documents across all 4 categories.
  */
-export async function getPublishedDocumentsByCategory(): Promise<
-  Record<DocumentCategory, CvDocumentRecord | null>
-> {
-  const result: Record<DocumentCategory, CvDocumentRecord | null> = {
-    cv: null,
-    resume: null,
-    portfolio: null,
-    "cover-letter": null,
-  };
+export const getPublishedDocumentsByCategory = cache(
+  async (): Promise<Record<DocumentCategory, CvDocumentRecord | null>> => {
+    const result: Record<DocumentCategory, CvDocumentRecord | null> = {
+      cv: null,
+      resume: null,
+      portfolio: null,
+      "cover-letter": null,
+    };
 
-  try {
-    const supabase = await createClient();
-    if (!supabase) return result;
-
-    const { data, error } = await supabase
-      .from("cv_documents")
-      .select("*")
-      .order("updated_at", { ascending: false });
-
-    if (error || !data) return result;
-
-    for (const raw of data as CvDocumentRecord[]) {
-      const doc = normalizeRecord(raw);
+    const rows = await getCachedPublishedCvRows();
+    for (const doc of rows) {
       if (!doc.is_published) continue;
       const cat = getDocumentCategory(doc);
       if (!result[cat]) {
@@ -182,10 +195,8 @@ export async function getPublishedDocumentsByCategory(): Promise<
       }
     }
     return result;
-  } catch {
-    return result;
   }
-}
+);
 
 /**
  * Retrieves all document records (optionally filtered by category) for the Admin Dashboard.
@@ -284,7 +295,7 @@ export async function uploadAndReplaceCvDocument(params: {
   const { buffer, sanitizedFileName, fileSize } = await validateAndReadPdfBuffer(params.file);
   const publishImmediately = params.publishImmediately !== false;
   const nowIso = new Date().toISOString();
-  const uniquePrefix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const uniquePrefix = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
   const storagePath = `${categoryMeta.storagePrefix}${uniquePrefix}-${sanitizedFileName.toLowerCase()}`;
 
   // Step 1: Upload to private/controlled storage bucket first
@@ -402,8 +413,7 @@ export async function uploadAndReplaceCvDocument(params: {
     // Non-fatal archive cleanup error
   }
 
-  revalidatePath("/cv");
-  revalidatePath("/sitemap.xml");
+  revalidateCvRoutes();
 
   return normalizeRecord(inserted as CvDocumentRecord);
 }
@@ -500,8 +510,7 @@ export async function updateCvDocumentState(
     throw new Error(`Failed to update document: ${error?.message || "Unknown error"}`);
   }
 
-  revalidatePath("/cv");
-  revalidatePath("/sitemap.xml");
+  revalidateCvRoutes();
 
   return normalizeRecord(data as CvDocumentRecord);
 }
@@ -533,8 +542,7 @@ export async function deleteCvDocument(id: string): Promise<boolean> {
     throw new Error(`Failed to delete document: ${error.message}`);
   }
 
-  revalidatePath("/cv");
-  revalidatePath("/sitemap.xml");
+  revalidateCvRoutes();
 
   return true;
 }

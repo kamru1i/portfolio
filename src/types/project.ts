@@ -109,6 +109,23 @@ export function encodeCaseStudyIntoDescription(
   return `${cleanDesc}\n\n<!--CASE_STUDY_META:${metaJson}-->`;
 }
 
+const LEGACY_ASSET_REWRITES: Record<string, string> = {
+  "/images/Kamrul-I.png": "/images/Kamrul-I.webp",
+  "/images/work-1-biqolpo.png": "/images/work-1-biqolpo.webp",
+  "/images/web-projects/web-project-1.png": "/images/web-projects/web-project-1.webp",
+  "/images/web-projects/web-project-2.png": "/images/web-projects/web-project-2.webp",
+  "/images/web-projects/web-project-3.png": "/images/web-projects/web-project-3.webp",
+  "/images/web-projects/web-project-4.png": "/images/web-projects/web-project-4.webp",
+  "/images/web-projects/web-project-5.png": "/images/web-projects/web-project-5.webp",
+  "/images/web-projects/web-project-6.png": "/images/web-projects/web-project-6.webp",
+};
+
+export function normalizeLegacyLocalAssetUrl(url?: string | null): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  return LEGACY_ASSET_REWRITES[trimmed] || trimmed;
+}
+
 /**
  * Adapter function that maps a database ProjectRecord to the UI PortfolioProject model,
  * ensuring 100% backward and visual compatibility with Video & Web project card components.
@@ -122,10 +139,11 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
   );
   const defaultThumb =
     fallbackMatch?.thumbnail ||
-    (record.type === "video" ? "/images/work-1-biqolpo.png" : "/images/web-projects/web-project-1.png");
+    (record.type === "video" ? "/images/work-1-biqolpo.webp" : "/images/web-projects/web-project-1.webp");
 
   const extracted = extractCaseStudyFromRecord(record);
   const resolvedTags = record.tags || [];
+  const normalizedPreviewImage = normalizeLegacyLocalAssetUrl(record.preview_image_url);
 
   return {
     id: record.id,
@@ -145,8 +163,8 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
       resolvedTags.length > 0
         ? resolvedTags
         : fallbackMatch?.tools || undefined,
-    thumbnail: record.preview_image_url || defaultThumb,
-    previewImageUrl: record.preview_image_url || undefined,
+    thumbnail: normalizedPreviewImage || defaultThumb,
+    previewImageUrl: normalizedPreviewImage || undefined,
     videoUrl: record.video_url || undefined,
     videoType: record.video_provider || "other",
     format: record.aspect_ratio,
@@ -164,51 +182,5 @@ export function mapProjectRecordToPortfolio(record: ProjectRecord): PortfolioPro
   };
 }
 
-/**
- * Deterministic sorting comparator for portfolio projects:
- * 1. Published projects with explicit manual priority in ascending order (1, 2, 3...)
- * 2. Published projects with no priority ordered by newest publication date (published_at DESC, fallback created_at DESC)
- * 3. Stable tie-breaker: created_at DESC, id ASC.
- */
-export function compareProjectsByPriorityAndRecency<T extends {
-  id: string;
-  manual_priority?: number | null;
-  manualPriority?: number | null;
-  sort_order?: number;
-  order?: number;
-  published_at?: string | null;
-  publishedAt?: string;
-  created_at?: string;
-  createdAt?: string;
-}>(a: T, b: T): number {
-  const aPri = a.manual_priority !== undefined ? a.manual_priority : a.manualPriority;
-  const bPri = b.manual_priority !== undefined ? b.manual_priority : b.manualPriority;
-
-  const hasAPri = aPri !== null && aPri !== undefined && Number(aPri) > 0;
-  const hasBPri = bPri !== null && bPri !== undefined && Number(bPri) > 0;
-
-  if (hasAPri && hasBPri) {
-    if (Number(aPri) !== Number(bPri)) return Number(aPri) - Number(bPri);
-  } else if (hasAPri) {
-    return -1; // a comes first
-  } else if (hasBPri) {
-    return 1; // b comes first
-  }
-
-  // Fallback to published_at DESC, fallback created_at DESC
-  const aPub = a.published_at || a.publishedAt;
-  const bPub = b.published_at || b.publishedAt;
-  const aDate = aPub ? new Date(aPub).getTime() : (a.created_at || a.createdAt ? new Date(a.created_at || a.createdAt!).getTime() : 0);
-  const bDate = bPub ? new Date(bPub).getTime() : (b.created_at || b.createdAt ? new Date(b.created_at || b.createdAt!).getTime() : 0);
-
-  if (bDate !== aDate) return bDate - aDate;
-
-  // Tie breaker 1: created_at DESC
-  const aCreated = a.created_at || a.createdAt ? new Date(a.created_at || a.createdAt!).getTime() : 0;
-  const bCreated = b.created_at || b.createdAt ? new Date(b.created_at || b.createdAt!).getTime() : 0;
-  if (bCreated !== aCreated) return bCreated - aCreated;
-
-  // Tie breaker 2: id ASC
-  return (a.id || "").localeCompare(b.id || "");
-}
+export { compareProjectsByPriorityAndRecency } from "@/lib/project-sort";
 

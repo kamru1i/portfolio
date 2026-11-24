@@ -4,11 +4,11 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { m } from "motion/react";
 import { ArrowLeft, ArrowRight, Film, Play } from "lucide-react";
-import { PortfolioProject, PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import type { PortfolioProject } from "@/lib/portfolio-data";
 import { isNextImageOptimizedUrl } from "@/lib/url-utils";
-import { compareProjectsByPriorityAndRecency } from "@/types/project";
+import { compareProjectsByPriorityAndRecency } from "@/lib/project-sort";
 import { VideoPlayerModal } from "./VideoPlayerModal";
 import { ProjectPreviewModal } from "./ProjectPreviewModal";
 import { WebCaseStudyCard } from "./WebCaseStudyCard";
@@ -49,11 +49,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
   const [activeWebModal, setActiveWebModal] = useState<PortfolioProject | null>(null);
 
   // All published projects (server-provided initialProjects is authoritative when defined)
-  const [allProjects, setAllProjects] = useState<PortfolioProject[]>(
-    initialProjects !== undefined
-      ? initialProjects
-      : PORTFOLIO_DATA.showcaseProjects || []
-  );
+  const [allProjects, setAllProjects] = useState<PortfolioProject[]>(initialProjects ?? []);
 
   // Only fetch client-side if initialProjects was not supplied by the Server Component
   useEffect(() => {
@@ -180,7 +176,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
             }`}
           >
             {activeTab === "video" && (
-              <motion.div
+              <m.div
                 layoutId="activeArchiveTab"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 className="absolute inset-0 bg-white/15 border border-white/20 rounded-full z-[-1] shadow-sm"
@@ -202,7 +198,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
             }`}
           >
             {activeTab === "web" && (
-              <motion.div
+              <m.div
                 layoutId="activeArchiveTab"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 className="absolute inset-0 bg-white/15 border border-white/20 rounded-full z-[-1] shadow-sm"
@@ -273,7 +269,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                 const isPortrait = formatLabel === "9:16";
 
                 return (
-                  <motion.div
+                  <m.div
                     key={project.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -282,10 +278,19 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                   >
                     {/* Media Thumbnail Container with Format Badge & Play Action */}
                     <div
-                      className={`relative w-full overflow-hidden bg-black/60 cursor-pointer ${
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Play ${project.title}`}
+                      className={`relative w-full overflow-hidden bg-black/60 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                         isPortrait ? "h-[360px] sm:h-[400px]" : "h-[220px] sm:h-[240px]"
                       }`}
                       onClick={() => setActiveVideoModal(project)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setActiveVideoModal(project);
+                        }
+                      }}
                     >
                       <Image
                         src={project.thumbnail}
@@ -369,7 +374,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                         </Link>
                       </div>
                     </div>
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>
@@ -408,7 +413,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                 const projectSlug = project.slug || project.id;
 
                 return (
-                  <motion.div
+                  <m.div
                     key={project.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -435,7 +440,7 @@ export function ProjectsPageContent({ initialProjects }: ProjectsPageContentProp
                         <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>
