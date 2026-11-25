@@ -78,6 +78,10 @@ const nextConfig = {
             value: "same-origin-allow-popups",
           },
           {
+            key: "Cross-Origin-Resource-Policy",
+            value: "same-site",
+          },
+          {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },

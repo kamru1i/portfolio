@@ -14,7 +14,12 @@ function ContactFormWithSearchParams() {
   const searchParams = useSearchParams();
   const serviceParam = searchParams.get("service") || undefined;
 
-  return <ContactFormSection initialService={serviceParam} />;
+  return (
+    <ContactFormSection
+      key={serviceParam ?? "default"}
+      initialService={serviceParam}
+    />
+  );
 }
 
 export function ContactPageContent() {

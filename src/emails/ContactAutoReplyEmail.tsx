@@ -10,7 +10,7 @@ import {
   Row,
   Section,
   Text,
-} from "@react-email/components";
+} from "react-email";
 import type { ContactNotificationEmailProps } from "./ContactNotificationEmail";
 
 export function ContactAutoReplyEmail({

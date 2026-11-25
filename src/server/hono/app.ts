@@ -2,6 +2,11 @@ import { Hono } from "hono";
 import { setCookie, deleteCookie } from "hono/cookie";
 import type { User } from "@supabase/supabase-js";
 import { z } from "zod";
+import {
+  createProjectSchema,
+  patchProjectSchema,
+  updateProjectSchema,
+} from "./project-schemas";
 import { verifyAdminSession } from "@/lib/supabase/admin-auth";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -450,8 +455,15 @@ app.get("/admin/projects", async (c) => {
 
 app.post("/admin/projects", async (c) => {
   try {
-    const body = await readBoundedJson(c.req.raw);
-    const project = await createProject(body as Parameters<typeof createProject>[0]);
+    const rawBody = await readBoundedJson<unknown>(c.req.raw);
+    const parsed = createProjectSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return c.json(
+        { error: parsed.error.issues[0]?.message || "Invalid project payload." },
+        400
+      );
+    }
+    const project = await createProject(parsed.data);
     invalidatePublishedProjectsCache();
     return c.json({ project }, 201);
   } catch (err: unknown) {
@@ -477,8 +489,15 @@ app.get("/admin/projects/:id", async (c) => {
 app.put("/admin/projects/:id", async (c) => {
   const id = c.req.param("id");
   try {
-    const body = await readBoundedJson(c.req.raw);
-    const updated = await updateProject(id, body as Parameters<typeof updateProject>[1]);
+    const rawBody = await readBoundedJson<unknown>(c.req.raw);
+    const parsed = updateProjectSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return c.json(
+        { error: parsed.error.issues[0]?.message || "Invalid project update payload." },
+        400
+      );
+    }
+    const updated = await updateProject(id, parsed.data);
     invalidatePublishedProjectsCache();
     return c.json({ project: updated });
   } catch (err: unknown) {
@@ -490,11 +509,18 @@ app.put("/admin/projects/:id", async (c) => {
 app.patch("/admin/projects/:id", async (c) => {
   const id = c.req.param("id");
   try {
-    const body = await readBoundedJson<{ is_published?: boolean }>(c.req.raw);
-    if (typeof body.is_published === "boolean") {
+    const rawBody = await readBoundedJson<unknown>(c.req.raw);
+    const parsed = patchProjectSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return c.json(
+        { error: parsed.error.issues[0]?.message || "Invalid publish status payload." },
+        400
+      );
+    }
+    if (typeof parsed.data.is_published === "boolean") {
       const updated = await updateProject(id, {
-        is_published: body.is_published,
-        published_at: body.is_published ? new Date().toISOString() : null,
+        is_published: parsed.data.is_published,
+        published_at: parsed.data.is_published ? new Date().toISOString() : null,
       });
       invalidatePublishedProjectsCache();
       return c.json({ project: updated });
