@@ -69,7 +69,6 @@ export const HOME_SERVICES_SUMMARY: HomeServiceSummary[] = [
     images: [
       "/images/services/video-editing-hero.webp",
       "/images/hero-gallery/hero-card-2.webp",
-      "/images/hero-gallery/hero-card-3.webp",
       "/images/hero-gallery/hero-card-1.webp",
     ],
     image: "/images/services/video-editing-hero.webp",
@@ -83,7 +82,7 @@ export const HOME_SERVICES_SUMMARY: HomeServiceSummary[] = [
     title: "AI-Assisted Content Creation",
     images: [
       "/images/services/ai-content-hero.webp",
-      "/images/hero-gallery/hero-card-4.webp",
+      "/images/hero-gallery/hero-card-3.webp",
       "/images/services/ai-content-2.webp",
     ],
     image: "/images/services/ai-content-hero.webp",
@@ -97,6 +96,7 @@ export const HOME_SERVICES_SUMMARY: HomeServiceSummary[] = [
     title: "Web Development",
     images: [
       "/images/services/web-dev-hero.webp",
+      "/images/hero-gallery/hero-card-4.webp",
       "/images/hero-gallery/hero-card-5.webp",
       "/images/services/web-dev-2.webp",
     ],

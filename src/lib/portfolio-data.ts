@@ -278,7 +278,7 @@ export const PORTFOLIO_DATA = {
         "Fast-paced promotional video series focused on vehicular presentation, crisp transitions, motion graphics badges, and multi-platform optimization.",
       aspect: "small",
       colSpan: "col-span-12 md:col-span-4",
-      image: "/images/hero-gallery/hero-card-3.webp",
+      image: "/images/services/video-editing-hero.webp",
       tags: ["CapCut", "Premiere Pro", "Motion Graphics", "Social Format"],
       links: [
         { label: "Video 01", url: "#" },
@@ -736,13 +736,12 @@ export const PORTFOLIO_DATA = {
           role: "Automotive Promotional Content",
           summary:
             "Commercial vehicle showcases, short-form editing, visual presentation, and social media optimization.",
-          image: "/images/hero-gallery/hero-card-3.webp",
+          image: "/images/services/video-editing-hero.webp",
         },
       ],
       images: [
         "/images/services/video-editing-hero.webp",
         "/images/hero-gallery/hero-card-2.webp",
-        "/images/hero-gallery/hero-card-3.webp",
         "/images/hero-gallery/hero-card-1.webp",
       ],
       image: "/images/services/video-editing-hero.webp",
@@ -874,12 +873,12 @@ export const PORTFOLIO_DATA = {
           role: "Concept & Asset Synthesis",
           summary:
             "Exploration of hybrid AI visual techniques, motion consistency, and prompt-driven scene composition.",
-          image: "/images/hero-gallery/hero-card-4.webp",
+          image: "/images/hero-gallery/hero-card-3.webp",
         },
       ],
       images: [
         "/images/services/ai-content-hero.webp",
-        "/images/hero-gallery/hero-card-4.webp",
+        "/images/hero-gallery/hero-card-3.webp",
         "/images/services/ai-content-2.webp",
       ],
       image: "/images/services/ai-content-hero.webp",
@@ -1028,7 +1027,7 @@ export const PORTFOLIO_DATA = {
           role: "Front-End & Full-Stack Development",
           summary:
             "Responsive web applications, component engineering, performance tuning, and CMS architecture.",
-          image: "/images/hero-gallery/hero-card-5.webp",
+          image: "/images/hero-gallery/hero-card-4.webp",
         },
         {
           title: "Job Portal Platform",
@@ -1041,6 +1040,7 @@ export const PORTFOLIO_DATA = {
       ],
       images: [
         "/images/services/web-dev-hero.webp",
+        "/images/hero-gallery/hero-card-4.webp",
         "/images/hero-gallery/hero-card-5.webp",
         "/images/services/web-dev-2.webp",
       ],
